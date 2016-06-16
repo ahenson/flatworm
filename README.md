@@ -33,6 +33,11 @@ flatworm is open source and is licensed under the [Apache 2.0 license](http://ww
 TODOs
 -------
 * Update the "Field Guide" to reflect the latest changes and usages
+ * file-format::ignore-unmapped-record
+ * record-ident::script-ident
+ * segment-element::collection-property-name
+ * removal segment-element::name 
 * Update the examples to reflect the latest capabilities and provide more guidance within the examples
 * Add annotations support to all for beans to define their record makeup
+* Add the ability to specify a type in addition-to or instead-of a converter
 * 
