@@ -20,18 +20,13 @@
  * To change the template for this generated file go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  * Comments
  */
-package examples;
+package com.blackbear.flatworm.examples;
 
-import com.blackbear.flatworm.FileCreator;
 import com.blackbear.flatworm.MatchedRecord;
-import com.blackbear.flatworm.errors.FlatwormConfigurationException;
-
-import java.io.IOException;
 
 import com.blackbear.flatworm.test.domain.Book;
 import com.blackbear.flatworm.test.domain.Dvd;
 import com.blackbear.flatworm.test.domain.Film;
-import com.blackbear.flatworm.test.domain.Inventory;
 import com.blackbear.flatworm.test.domain.Videotape;
 
 /**
@@ -40,36 +35,26 @@ import com.blackbear.flatworm.test.domain.Videotape;
  *         To change the template for this generated type comment go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  *         Comments
  */
-public class InventoryHandler {
-
-    private FileCreator writer;
-
-    public InventoryHandler(FileCreator writer) {
-        this.writer = writer;
-    }
+public class ProductHandler {
 
     public void handleDvd(MatchedRecord results) {
-
         Dvd dvd = (Dvd) results.getBean("dvd");
         Film film = (Film) results.getBean("film");
 
-        writeInventory(InventoryFactory.getInventoryFor(dvd, film));
-        System.out.println("Processing Dvd...");
+        System.out.println("Handling Dvd\n - " + dvd + "\n - " + film);
     }
 
     public void handleVideotape(MatchedRecord results) {
         Videotape video = (Videotape) results.getBean("video");
         Film film = (Film) results.getBean("film");
 
-        writeInventory(InventoryFactory.getInventoryFor(video, film));
-        System.out.println("Handling VideoTape...");
+        System.out.println("Handling VideoTape\n - " + video + "\n - " + film);
     }
 
     public void handleBook(MatchedRecord results) {
         Book book = (Book) results.getBean("book");
 
-        writeInventory(InventoryFactory.getInventoryFor(book));
-        System.out.println("Handling Book...");
+        System.out.println("Handling Book\n - " + book);
     }
 
     public void handleException(String exception, String lastLine) {
@@ -77,15 +62,4 @@ public class InventoryHandler {
         System.out.println("HandlingException\n - " + exception + "\n - " + lastLine);
     }
 
-    // TODO - need to update this.
-    private void writeInventory(Inventory inventory) {
-        try {
-            writer.setBean("inventory", inventory);
-            writer.write("inventory");
-        } catch (IOException ex) {
-            System.out.println("Something bad happend while opening,reading,closing the input file: " + ex.getMessage());
-        } catch (FlatwormConfigurationException ex) {
-            System.out.println("Something happened that the creator did not like: " + ex.getMessage());
-        }
-    }
 }

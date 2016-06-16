@@ -14,14 +14,14 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.FileParser;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.IOException;
 
-public class ReadDelimitEmployee {
+public class ReadFixedMovies {
     public static void main(String[] args) {
 
         String xmlConfigFile = args[0];
@@ -32,11 +32,13 @@ public class ReadDelimitEmployee {
             parser.open();
 
             // Instantiate object responsible for handling callbacks
-            EmployeeHandler handler = new EmployeeHandler();
+            ProductHandler handler = new ProductHandler();
 
             // set callback methods
             // Args are: bean name (from flatworm xml file), handler object, handler method name
-//            parser.setBeanHandler("newhire", handler, "handleNewhire");
+//            parser.setBeanHandler("dvd", handler, "handleDvd");
+//            parser.setBeanHandler("videotape", handler, "handleVideotape");
+//            parser.setBeanHandler("book", handler, "handleBook");
 
             // Args are handler object, exception handling method name
 //            parser.setExceptionHandler(handler, "handleException");
@@ -46,14 +48,14 @@ public class ReadDelimitEmployee {
             parser.close();
 
         }
-//        catch (NoSuchMethodException ex)
-//        {
+//        catch (NoSuchMethodException ex) {
 //            System.out
 //                    .println("NoSuchMethodException: Most likely, you didn't implement (or named incorrectly) the handler methods: "
 //                            + ex.getMessage());
 //        }
         catch (IOException ex) {
-            System.out.println("IOException: Something bad happend while accesing the flatfile: " + ex.getMessage());
+            System.out.println("IOException: Something bad happend while opening,reading,closing the input file: "
+                    + ex.getMessage());
         } catch (FlatwormParserException ex) {
             System.out.println("FlatwormParserException: Something happened that the parser did not like: "
                     + ex.getMessage());

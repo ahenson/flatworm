@@ -16,60 +16,90 @@
 
 package com.blackbear.flatworm;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+
+import com.blackbear.flatworm.callbacks.ExceptionCallback;
+import com.blackbear.flatworm.callbacks.RecordCallback;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.Closeable;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Used to read a flatfile. Encapsulates parser setup and callback mechanism. This class wraps the functionality that used to be in the
+ * Used to read a flat file. Encapsulates parser setup and callback mechanism. This class wraps the functionality that used to be in the
  * main() of the examples. This way, the client knows less about the internal workings of FlatWorm.
  */
-public class FileParser {
-    private static Log log = LogFactory.getLog(FileParser.class);
-    private static Class[] METHODSIG = {MatchedRecord.class};
-    private static Class[] EXCEPTIONSIG = {String.class, String.class};
-    private static String EXCEPTIONS = "exception";
+@Slf4j
+public class FileParser implements Closeable {
+    private ListMultimap<String, RecordCallback> recordCallbacks = ArrayListMultimap.create();
 
-    private Map<String, Callback> callbacks = new HashMap<>();
-    // This map provides access to callback objects, rather than methods as with
-    // the older callbacks Map.
-    // It is intended to eventually replace that mechanism
-    private Map<String, RecordCallback> recordCallbacks = new HashMap<>();
-    // Provide a single callback object for exceptions. This is not stored in the
-    // callbacks map because exception handling
-    // is inherently different than record processing and the callback signature
-    // is therefore different
-    private ExceptionCallback exceptionCallback;
-    private String file;
-    protected FileFormat ff;
-    protected BufferedReader bufIn = null;
+    private List<ExceptionCallback> exceptionCallbacks = new ArrayList<>();
+
+    private File configFile;
+    private File dataInputFile;
+
+    private String dataInputContent;
+    private String configContent;
+    protected FileFormat fileFormat;
+    protected BufferedReader bufIn;
 
     /**
-     * Constructor for FileParser<br>
+     * Constructor for FileParser.
      *
-     * @param config full path to the FlatWorm XML configuration file
-     * @param file   full path to input file
-     * @throws FlatwormParserException should any issues occur while parse the data.
+     * @param configContent    The config content to parse.
+     * @param dataInputContent The content to parse using the provided configuration.
      */
-    public FileParser(String config, String file) throws FlatwormParserException {
-        this.file = file;
+    public FileParser(String configContent, String dataInputContent) {
+        this.configContent = configContent;
+        this.dataInputContent = dataInputContent;
+    }
 
-        try {
-            ConfigurationReader parser = new ConfigurationReader();
-            ff = parser.loadConfigurationFile(config);
-        } catch (Exception ex) {
-            throw new FlatwormParserException(ex.getMessage());
-        }
+    /**
+     * Constructor for FileParser.
+     *
+     * @param configFile    The config file to parse.
+     * @param dataInputFile The data file to parse using the provided configuration.
+     */
+    public FileParser(File configFile, File dataInputFile) {
+        this.configFile = configFile;
+        this.dataInputFile = dataInputFile;
+    }
+
+    /**
+     * Constructor for FileParser.
+     *
+     * @param configFile       The config file to parse.
+     * @param dataInputContent The content to parse using the provided configuration.
+     */
+    public FileParser(File configFile, String dataInputContent) {
+        this.configFile = configFile;
+        this.dataInputContent = dataInputContent;
+    }
+
+    /**
+     * Constructor for FileParser.
+     *
+     * @param configContent The config content to parse.
+     * @param dataInputFile The data file to parse using the provided configuration.
+     */
+    public FileParser(String configContent, File dataInputFile) {
+        this.configContent = configContent;
+        this.dataInputFile = dataInputFile;
     }
 
     /**
@@ -79,8 +109,23 @@ public class FileParser {
      * @param recordName The name of the record.
      * @param callback   The {@link RecordCallback} instance to register.
      */
-    public void addRecordCallback(String recordName, RecordCallback callback) {
-        recordCallbacks.put(recordName, callback);
+    public void registerRecordCallback(String recordName, RecordCallback callback) {
+        List<RecordCallback> callbacks = recordCallbacks.get(recordName);
+        if (!callbacks.contains(callback)) {
+            recordCallbacks.put(recordName, callback);
+        }
+    }
+
+    /**
+     * Remove a {@link RecordCallback} that has been registered.
+     *
+     * @param recordName The name of the {@link Record} for which the {@link RecordCallback} was registered.
+     * @param callback   The {@link RecordCallback} instance to remove.
+     * @return {@code true} if the {@link RecordCallback} instance was found and removed and {@code false} if it was not found and therefore
+     * note removed.
+     */
+    public boolean removeRecordCallback(String recordName, RecordCallback callback) {
+        return recordCallbacks.get(recordName).remove(callback);
     }
 
     /**
@@ -90,18 +135,55 @@ public class FileParser {
      *
      * @param callback The {@link ExceptionCallback} instance to register.
      */
-    public void setExceptionCallback(ExceptionCallback callback) {
-        exceptionCallback = callback;
+    public void registerExceptionCallback(ExceptionCallback callback) {
+        if (!exceptionCallbacks.contains(callback)) {
+            exceptionCallbacks.add(callback);
+        }
     }
 
     /**
-     * Open the buffered reader for the input file.
+     * Remove a {@link ExceptionCallback} that has been registered.
      *
-     * @throws IOException should the {@link InputStream} fail to properly open.
+     * @param callback The {@link ExceptionCallback} instance to remove.
+     * @return {@code true} if the {@link ExceptionCallback} instance was found and removed and {@code false} if it was not found and
+     * therefore note removed.
      */
-    public void open() throws IOException {
-        InputStream in = new FileInputStream(file);
-        String encoding = ff.getEncoding();
+    public boolean removeExceptionCallback(ExceptionCallback callback) {
+        return exceptionCallbacks.remove(callback);
+    }
+
+    /**
+     * Parse the specified config information and then parse the file based upon the config information provided. Either the config file or
+     * the config content will be parsed and either the data file or the data content will be parsed depending upon which constructor was
+     * used.
+     *
+     * @throws FlatwormParserException should parsing the config have issues due to syntactical reasons.
+     * @throws IOException             should the {@link InputStream} fail to properly open.
+     */
+    public void open() throws FlatwormParserException, IOException {
+        Preconditions.checkState((configFile != null || dataInputFile != null)
+                        || !StringUtils.isBlank(configContent) | !StringUtils.isBlank(dataInputContent),
+                "Either the config file or config content must be provided and either the input file or input content must be provided.");
+        try {
+            ConfigurationReader parser = new ConfigurationReader();
+            if (configFile != null) {
+                fileFormat = parser.loadConfigurationFile(configFile);
+            } else {
+                fileFormat = parser.loadConfigurationFile(new ByteArrayInputStream(configContent.getBytes(StandardCharsets.UTF_8)));
+            }
+        } catch (Exception ex) {
+            throw new FlatwormParserException(ex.getMessage(), ex);
+        }
+
+        InputStream in;
+        String encoding;
+        if (dataInputFile != null) {
+            in = new FileInputStream(dataInputFile);
+            encoding = fileFormat.getEncoding();
+        } else {
+            encoding = StandardCharsets.UTF_8.name();
+            in = new ByteArrayInputStream(dataInputContent.getBytes(StandardCharsets.UTF_8));
+        }
         bufIn = new BufferedReader(new InputStreamReader(in, encoding));
     }
 
@@ -110,6 +192,7 @@ public class FileParser {
      *
      * @throws IOException - Should the file system choose to complain about closing an existing file opened for reading.
      */
+    @Override
     public void close() throws IOException {
         if (bufIn != null) {
             bufIn.close();
@@ -122,6 +205,7 @@ public class FileParser {
      * in case you want to do something with it.
      */
     public void read() {
+        Preconditions.checkState(bufIn != null && fileFormat != null, "You must first call open() before calling read().");
 
         MatchedRecord results = null;
         boolean exception;
@@ -130,10 +214,10 @@ public class FileParser {
 
             // Attempt to parse the next line
             try {
-                results = ff.nextRecord(bufIn);
+                results = fileFormat.nextRecord(bufIn);
                 exception = false;
             } catch (Exception ex) {
-                doExceptionCallback(ex, ex.getMessage(), ff.getCurrentParsedLine());
+                doExceptionCallback(ex, ex.getMessage(), fileFormat.getCurrentParsedLine());
             }
 
             if (null != results) {
@@ -145,61 +229,42 @@ public class FileParser {
     }
 
     /**
-     * Encapsulated details about calling client's handler methods (for exceptions too).
+     * Execute all {@link RecordCallback}s for the given record name if any are registered. Exceptions are dumped to the logger vs. causing
+     * a disruption and are also sent to the {@code doExceptionCallback} method.
      *
-     * @param callback The Callback object to be invoked
-     * @param arg1     first argument for callback - used for record handlers and exceptions
-     * @param arg2     second argument for callback - used for only for exceptions. Contains a string that contains the offending line from
-     *                 the input file <br> <br> <b>NOTE:</b> All exceptions are consumed and passed to the exception handler method you
-     *                 defined (The offending line is provided just in case you want to do something with it.
+     * @param recordName The name of the {@link Record} - this comes from the configuration file.
+     * @param record     The {@link MatchedRecord} instance that was loaded.
      */
-    private void doCallback(Callback callback, Object arg1, Object arg2) {
-        try {
-            Method method = callback.getMethod();
-            Object[] args;
-
-            if (null == arg2) {
-                args = new Object[1];
-                args[0] = arg1;
-            } else {
-                args = new Object[2];
-                args[0] = arg1;
-                args[1] = arg2;
-            }
-
-            method.invoke(callback.getInstance(), args);
-        } catch (Exception ex) {
-            // Something happened during the method call
-            String details = callback.getInstance().getClass().getName() + "."
-                    + callback.getMethod().getName();
-            log.error("Bad handler method call: " + details + " - " + ex);
-        }
-    }
-
-    private void doCallback(String recordType, MatchedRecord record) {
+    private void doCallback(String recordName, MatchedRecord record) {
         // first check for an old style callback
-        Callback oldType = callbacks.get(recordType);
-        if (oldType != null) {
-            doCallback(oldType, record, null);
-        } else {
-            RecordCallback callback = recordCallbacks.get(recordType);
-            if (callback != null) {
-                callback.processRecord(record);
+        if (recordCallbacks.containsKey(recordName)) {
+            for (RecordCallback recordCallback : recordCallbacks.get(recordName)) {
+                try {
+                    recordCallback.processRecord(record);
+                } catch (Exception e) {
+                    String errMsg = String.format("Failed to invoke callback %s for Record %s: %s",
+                            recordCallback.getClass().getName(), recordName, e.getMessage());
+                    log.error(errMsg, e);
+                    doExceptionCallback(e, errMsg, null);
+                }
             }
         }
     }
 
+    /**
+     * Execute all {@link ExceptionCallback}s that have been registered. Exceptions are dumped to the logger vs. causing a disruption.
+     *
+     * @param ex The Exception that occurred.
+     */
     private void doExceptionCallback(Exception ex, String message, String lastLine) {
-        // first check for an old style callback
-        Callback oldType = callbacks.get(EXCEPTIONS);
-        if (oldType != null) {
-            doCallback(oldType, message, lastLine);
-        } else {
-            if (exceptionCallback == null) {
-                throw new RuntimeException("No callback specified for Exceptions. Exception occurred: "
-                        + ex);
+        // Execute all ExceptionCallbacks.
+        exceptionCallbacks.forEach(callback -> {
+            try {
+                callback.processException(ex, message, lastLine);
+            } catch (Exception e) {
+                log.error(String.format("Failed to execute ExceptionCallback %s for Exception %s and error message %s [line = %s].",
+                        callback.getClass().getName(), ex.getClass().getName(), message, lastLine));
             }
-            exceptionCallback.processException(ex, lastLine);
-        }
+        });
     }
 }

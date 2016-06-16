@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.FileCreator;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;

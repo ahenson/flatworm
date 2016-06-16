@@ -14,10 +14,20 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.examples;
 
-/**
- * Created by IntelliJ IDEA. User: james Date: Sep 18, 2003 Time: 2:56:56 AM To change this template use Options | File Templates.
- */
-public class Address {
+import java.util.HashMap;
+
+//import org.apache.log4j.Category;
+
+public class MyConverters {
+
+    public String convertChar(String str, HashMap options) {
+        // nothing extra to do, since convHelper calls removePadding now
+        return "*** " + str + " ***";
+    }
+
+    // TODO This is a Log4j Category that's doing something - need to figure out what.
+//    static Category cat = Category.getInstance(MyConverters.class);
+
 }

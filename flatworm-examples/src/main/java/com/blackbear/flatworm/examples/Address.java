@@ -14,8 +14,10 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.examples;
 
-public interface ExceptionCallback {
-    void processException(Exception ex, String inputLine);
+/**
+ * Created by IntelliJ IDEA. User: james Date: Sep 18, 2003 Time: 2:56:56 AM To change this template use Options | File Templates.
+ */
+public class Address {
 }

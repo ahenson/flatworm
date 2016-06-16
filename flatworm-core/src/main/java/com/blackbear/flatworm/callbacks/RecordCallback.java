@@ -14,20 +14,10 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.callbacks;
 
-import java.util.HashMap;
+import com.blackbear.flatworm.MatchedRecord;
 
-//import org.apache.log4j.Category;
-
-public class MyConverters {
-
-    public String convertChar(String str, HashMap options) {
-        // nothing extra to do, since convHelper calls removePadding now
-        return "*** " + str + " ***";
-    }
-
-    // TODO This is a Log4j Category that's doing something - need to figure out what.
-//    static Category cat = Category.getInstance(MyConverters.class);
-
+public interface RecordCallback {
+    void processRecord(MatchedRecord record);
 }

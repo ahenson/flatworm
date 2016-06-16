@@ -14,29 +14,39 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.examples;
 
+import com.blackbear.flatworm.FileCreator;
 import com.blackbear.flatworm.FileParser;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.IOException;
 
-public class ReadFixedEmployee {
+public class WriteInventory {
     public static void main(String[] args) {
 
-        String xmlConfigFile = args[0];
+        String xmlConfigFileIn = args[0];
         String inputFile = args[1];
+        String xmlConfigFileOut = args[2];
+        String outputFile = args[3];
 
         try {
-            FileParser parser = new FileParser(xmlConfigFile, inputFile);
+            FileParser parser = new FileParser(xmlConfigFileIn, inputFile);
+            FileCreator writer = new FileCreator(xmlConfigFileOut, outputFile);
+            writer.setRecordSeparator("\n");
+
+            writer.open();
             parser.open();
 
             // Instantiate object responsible for handling callbacks
-            EmployeeHandler handler = new EmployeeHandler();
+            InventoryHandler handler = new InventoryHandler(writer);
 
             // set callback methods
             // Args are: bean name (from flatworm xml file), handler object, handler method name
-//            parser.setBeanHandler("newhire", handler, "handleNewhire");
+//            parser.setBeanHandler("dvd", handler, "handleDvd");
+//            parser.setBeanHandler("videotape", handler, "handleVideotape");
+//            parser.setBeanHandler("book", handler, "handleBook");
 
             // Args are handler object, exception handling method name
 //            parser.setExceptionHandler(handler, "handleException");
@@ -44,20 +54,21 @@ public class ReadFixedEmployee {
             parser.read();
 
             parser.close();
+            writer.close();
 
         }
-//        catch (NoSuchMethodException ex) {
+//        catch (NoSuchMethodException ex)
+//        {
 //            System.out
 //                    .println("NoSuchMethodException: Most likely, you didn't implement (or named incorrectly) the handler methods: "
 //                            + ex.getMessage());
 //        }
         catch (IOException ex) {
-            System.out.println("IOException: Something bad happend while opening,reading,closing the input file: "
-                    + ex.getMessage());
+            System.out.println("Something bad happened while opening,reading,closing the input file: " + ex.getMessage());
         } catch (FlatwormParserException ex) {
-            System.out.println("FlatwormParserException: Something happened that the parser did not like: "
-                    + ex.getMessage());
+            System.out.println("Something happened that the parser did not like: " + ex.getMessage());
+        } catch (FlatwormConfigurationException ex) {
+            System.out.println("Something happened that the creator did not like: " + ex.getMessage());
         }
-
     }
 }

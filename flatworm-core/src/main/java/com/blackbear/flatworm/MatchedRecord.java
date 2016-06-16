@@ -16,8 +16,12 @@
 
 package com.blackbear.flatworm;
 
+import com.google.common.base.Joiner;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +31,7 @@ import java.util.Map;
  * record.
  */
 public class MatchedRecord {
-    private Map<String, Object> beans = new HashMap<String, Object>();
+    private Map<String, Object> beans = new HashMap<>();
 
     private String recordName;
 
@@ -57,23 +61,19 @@ public class MatchedRecord {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
         sb.append("[");
         sb.append("MatchedRecord: recordName = ");
         sb.append(recordName);
         sb.append(", beans = {");
-        Iterator<String> itBeans = beans.keySet().iterator();
-        while (itBeans.hasNext()) {
-            Object key = itBeans.next();
+
+        List<String> beanStrings = new ArrayList<>();
+        beans.keySet().forEach(key -> {
             Object val = beans.get(key);
-            sb.append(key);
-            sb.append("=");
-            sb.append(val.toString());
-            if (itBeans.hasNext()) {
-                sb.append(", ");
-            }
-        }
+            beanStrings.add(key + "=" + val);
+        });
+        sb.append(Joiner.on(',').join(beanStrings));
         sb.append("}]");
         return sb.toString();
     }

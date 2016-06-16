@@ -34,7 +34,7 @@ public class InputStreamFileParser extends FileParser {
 
     @Override
     public void open() throws IOException {
-        String encoding = ff.getEncoding();
+        String encoding = fileFormat.getEncoding();
         bufIn = new BufferedReader(new InputStreamReader(is, encoding));
     }
 

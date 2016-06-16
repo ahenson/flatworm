@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.ConfigurationReader;
 import com.blackbear.flatworm.FileFormat;
@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class SimpleFlatwormExample {
+public class ComplexFlatwormExample {
     public static void main(String[] args) {
         ConfigurationReader parser = new ConfigurationReader();
         try {
@@ -35,13 +35,22 @@ public class SimpleFlatwormExample {
 
             MatchedRecord results;
             while ((results = ff.nextRecord(bufIn)) != null) {
-                if (results.getRecordName().equals("newhire")) {
-                    System.out.println(results.getBean("employee"));
+                if (results.getRecordName().equals("dvd")) {
+                    System.out.println(results.getBean("dvd"));
+                    System.out.println(results.getBean("film"));
                 }
+                if (results.getRecordName().equals("videotape")) {
+                    System.out.println(results.getBean("video"));
+                    System.out.println(results.getBean("film"));
+                }
+                if (results.getRecordName().equals("book")) {
+                    System.out.println(results.getBean("book"));
+                }
+                System.out.println("");
             }
 
         } catch (Exception e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File
+            e.printStackTrace();
         }
     }
 

@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,23 +48,37 @@ public class ConfigurationReader {
      * {@code loadConfigurationFile} takes an XML configuration file, and returns a {@code FileFormat} object, which can be used to parse an
      * input file into beans.
      *
-     * @param xmlFile An XML file which contains a valid Flatworm configuration.
+     * @param xmlFilePath The path to an XML file which contains a valid Flatworm configuration.
      * @return A {@code FileFormat} object which can parse the specified format.
      * @throws FlatwormConfigurationException If the configuration data contains invalid syntax.
      * @throws IOException                    If issues occur while reading from I/O.
      */
-    public FileFormat loadConfigurationFile(String xmlFile) throws FlatwormConfigurationException, IOException {
+    public FileFormat loadConfigurationFile(String xmlFilePath) throws FlatwormConfigurationException, IOException {
         FileFormat fileFormat;
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream(xmlFile)) {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(xmlFilePath)) {
             if (in != null) {
                 fileFormat = loadConfigurationFile(in);
             } else {
-                try (InputStream inTakeTwo = new FileInputStream(xmlFile)) {
+                try (InputStream inTakeTwo = new FileInputStream(xmlFilePath)) {
                     fileFormat = loadConfigurationFile(inTakeTwo);
                 }
             }
         }
         return fileFormat;
+    }
+
+
+    /**
+     * {@code loadConfigurationFile} takes an XML configuration file, and returns a {@code FileFormat} object, which can be used to parse an
+     * input file into beans.
+     *
+     * @param xmlFile An XML file which contains a valid Flatworm configuration.
+     * @return A {@code FileFormat} object which can parse the specified format.
+     * @throws FlatwormConfigurationException If the configuration data contains invalid syntax.
+     * @throws IOException                    If issues occur while reading from I/O.
+     */
+    public FileFormat loadConfigurationFile(File xmlFile) throws FlatwormConfigurationException, IOException {
+        return loadConfigurationFile(xmlFile.getAbsolutePath());
     }
 
     /**

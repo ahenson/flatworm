@@ -30,6 +30,20 @@ License
 -------
 flatworm is open source and is licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
 
+Work Completed
+--------------
+* Added support for Maven
+* Cleaned up exceptions to have two main checked-exceptions: 
+ * FlatwormConfigurationException - used for indicating issues with parsing configuration data
+ * FlatwormParserException - used for indicating issues with parsing the actual data
+* Removed Generics type declaration where the type could be inferred: `List<String> result = new ArrayList<>();`
+* Added use of the foreach construct `for(String item : collection)`
+* Added use of `Streams` and `Lambdas` where it mae code cleaners
+* Cleaned up some comments
+* Removed com.blackbear.flatworm.Callback - use ExceptionCallback or RecordCallback instead (moved to new callbacks package).
+* Added ability to use a JavaScript snippet to see if a line should be processed by a given Record
+* 
+
 TODOs
 -------
 * Update the "Field Guide" to reflect the latest changes and usages
@@ -40,4 +54,6 @@ TODOs
 * Update the examples to reflect the latest capabilities and provide more guidance within the examples
 * Add annotations support to all for beans to define their record makeup
 * Add the ability to specify a type in addition-to or instead-of a converter
-* 
+* Introduce constants where string literals are used
+* Complete checklist for deploying production jar to Maven Central repository
+* Add default converters based upon reflection 

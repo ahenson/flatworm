@@ -14,14 +14,14 @@
  * and limitations under the License.
  */
 
-package examples;
+package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.FileParser;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.IOException;
 
-public class ReadFixedMovies {
+public class ReadFixedEmployee {
     public static void main(String[] args) {
 
         String xmlConfigFile = args[0];
@@ -32,13 +32,11 @@ public class ReadFixedMovies {
             parser.open();
 
             // Instantiate object responsible for handling callbacks
-            ProductHandler handler = new ProductHandler();
+            EmployeeHandler handler = new EmployeeHandler();
 
             // set callback methods
             // Args are: bean name (from flatworm xml file), handler object, handler method name
-//            parser.setBeanHandler("dvd", handler, "handleDvd");
-//            parser.setBeanHandler("videotape", handler, "handleVideotape");
-//            parser.setBeanHandler("book", handler, "handleBook");
+//            parser.setBeanHandler("newhire", handler, "handleNewhire");
 
             // Args are handler object, exception handling method name
 //            parser.setExceptionHandler(handler, "handleException");
@@ -62,5 +60,4 @@ public class ReadFixedMovies {
         }
 
     }
-
 }

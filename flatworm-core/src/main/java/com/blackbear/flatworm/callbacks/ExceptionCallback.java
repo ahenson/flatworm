@@ -14,8 +14,8 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.callbacks;
 
-public interface RecordCallback {
-    void processRecord(MatchedRecord record);
+public interface ExceptionCallback {
+    void processException(Exception ex, String message, String inputLine);
 }

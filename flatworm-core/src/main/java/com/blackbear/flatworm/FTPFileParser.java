@@ -38,7 +38,7 @@ public class FTPFileParser extends FileParser {
     public void open() throws IOException {
         URLConnection con = url.openConnection();
         InputStream in = con.getInputStream();
-        String encoding = ff.getEncoding();
+        String encoding = fileFormat.getEncoding();
         bufIn = new BufferedReader(new InputStreamReader(in, encoding));
 
         in.close();

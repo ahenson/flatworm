@@ -16,7 +16,7 @@
   -->
 
 <file-format>
-    <converter name="char2" class="examples.MyConverters"
+    <converter name="char2" class="com.blackbear.flatworm.examples.MyConverters"
                method="convertChar" return-type="java.lang.String"/>
     <converter name="char"
                class="com.blackbear.flatworm.converters.CoreConverters"
