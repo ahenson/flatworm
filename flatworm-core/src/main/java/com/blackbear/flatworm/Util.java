@@ -37,65 +37,45 @@ public final class Util {
     private static Pattern numbersOrLettersOnly = Pattern.compile("[^A-Za-z0-9]+");
 
     /**
-     * <code>split</code> divides a string into many strings based on a delimiter
-     * The main difference between this split and the one that comes with Java is
-     * this one will ignore delimiters that are within quoted fields
-     * <p>
-     * <b>NOTE:</b> Delimiter will be ignored once chrQuote is encountered.
-     * Consideration will begin once matching chrQuote is encountered
-     * </p>
+     * <code>split</code> divides a string into many strings based on a delimiter The main difference between this split and the one that
+     * comes with Java is this one will ignore delimiters that are within quoted fields <p> <b>NOTE:</b> Delimiter will be ignored once
+     * chrQuote is encountered. Consideration will begin once matching chrQuote is encountered </p>
      *
-     * @param str
-     *          The string you want to split
-     * @param chrSplit
-     *          character you want to split the string on
-     * @param chrQuote
-     *          character you want to be considered to be your quoting character
+     * @param str      The string you want to split
+     * @param chrSplit character you want to split the string on
+     * @param chrQuote character you want to be considered to be your quoting character
      * @return String array containing results of splitting the supplied String
      */
     public static String[] split(String str, char chrSplit, char chrQuote) {
-        List<String> tokens = new ArrayList<String>();
-        String str1 = new String();
+        List<String> tokens = new ArrayList<>();
+        StringBuilder str1 = new StringBuilder();
         boolean inQuote = false;
 
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) == chrSplit && !inQuote) {
-                tokens.add(str1);
-                str1 = new String();
+                tokens.add(str1.toString());
+                str1 = new StringBuilder();
             } else if (str.charAt(i) == chrQuote) {
                 inQuote = (!inQuote);
             } else {
-                str1 += str.charAt(i);
+                str1.append(str.charAt(i));
             }
         }
 
-        tokens.add(str1);
-
-        return tokens.toArray(new String[0]);
+        tokens.add(str1.toString());
+        return tokens.toArray(new String[tokens.size()]);
     }
 
     /**
-     * Different from the method in CoreConverters, this one is used for file
-     * creation
+     * Different from the method in CoreConverters, this one is used for file creation
      *
-     * <br>
-     * <br>
-     * Specified in flatworm XML file like:
-     * <code>&lt;conversion-option name="format" value="yyyy-MM-dd"/&gt;</code>
+     * <br> <br> Specified in flatworm XML file like: <code>&lt;conversion-option name="format" value="yyyy-MM-dd"/&gt;</code>
      *
-     * @param date
-     *          The Date to be converted to a string
-     * @param defaultDateFormat
-     *          provided by FileCreator and used when the date format is not
-     *          supplied in the Flatworm XML file
-     * @param options
-     *          collection of ConversionOptions to gather further justification
-     *          options
-     *
+     * @param date              The Date to be converted to a string
+     * @param defaultDateFormat provided by FileCreator and used when the date format is not supplied in the Flatworm XML file
+     * @param options           collection of ConversionOptions to gather further justification options
      * @return The formatted Date string
-     * @throws Exception
-     *           - if date format is not specified in the XML file or given to
-     *           FileCreator. At least one must be specified.
+     * @throws Exception - if date format is not specified in the XML file or given to FileCreator. At least one must be specified.
      */
     public static String formatDate(Date date, String defaultDateFormat,
                                     Map<String, ConversionOption> options) throws Exception {
@@ -112,29 +92,17 @@ public final class Util {
         SimpleDateFormat sdf = new SimpleDateFormat(format);
 
         return sdf.format(date);
-
     }
 
     /**
-     * Removes pre-determined chracters from string based on Java Patterns
+     * Removes pre-determined characters from string based on Java Patterns
      *
-     * <br>
-     * <br>
-     * Specified in flatworm XML file like:
-     * <code>&lt;conversion-option name="justify" value="right"/&gt;</code>
+     * <br> <br> Specified in flatworm XML file like: <code>&lt;conversion-option name="justify" value="right"/&gt;</code>
      *
-     * @param str
-     *          field to be justified
-     * @param value
-     *          specifies the type of justification. Can be
-     *          ('left'|'right'|'both') - default value is 'both' if not specified
-     * @param options
-     *          collection of ConversionOptions to gather further justification
-     *          options
-     * @param length
-     *          used in file creation to ensure string is padded to the proper
-     *          length
-     *
+     * @param str     field to be justified
+     * @param value   specifies the type of justification. Can be ('left'|'right'|'both') - default value is 'both' if not specified
+     * @param options collection of ConversionOptions to gather further justification options
+     * @param length  used in file creation to ensure string is padded to the proper length
      * @return padded string
      */
     public static String justify(String str, String value, Map<String, ConversionOption> options,
@@ -189,7 +157,7 @@ public final class Util {
             strPadChar = strPadChar.substring(0, 1);
 
             if (str.length() < length) {
-                // Figure out diffenence in length to create padding string
+                // Figure out difference in length to create padding string
                 int lenDiff = length - str.length();
 
                 String padding = "";
@@ -216,19 +184,11 @@ public final class Util {
     /**
      * Removes pre-determined characters from string based on Java Patterns
      *
-     * <br>
-     * <br>
-     * Specified in flatworm XML file like:
-     * <code>&lt;conversion-option name="strip-chars" value="non-numeric"/&gt;</code>
+     * <br> <br> Specified in flatworm XML file like: <code>&lt;conversion-option name="strip-chars" value="non-numeric"/&gt;</code>
      *
-     * @param str
-     *          field to be stripped
-     * @param value
-     *          type of characters to be stripped. Can be
-     *          ('non-numeric'|'non-alpha'|'non-alphanumeric')
-     * @param options
-     *          collection of ConversionOptions, for future enhancement
-     *
+     * @param str     field to be stripped
+     * @param value   type of characters to be stripped. Can be ('non-numeric'|'non-alpha'|'non-alphanumeric')
+     * @param options collection of ConversionOptions, for future enhancement
      * @return the string stripped of the specified character types
      */
     public static String strip(String str, String value, Map<String, ConversionOption> options) {
@@ -247,41 +207,28 @@ public final class Util {
     }
 
     /**
-     * <br>
-     * <br>
-     * Specified in flatworm XML file like:
-     * <code>&lt;conversion-option name="substring" value="1,10"/&gt;</code>
+     * <br> <br> Specified in flatworm XML file like: <code>&lt;conversion-option name="substring" value="1,10"/&gt;</code>
      *
-     * @param str
-     *          value of field
-     * @param value
-     *          a string containing the beginning index and the ending index of
-     *          the desired substring, separated by a comma ','
-     * @param options
-     *          collection of ConversionOptions, for future enhancement
-     *
+     * @param str     value of field
+     * @param value   a string containing the beginning index and the ending index of the desired substring, separated by a comma ','
+     * @param options collection of ConversionOptions, for future enhancement
      * @return The specified substring
      */
     public static String substring(String str, String value, Map<String, ConversionOption> options) {
 
         String[] args = value.split(",");
-        str = str.substring(new Integer(args[0]).intValue(), new Integer(args[1]).intValue());
+        str = str.substring(new Integer(args[0]), new Integer(args[1]));
 
         return str;
     }
 
     /**
-     * If str is length zero (after trimming), value is returned. Default values
-     * <b>should not</b> be specified in the flatworm XML file when you want a
-     * string of only spaces.
+     * If str is length zero (after trimming), value is returned. Default values <b>should not</b> be specified in the flatworm XML file
+     * when you want a string of only spaces.
      *
-     * @param str
-     *          value of field
-     * @param value
-     *          default value
-     * @param options
-     *          collection of ConversionOptions, for future enhancement
-     *
+     * @param str     value of field
+     * @param value   default value
+     * @param options collection of ConversionOptions, for future enhancement
      * @return The string passed in, or the default value if the string is blank
      */
     public static String defaultValue(String str, String value, Map<String, ConversionOption> options) {
@@ -291,11 +238,8 @@ public final class Util {
     /**
      * Conversion-Option now stored in class, more than a simple Hashmap lookup
      *
-     * @param options
-     *          The conversion-option values for the field
-     * @param key
-     *          The key to lookup appropriate ConversionOption
-     *
+     * @param options The conversion-option values for the field
+     * @param key     The key to lookup appropriate ConversionOption
      * @return The string that contains value of the ConversionOption
      */
     public static String getValue(Map<String, ConversionOption> options, String key) {
@@ -306,5 +250,4 @@ public final class Util {
             return null;
         }
     }
-
 }

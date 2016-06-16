@@ -30,14 +30,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Bean class used to store the values from the Line XML tag
  */
+@Slf4j
 class Line {
-    private static Log log = LogFactory.getLog(Line.class);
-
-    private List<LineElement> elements = new ArrayList<LineElement>();
-    private String delimit = null;
+    private List<LineElement> elements = new ArrayList<>();
+    private String delimit;
     private char chrQuote = '\0';
     private ConversionHelper convHelper;
     private Map<String, Object> beans;
@@ -84,9 +85,9 @@ class Line {
 
     @Override
     public String toString() {
-        StringBuffer b = new StringBuffer();
-        b.append(super.toString() + "[");
-        b.append("elements = " + elements);
+        StringBuilder b = new StringBuilder();
+        b.append(super.toString()).append("[");
+        b.append("elements = ").append(elements);
         b.append("]");
         return b.toString();
     }
