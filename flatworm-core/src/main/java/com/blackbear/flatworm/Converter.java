@@ -17,6 +17,7 @@
 package com.blackbear.flatworm;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,6 +26,7 @@ import lombok.EqualsAndHashCode;
  * from CoreConverters or one you implement.
  */
 @Data
+@Builder
 @EqualsAndHashCode
 @AllArgsConstructor
 class Converter {
