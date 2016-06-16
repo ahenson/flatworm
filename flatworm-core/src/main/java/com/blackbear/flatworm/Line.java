@@ -75,22 +75,13 @@ class Line {
         return Collections.unmodifiableList(elements);
     }
 
-    public void setElements(List<LineElement> recordElements) {
-        this.elements.clear();
-        this.elements.addAll(recordElements);
-    }
-
     public void addElement(LineElement re) {
         elements.add(re);
     }
 
     @Override
     public String toString() {
-        StringBuilder b = new StringBuilder();
-        b.append(super.toString()).append("[");
-        b.append("elements = ").append(elements);
-        b.append("]");
-        return b.toString();
+        return super.toString() + "[elements = " + elements + "]";
     }
 
     /**
@@ -150,38 +141,37 @@ class Line {
                     // JBL - to keep from dup. code, moved this to a private method
                     mapField(fieldChars, re);
                 }
-            } else if (le instanceof SegmentElement) {
-                SegmentElement se = (SegmentElement) le;
-        /* TODO - to be added. For now we only support delimited. But there really is no reason not to
-                   support fixed-format as well
-        int start = charPos;
-        int end = charPos;
-        if (se.isFieldStartSet())
-            start = se.getFieldStart();
-        if (se.isFieldEndSet())
-        {
-            end = se.getFieldEnd();
-            charPos = end;
-        }
-        if (se.isFieldLengthSet())
-        {
-            end = start + se.getFieldLength();
-            charPos = end;
-        }
-        if (end > inputLine.length())
-            throw new FlatwormInputLineLengthException("Looking for field " + se.getBeanRef() + " at pos " + start
-                    + ", end " + end + ", input length = " + inputLine.length());
-        String beanRef = se.getBeanRef();
-        if (beanRef != null)
-        {
-            String fieldChars = inputLine.substring(start, end);
-
-            // JBL - to keep from dup. code, moved this to a private method
-            mapField(convHelper, fieldChars, se, beans);
-
-        }
-         */
             }
+            /* TODO - to be added. For now we only support delimited. But there really is no reason not to support fixed-format as well
+            else if (le instanceof SegmentElement) {
+                SegmentElement se = (SegmentElement) le;
+                int start = charPos;
+                int end = charPos;
+                if (se.isFieldStartSet())
+                    start = se.getFieldStart();
+                if (se.isFieldEndSet())
+                {
+                    end = se.getFieldEnd();
+                    charPos = end;
+                }
+                if (se.isFieldLengthSet())
+                {
+                    end = start + se.getFieldLength();
+                    charPos = end;
+                }
+                if (end > inputLine.length())
+                    throw new FlatwormInputLineLengthException("Looking for field " + se.getBeanRef() + " at pos " + start
+                            + ", end " + end + ", input length = " + inputLine.length());
+                String beanRef = se.getBeanRef();
+                if (beanRef != null)
+                {
+                    String fieldChars = inputLine.substring(start, end);
+
+                    // JBL - to keep from dup. code, moved this to a private method
+                    mapField(convHelper, fieldChars, se, beans);
+                }
+            }
+            */
         }
     }
 
