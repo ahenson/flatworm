@@ -23,9 +23,6 @@ package com.blackbear.flatworm.errors;
 public class FlatwormException extends Exception {
     private static final long serialVersionUID = 7458005788127155709L;
 
-    public FlatwormException() {
-    }
-
     public FlatwormException(String s) {
         super(s);
     }

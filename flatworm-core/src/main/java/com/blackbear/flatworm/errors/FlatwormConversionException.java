@@ -18,7 +18,7 @@ package com.blackbear.flatworm.errors;
 
 /**
  * The exception thrown when an error occurs during field conversion. This can
- * either be a parsing error in the field, or an invokation error against the
+ * either be a parsing error in the field, or an invocation error against the
  * registered method, so be sure to check both.
  */
 

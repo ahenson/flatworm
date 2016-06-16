@@ -17,7 +17,7 @@
 package com.blackbear.flatworm.errors;
 
 /**
- * Thrown if no match is found for an input file in the re
+ * Thrown if no match is found for an input file in the configuration.
  */
 
 public class FlatwormInvalidRecordException extends FlatwormException {

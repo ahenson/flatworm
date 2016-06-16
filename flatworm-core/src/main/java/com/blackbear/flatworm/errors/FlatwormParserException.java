@@ -17,8 +17,8 @@
 package com.blackbear.flatworm.errors;
 
 /**
- * The exception thrown when a value is missing or inconsistant values are given
- * in the configuation file.
+ * The exception thrown when a value is missing or inconsistent values are given
+ * in the configuration file.
  */
 
 public class FlatwormParserException extends FlatwormException {
