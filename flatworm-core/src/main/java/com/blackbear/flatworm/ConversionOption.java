@@ -16,34 +16,17 @@
 
 package com.blackbear.flatworm;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * Bean class used to store the values from the Conversion-Option XML tag
  */
+@Data
+@EqualsAndHashCode
+@AllArgsConstructor
 public class ConversionOption {
-
     private String name;
-
     private String value;
-
-    ConversionOption(String name, String value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setName(String string) {
-        name = string;
-    }
-
-    public void setValue(String string) {
-        value = string;
-    }
-
 }
