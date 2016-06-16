@@ -19,16 +19,9 @@ package examples;
 import com.blackbear.flatworm.ConfigurationReader;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.MatchedRecord;
-import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -41,7 +34,7 @@ public class SimpleFlatwormExample {
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
 
             MatchedRecord results;
-            while ((results = ff.getNextRecord(bufIn)) != null) {
+            while ((results = ff.nextRecord(bufIn)) != null) {
                 if (results.getRecordName().equals("newhire")) {
                     System.out.println(results.getBean("employee"));
                 }

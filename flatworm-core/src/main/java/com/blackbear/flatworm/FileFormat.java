@@ -119,7 +119,7 @@ public class FileFormat {
      * @param in The stream to read from
      * @return The created beans in a MatchedRecord object
      */
-    public MatchedRecord getNextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
+    public MatchedRecord nextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,
             FlatwormUnsetFieldValueException, FlatwormCreatorException {
         try {

@@ -40,7 +40,7 @@ public class ComplexFileTest {
             InputStream in = getClass().getClassLoader().getResourceAsStream("complex_input.txt");
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
 
-            MatchedRecord results = ff.getNextRecord(bufIn);
+            MatchedRecord results = ff.nextRecord(bufIn);
             assertEquals("dvd", results.getRecordName());
             Dvd dvd = (Dvd) results.getBean("dvd");
             Film film = (Film) results.getBean("film");
@@ -51,7 +51,7 @@ public class ComplexFileTest {
             assertEquals("DIAL J FOR JAVA", film.getTitle());
             assertEquals("RUN ANYWHERE STUDIO", film.getStudio());
 
-            results = ff.getNextRecord(bufIn);
+            results = ff.nextRecord(bufIn);
             assertEquals("book", results.getRecordName());
             Book book = (Book) results.getBean("book");
             assertEquals("546234476", book.getSku());
@@ -60,7 +60,7 @@ public class ComplexFileTest {
             assertEquals(13.95, book.getPrice(), 0.01);
             assertEquals("2003/11/10", format.format(book.getReleaseDate()));
 
-            results = ff.getNextRecord(bufIn);
+            results = ff.nextRecord(bufIn);
             assertEquals("videotape", results.getRecordName());
             Videotape tape = (Videotape) results.getBean("video");
             film = (Film) results.getBean("film");
@@ -70,10 +70,10 @@ public class ComplexFileTest {
             assertEquals("WHEN A STRANGER IMPLEMENTS", film.getTitle());
             assertEquals("NULL POINTER PRODUCTIONS", film.getStudio());
 
-            results = ff.getNextRecord(bufIn);
+            results = ff.nextRecord(bufIn);
             assertEquals("book", results.getRecordName());
 
-            results = ff.getNextRecord(bufIn);
+            results = ff.nextRecord(bufIn);
             assertEquals("videotape", results.getRecordName());
         } catch (Exception e) {
             e.printStackTrace();

@@ -43,11 +43,11 @@ public class SegmentFileTest {
             InputStream in = getClass().getClassLoader().getResourceAsStream("segment_input.txt");
             bufIn = new BufferedReader(new InputStreamReader(in));
 
-            MatchedRecord results = ff.getNextRecord(bufIn);
+            MatchedRecord results = ff.nextRecord(bufIn);
             assertEquals("account", results.getRecordName());
             Account account = (Account) results.getBean("account");
             for (int cnt = 1; cnt < 4; ++cnt) {
-                results = ff.getNextRecord(bufIn);
+                results = ff.nextRecord(bufIn);
             }
             account = (Account) results.getBean("account");
             assertComplexAccount(account);

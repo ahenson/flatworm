@@ -38,11 +38,11 @@ public class TabSegmentFileTest {
             InputStream in = getClass().getClassLoader().getResourceAsStream("segment-class-tabs-input.txt");
             bufIn = new BufferedReader(new InputStreamReader(in));
 
-            MatchedRecord results = ff.getNextRecord(bufIn);
+            MatchedRecord results = ff.nextRecord(bufIn);
             assertEquals("class", results.getRecordName());
             ClassPeriod cl = (ClassPeriod) results.getBean("class");
             for (int cnt = 1; cnt < 4; ++cnt) {
-                results = ff.getNextRecord(bufIn);
+                results = ff.nextRecord(bufIn);
             }
         } catch (Exception e) {
             fail("Caught an exception of type " + e.getClass().getSimpleName() + ": " + e.getMessage());

@@ -34,7 +34,7 @@ public class ComplexFlatwormExample {
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
 
             MatchedRecord results;
-            while ((results = ff.getNextRecord(bufIn)) != null) {
+            while ((results = ff.nextRecord(bufIn)) != null) {
                 if (results.getRecordName().equals("dvd")) {
                     System.out.println(results.getBean("dvd"));
                     System.out.println(results.getBean("film"));

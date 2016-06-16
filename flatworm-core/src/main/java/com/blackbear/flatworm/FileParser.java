@@ -16,32 +16,23 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Used to read a flatfile. Encapsulates parser setup and callback mechanism.
- * This class wraps the functionality that used to be in the main() of the
- * examples. This way, the client knows less about the internal workings of
- * FlatWorm.
+ * Used to read a flatfile. Encapsulates parser setup and callback mechanism. This class wraps the functionality that used to be in the
+ * main() of the examples. This way, the client knows less about the internal workings of FlatWorm.
  */
 public class FileParser {
     private static Log log = LogFactory.getLog(FileParser.class);
@@ -49,11 +40,11 @@ public class FileParser {
     private static Class[] EXCEPTIONSIG = {String.class, String.class};
     private static String EXCEPTIONS = "exception";
 
-    private Map<String, Callback> callbacks = new HashMap<String, Callback>();
+    private Map<String, Callback> callbacks = new HashMap<>();
     // This map provides access to callback objects, rather than methods as with
     // the older callbacks Map.
     // It is intended to eventually replace that mechanism
-    private Map<String, RecordCallback> recordCallbacks = new HashMap<String, RecordCallback>();
+    private Map<String, RecordCallback> recordCallbacks = new HashMap<>();
     // Provide a single callback object for exceptions. This is not stored in the
     // callbacks map because exception handling
     // is inherently different than record processing and the callback signature
@@ -66,14 +57,10 @@ public class FileParser {
     /**
      * Constructor for FileParser<br>
      *
-     * @param config
-     *          full path to the FlatWorm XML configuration file
-     * @param file
-     *          full path to input file
-     * @throws FlatwormParserException
-     *           - wraps FlatwormConfigurationValueException &
-     *           FlatwormUnsetFieldValueException (to reduce number of exceptions
-     *           clients have to be aware of)
+     * @param config full path to the FlatWorm XML configuration file
+     * @param file   full path to input file
+     * @throws FlatwormParserException - wraps FlatwormConfigurationValueException & FlatwormUnsetFieldValueException (to reduce number of
+     *                                 exceptions clients have to be aware of)
      */
     public FileParser(String config, String file) throws FlatwormParserException {
         this.file = file;
@@ -87,9 +74,8 @@ public class FileParser {
     }
 
     /**
-     * Provide a callback object that doesn't require reflection to be invoked.
-     * The <code>MatchedRecord</code> will be passed back to the callback. Add a
-     * callback for each record type specified in the configuration file.
+     * Provide a callback object that doesn't require reflection to be invoked. The <code>MatchedRecord</code> will be passed back to the
+     * callback. Add a callback for each record type specified in the configuration file.
      *
      * @since 2.0
      */
@@ -98,11 +84,9 @@ public class FileParser {
     }
 
     /**
-     * Set a callback for exceptions that doesn't require reflection to be
-     * invoked. The exception (rather than just the exception type) will be passed
-     * to the callback, along with the input line that caused the exception.
-     * Should only be invoked once as any subsequent invocations will replace the
-     * previous callback.
+     * Set a callback for exceptions that doesn't require reflection to be invoked. The exception (rather than just the exception type) will
+     * be passed to the callback, along with the input line that caused the exception. Should only be invoked once as any subsequent
+     * invocations will replace the previous callback.
      *
      * @since 2.0
      */
@@ -124,9 +108,7 @@ public class FileParser {
     /**
      * Close the input file<br>
      *
-     * @throws IOException
-     *           - Should the file system choose to complain about closing an
-     *           existing file opened for reading.
+     * @throws IOException - Should the file system choose to complain about closing an existing file opened for reading.
      */
     public void close() throws IOException {
         if (bufIn != null) {
@@ -135,12 +117,9 @@ public class FileParser {
     }
 
     /**
-     * Read the entire input file. This method will call your handler methods, if
-     * defined, to handle Records it parses. <br>
-     * <br>
-     * <b>NOTE:</b> All exceptions are consumed and passed to the exception
-     * handler method you defined (The offending line is provided just in case you
-     * want to do something with it.<br>
+     * Read the entire input file. This method will call your handler methods, if defined, to handle Records it parses. <br> <br>
+     * <b>NOTE:</b> All exceptions are consumed and passed to the exception handler method you defined (The offending line is provided just
+     * in case you want to do something with it.<br>
      */
     public void read() {
 
@@ -151,7 +130,7 @@ public class FileParser {
 
             // Attempt to parse the next line
             try {
-                results = ff.getNextRecord(bufIn);
+                results = ff.nextRecord(bufIn);
                 exception = false;
             } catch (Exception ex) {
                 doExceptionCallback(ex, ex.getMessage(), ff.getLastLine());
@@ -166,22 +145,13 @@ public class FileParser {
     }
 
     /**
-     * Encapsulated details about calling client's handler methods (for exceptions
-     * too)
+     * Encapsulated details about calling client's handler methods (for exceptions too)
      *
-     * @param callback
-     *          The Callback object to be invoked
-     * @param arg1
-     *          first argument for callback - used for record handlers and
-     *          exceptions
-     * @param arg2
-     *          second argument for callback - used for only for exceptions.
-     *          Contains a string that contains the offending line from the input
-     *          file <br>
-     * <br>
-     *          <b>NOTE:</b> All exceptions are consumed and passed to the
-     *          exception handler method you defined (The offending line is
-     *          provided just in case you want to do something with it.<br>
+     * @param callback The Callback object to be invoked
+     * @param arg1     first argument for callback - used for record handlers and exceptions
+     * @param arg2     second argument for callback - used for only for exceptions. Contains a string that contains the offending line from
+     *                 the input file <br> <br> <b>NOTE:</b> All exceptions are consumed and passed to the exception handler method you
+     *                 defined (The offending line is provided just in case you want to do something with it.<br>
      */
     private void doCallback(Callback callback, Object arg1, Object arg2) {
         try {
