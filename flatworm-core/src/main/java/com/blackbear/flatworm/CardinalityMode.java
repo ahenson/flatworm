@@ -17,5 +17,18 @@
 package com.blackbear.flatworm;
 
 public enum CardinalityMode {
-    STRICT, RESTRICTED, LOOSE
+    /**
+     * If the total number of entities read exceeds the max limit then an exception will be thrown.
+     */
+    STRICT,
+
+    /**
+     * If the total number of entities read exceeds the max limit then all entities after the max limit will be ignored.
+     */
+    RESTRICTED,
+
+    /**
+     * All entities read will be captured even if the limit is exceeded.
+     */
+    LOOSE
 }

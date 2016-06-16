@@ -16,9 +16,12 @@
 
 package com.blackbear.flatworm.test.domain;
 
+import lombok.Data;
+
 /**
  * Created by IntelliJ IDEA. User: james Date: Sep 18, 2003 Time: 2:56:46 AM To change this template use Options | File Templates.
  */
+@Data
 public class Employee {
     private String firstName;
 
@@ -31,54 +34,6 @@ public class Employee {
     private String gender;
 
     private String misc;
-
-    public String getMisc() {
-        return misc;
-    }
-
-    public void setMisc(String misc) {
-        this.misc = misc;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getSsn() {
-        return ssn;
-    }
-
-    public void setSsn(String ssn) {
-        this.ssn = ssn;
-    }
-
-    public double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
 
     public String toString() {
         return super.toString() + "[" + this.lastName + ", " + this.firstName + ", " + this.ssn + ", "

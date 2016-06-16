@@ -33,7 +33,7 @@
                 <record-element length="0" beanref="class.period" type="int"/>
                 <record-element length="0" beanref="class.teacher" type="char"/>
                 <record-element length="0" beanref="class.gradeLevel" type="int"/>
-                <segment-element name="student" parent-beanref="class" minCount="1" maxCount="30">
+                <segment-element beanref="student" parent-beanref="class" collection-property-name="students" minCount="1" maxCount="30">
                     <field-ident field-start="0" field-length="1">
                         <match-string>S</match-string>
                     </field-ident>

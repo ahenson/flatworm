@@ -29,7 +29,7 @@ class SegmentElement implements LineElement {
     private List<String> fieldIdentMatchStrings = new ArrayList<>();
     private int minCount;
     private int maxCount;
-    private String name;
+    private String collectionPropertyName;
     private String beanRef;
     private String parentBeanRef;
     private String addMethod;
@@ -59,11 +59,6 @@ class SegmentElement implements LineElement {
 
     public List<LineElement> getElements() {
         return Collections.unmodifiableList(elements);
-    }
-
-    public void setElements(List<LineElement> recordElements) {
-        this.elements.clear();
-        this.elements.addAll(recordElements);
     }
 
     public void addElement(LineElement re) {

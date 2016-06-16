@@ -45,6 +45,7 @@ public class TabSegmentFileTest {
                 results = ff.nextRecord(bufIn);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Caught an exception of type " + e.getClass().getSimpleName() + ": " + e.getMessage());
         } finally {
             if (bufIn != null) {

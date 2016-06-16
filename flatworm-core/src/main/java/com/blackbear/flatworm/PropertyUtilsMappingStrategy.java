@@ -25,6 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * The default BeanMappingStrategy. Uses Jakarta Commons PropertyUtils to map
  * the raw input data into the specified beans.
@@ -32,9 +34,8 @@ import java.util.Map;
  * @author Dave Derry
  *
  */
+@Slf4j
 public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
-    private static Log log = LogFactory.getLog(PropertyUtilsMappingStrategy.class);
-
     @Override
     public void mapBean(Object bean, String beanName, String property, Object value,
                         Map<String, ConversionOption> conv) throws FlatwormConversionException {

@@ -45,7 +45,7 @@ public class SegmentFileTest {
 
             MatchedRecord results = ff.nextRecord(bufIn);
             assertEquals("account", results.getRecordName());
-            Account account = (Account) results.getBean("account");
+            Account account;
             for (int cnt = 1; cnt < 4; ++cnt) {
                 results = ff.nextRecord(bufIn);
             }

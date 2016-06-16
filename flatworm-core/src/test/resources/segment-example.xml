@@ -50,8 +50,8 @@
                 <record-element beanref="account.accountNumber" length="0" type="char"/>
                 <record-element beanref="account.serviceType" length="0" type="char"/>
                 <record-element beanref="account.companyId" length="0" type="char"/>
-                <segment-element name="consumer" minCount="0" maxCount="5" parent-beanref="account" addMethod="addConsumer"
-                                 beanref="consumer" cardinality-mode="restrict">
+                <segment-element beanref="consumer" minCount="0" maxCount="5" parent-beanref="account" add-method="addConsumer"
+                                 cardinality-mode="restrict">
                     <field-ident field-start="0" field-length="2">
                         <match-string>ID</match-string>
                     </field-ident>
@@ -61,7 +61,7 @@
                     <record-element beanref="consumer.firstName" length="0" type="char"/>
                     <record-element beanref="consumer.middleName" length="0" type="char"/>
                     <record-element beanref="consumer.gender" length="0" type="char"/>
-                    <segment-element name="identity" minCount="0" maxCount="6" parent-beanref="consumer" addMethod="addId" beanref="id">
+                    <segment-element minCount="0" maxCount="6" parent-beanref="consumer" add-method="addId" beanref="id">
                         <field-ident field-start="0" field-length="2">
                             <match-string>II</match-string>
                         </field-ident>
@@ -70,7 +70,7 @@
                         <record-element beanref="id.state" length="0" type="char"/>
                         <record-element beanref="id.value" length="0" type="char"/>
                     </segment-element>
-                    <segment-element name="phone" minCount="0" maxCount="7" parent-beanref="consumer" addMethod="addPhone" beanref="phone">
+                    <segment-element minCount="0" maxCount="7" parent-beanref="consumer" add-method="addPhone" beanref="phone">
                         <field-ident field-start="0" field-length="2">
                             <match-string>PH</match-string>
                         </field-ident>
@@ -80,7 +80,7 @@
                         <record-element beanref="phone.number" length="0" type="char"/>
                     </segment-element>
                 </segment-element>
-                <segment-element name="address" minCount="0" maxCount="4" parent-beanref="account" addMethod="addAddress" beanref="address">
+                <segment-element minCount="0" maxCount="4" parent-beanref="account" add-method="addAddress" beanref="address">
                     <field-ident field-start="0" field-length="2">
                         <match-string>AD</match-string>
                     </field-ident>

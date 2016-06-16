@@ -54,7 +54,7 @@ class Line {
      * <b>NOTE:</b> Only the first character in the string is considered
      */
     public void setQuoteChar(String quote) {
-        if(quote != null) {
+        if (quote != null) {
             chrQuote = quote.charAt(0);
         }
     }
@@ -85,20 +85,10 @@ class Line {
     }
 
     /**
-     *
-     * @param inputLine
-     *          A single line from file to be parsed into its corresponding bean
-     * @param beans
-     *          A Hashmap containing a collection of beans which will be populated
-     *          with parsed data
-     * @param convHelper
-     *          A ConversionHelper which aids in the conversion of datatypes and
-     *          string formatting
-     *
-     * @throws FlatwormInputLineLengthException
-     *           , FlatwormConversionException, FlatwormUnsetFieldValueException
-     * @throws FlatwormInvalidRecordException
-     * @throws FlatwormCreatorException
+     * @param inputLine  A single line from file to be parsed into its corresponding bean
+     * @param beans      A Hashmap containing a collection of beans which will be populated with parsed data
+     * @param convHelper A ConversionHelper which aids in the conversion of datatypes and string formatting
+     * @throws FlatwormInputLineLengthException , FlatwormConversionException, FlatwormUnsetFieldValueException
      */
     public void parseInput(String inputLine, Map<String, Object> beans, ConversionHelper convHelper)
             throws FlatwormInputLineLengthException, FlatwormConversionException,
@@ -178,16 +168,10 @@ class Line {
     /**
      * Convert string field from file into appropriate type and set bean's value<br>
      *
-     * @param fieldChars
-     *          the raw string data read from the field
-     * @param re
-     *          the RecordElement, which contains detailed information about the
-     *          field
-     *
-     * @throws FlatwormInputLineLengthException
-     *           , FlatwormConversionException, FlatwormUnsetFieldValueException -
-     *           wraps
-     *           IllegalAccessException,InvocationTargetException,NoSuchMethodException
+     * @param fieldChars the raw string data read from the field
+     * @param re         the RecordElement, which contains detailed information about the field
+     * @throws FlatwormConversionException, FlatwormUnsetFieldValueException - wraps IllegalAccessException, InvocationTargetException,
+     *                                      NoSuchMethodException
      */
     private void mapField(String fieldChars, RecordElement re)
             throws FlatwormInputLineLengthException, FlatwormConversionException,
@@ -207,18 +191,11 @@ class Line {
     }
 
     /**
-     * Convert string field from file into appropriate type and set bean's value.
-     * This is used for delimited files only<br>
+     * Convert string field from file into appropriate type and set bean's value. This is used for delimited files only<br>
      *
-     * @param inputLine
-     *          the line of data read from the data file
-     *
-     * @throws FlatwormInputLineLengthException
-     *           , FlatwormConversionException, FlatwormUnsetFieldValueException -
-     *           wraps
-     *           IllegalAccessException,InvocationTargetException,NoSuchMethodException
-     * @throws FlatwormInvalidRecordException
-     * @throws FlatwormCreatorException
+     * @param inputLine the line of data read from the data file
+     * @throws FlatwormInputLineLengthException , FlatwormConversionException, FlatwormUnsetFieldValueException - wraps
+     *                                          IllegalAccessException, InvocationTargetException, NoSuchMethodException
      */
     private void parseInputDelimited(String inputLine) throws FlatwormInputLineLengthException,
             FlatwormConversionException, FlatwormUnsetFieldValueException,
@@ -298,7 +275,7 @@ class Line {
         // than a list
         String beanRef = segment.getBeanRef();
         if (!segment.matchesId(delimitedFields[currentField]) && minCount > 0) {
-            log.error("Segment " + segment.getName() + " with minimun required count of " + minCount
+            log.error("Segment " + segment.getCollectionPropertyName() + " with minimun required count of " + minCount
                     + " missing.");
         }
         int cardinality = 0;
@@ -308,19 +285,17 @@ class Line {
                 if (beanRef != null) {
                     ++cardinality;
                     String parentRef = segment.getParentBeanRef();
-                    String addMethod = segment.getAddMethod();
-                    if (parentRef != null && addMethod != null) {
+                    if (parentRef != null) {
                         Object instance = ParseUtils.newBeanInstance(beans.get(beanRef));
                         beans.put(beanRef, instance);
                         if (cardinality > maxCount) {
                             if (segment.getCardinalityMode() == CardinalityMode.STRICT) {
-                                throw new FlatwormInvalidRecordException(
-                                        "Cardinality exceeded with mode set to STRICT");
+                                throw new FlatwormInvalidRecordException("Cardinality exceeded with mode set to STRICT");
                             } else if (segment.getCardinalityMode() != CardinalityMode.RESTRICTED) {
-                                ParseUtils.invokeAddMethod(beans.get(parentRef), addMethod, instance);
+                                ParseUtils.addValueToCollection(segment, beans.get(parentRef), instance);
                             }
                         } else {
-                            ParseUtils.invokeAddMethod(beans.get(parentRef), addMethod, instance);
+                            ParseUtils.addValueToCollection(segment, beans.get(parentRef), instance);
                         }
                     }
                     doParseDelimitedInput(segment.getElements());
@@ -328,7 +303,7 @@ class Line {
             }
         } finally {
             if (cardinality > maxCount) {
-                log.error("Segment '" + segment.getName() + "' with maximum of " + maxCount
+                log.error("Segment '" + segment.getCollectionPropertyName() + "' with maximum of " + maxCount
                         + " encountered actual count of " + cardinality);
             }
         }

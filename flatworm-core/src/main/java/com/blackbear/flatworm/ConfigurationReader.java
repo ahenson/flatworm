@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm;
 
+import com.google.common.base.Preconditions;
+
 import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
@@ -46,14 +48,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
  */
 public class ConfigurationReader {
     /**
-     * <code>loadConfigurationFile</code> takes an XML configuration file, and
-     * returns a <code>FileFormat</code> object, which can be used to parse an
+     * {@code loadConfigurationFile} takes an XML configuration file, and
+     * returns a {@code FileFormat} object, which can be used to parse an
      * input file into beans.
      *
-     * @param xmlFile
-     *          An XML file which contains a valid Flatworm configuration
-     * @return A <code>FileFormat</code> object which can parse the specified
-     *         format.
+     * @param xmlFile An XML file which contains a valid Flatworm configuration.
+     * @return A {@code FileFormat} object which can parse the specified format.
      * @throws FlatwormUnsetFieldValueException If a required parameter of a tag is not set.
      * @throws FlatwormConfigurationValueException If the file contains invalid syntax.
      * @throws FlatwormParserException Should the {@code xmlFile} fail to parse.
@@ -307,12 +307,12 @@ public class ConfigurationReader {
             if (nodeName.equals("segment-element")) {
                 SegmentElement segment = new SegmentElement();
                 segment.setCardinalityMode(CardinalityMode.LOOSE);
-                segment.setName(getAttributeValueNamed(node, "name"));
                 segment.setMinCount(Util.tryParseInt(getAttributeValueNamed(node, "minCount")));
                 segment.setMaxCount(Util.tryParseInt(getAttributeValueNamed(node, "maxCount")));
                 segment.setBeanRef(getAttributeValueNamed(node, "beanref"));
                 segment.setParentBeanRef(getAttributeValueNamed(node, "parent-beanref"));
-                segment.setAddMethod(getAttributeValueNamed(node, "addMethod"));
+                segment.setCollectionPropertyName(getAttributeValueNamed(node, "collection-property-name"));
+                segment.setAddMethod(getAttributeValueNamed(node, "add-method"));
                 String segmentMode = getAttributeValueNamed(node, "cardinality-mode");
                 if (!StringUtils.isBlank(segmentMode)) {
                     if (segmentMode.toLowerCase().startsWith("strict")) {
@@ -384,26 +384,17 @@ public class ConfigurationReader {
 
     private void validateSegmentConfiguration(SegmentElement segment) throws FlatwormConfigurationValueException {
         StringBuilder errors = new StringBuilder();
-        if (StringUtils.isBlank(segment.getBeanRef())) {
-            if (!StringUtils.isBlank(segment.getName())) {
-                segment.setBeanRef(segment.getName());
-            } else {
-                errors.append("Must specify the beanref to be used, or a segment name that matches a bean name.\n");
-            }
-        }
         if (StringUtils.isBlank(segment.getParentBeanRef())) {
-            errors.append("Must specify the beanref for the parent object.");
+            errors.append(String.format("Must specify the parent-beanref attribute for segment-elements.%n"));
         }
-        if (StringUtils.isBlank(segment.getAddMethod())) {
-            if (errors.length() == 0) {
-                segment.setAddMethod("add"
-                        + StringUtils.capitalize(StringUtils.isBlank(segment.getName())
-                            ? segment.getBeanRef()
-                            : segment.getName()));
-            }
+        if (StringUtils.isBlank(segment.getBeanRef())) {
+            errors.append(String.format("Must specify the beanref attribute for segment-elements.%n"));
+        }
+        if (StringUtils.isBlank(segment.getCollectionPropertyName()) && StringUtils.isBlank(segment.getAddMethod())) {
+            errors.append(String.format("Must specify either the collection-property-name attribute or add-method attribute for segment-elements.%n"));
         }
         if (segment.getFieldIdentMatchStrings().size() == 0) {
-            errors.append("Must specify the segment identifier.\n");
+            errors.append(String.format("Must specify the segment identifier.%n"));
         }
         if (errors.length() > 0) {
             throw new FlatwormConfigurationValueException(errors.toString());
