@@ -21,37 +21,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Data;
+
 /**
  * Bean class used to store the values from the Record-Definition XML tag
  */
-
-class RecordDefinition extends Object {
+@Data
+class RecordDefinition {
     private Map<String, Bean> beansUsed;
     private List<Line> lines;
 
     public RecordDefinition() {
-        this.beansUsed = new HashMap<String, Bean>();
-        this.lines = new ArrayList<Line>();
-    }
-
-    public Map<String, Bean> getBeansUsed() {
-        return this.beansUsed;
-    }
-
-    public void setBeansUsed(Map<String, Bean> beansUsed) {
-        this.beansUsed = beansUsed;
+        this.beansUsed = new HashMap<>();
+        this.lines = new ArrayList<>();
     }
 
     public void addBeanUsed(Bean bean) {
         this.beansUsed.put(bean.getBeanName(), bean);
-    }
-
-    public List<Line> getLines() {
-        return this.lines;
-    }
-
-    public void setLines(List<Line> lines) {
-        this.lines = lines;
     }
 
     public void addLine(Line line) {
@@ -59,12 +45,6 @@ class RecordDefinition extends Object {
     }
 
     public String toString() {
-        StringBuffer b = new StringBuffer();
-        b.append(super.toString() + "[");
-        b.append("beans = " + beansUsed);
-        b.append(",lines=" + lines);
-        b.append("]");
-        return b.toString();
+        return super.toString() + "[bean = " + beansUsed + ", lines=" + lines + "]";
     }
-
 }
