@@ -14,34 +14,34 @@
  * and limitations under the License.
  */
 
-package domain.segment;
+package com.blackbear.flatworm.test.domain.domain;
 
-public class Student {
-    private String firstName;
-    private String lastName;
-    private int grade;
+/**
+ * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ */
+public class Videotape {
+    private String sku;
 
-    public String getFirstName() {
-        return firstName;
+    private double price;
+
+    public String getSku() {
+        return sku;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
-    public String getLastName() {
-        return lastName;
+    public double getPrice() {
+        return price;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public int getGrade() {
-        return grade;
+    public String toString() {
+        return super.toString() + "[" + sku + ", " + price + "]";
     }
 
-    public void setGrade(int grade) {
-        this.grade = grade;
-    }
 }

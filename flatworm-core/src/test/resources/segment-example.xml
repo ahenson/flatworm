@@ -35,11 +35,11 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="account" class="domain.segment.Account"/>
-            <bean name="consumer" class="domain.segment.Consumer"/>
-            <bean name="id" class="domain.segment.Identity"/>
-            <bean name="phone" class="domain.segment.Phone"/>
-            <bean name="address" class="domain.segment.Address"/>
+            <bean name="account" class="com.blackbear.flatworm.test.domain.domain.segment.Account"/>
+            <bean name="consumer" class="com.blackbear.flatworm.test.domain.domain.segment.Consumer"/>
+            <bean name="id" class="com.blackbear.flatworm.test.domain.domain.segment.Identity"/>
+            <bean name="phone" class="com.blackbear.flatworm.test.domain.domain.segment.Phone"/>
+            <bean name="address" class="com.blackbear.flatworm.test.domain.domain.segment.Address"/>
             <line delimit="|">
                 <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
                 <record-element beanref="account.reportingDate" length="0" type="date">

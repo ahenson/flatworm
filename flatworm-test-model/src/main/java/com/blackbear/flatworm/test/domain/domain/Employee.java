@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package domain;
+package com.blackbear.flatworm.test.domain.domain;
 
 /**
  * Created by IntelliJ IDEA. User: james Date: Sep 18, 2003 Time: 2:56:46 AM To change this template use Options | File Templates.

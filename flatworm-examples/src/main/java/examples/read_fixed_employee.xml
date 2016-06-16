@@ -29,7 +29,7 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="employee" class="domain.Employee"/>
+            <bean name="employee" class="com.blackbear.flatworm.test.domain.domain.Employee"/>
             <line>
                 <record-element length="2"/>
                 <record-element length="15" beanref="employee.firstName"

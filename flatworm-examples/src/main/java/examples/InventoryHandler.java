@@ -28,11 +28,11 @@ import com.blackbear.flatworm.errors.FlatwormCreatorException;
 
 import java.io.IOException;
 
-import domain.Book;
-import domain.Dvd;
-import domain.Film;
-import domain.Inventory;
-import domain.Videotape;
+import com.blackbear.flatworm.test.domain.domain.Book;
+import com.blackbear.flatworm.test.domain.domain.Dvd;
+import com.blackbear.flatworm.test.domain.domain.Film;
+import com.blackbear.flatworm.test.domain.domain.Inventory;
+import com.blackbear.flatworm.test.domain.domain.Videotape;
 
 /**
  * @author e50633

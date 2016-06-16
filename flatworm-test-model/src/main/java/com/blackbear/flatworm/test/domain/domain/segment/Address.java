@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package domain.segment;
+package com.blackbear.flatworm.test.domain.domain.segment;
 
 public class Address {
     private String type;

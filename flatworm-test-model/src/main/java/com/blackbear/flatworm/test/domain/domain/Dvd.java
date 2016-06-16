@@ -14,13 +14,15 @@
  * and limitations under the License.
  */
 
-package domain;
+package com.blackbear.flatworm.test.domain.domain;
 
 /**
  * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
  */
-public class Videotape {
+public class Dvd {
     private String sku;
+
+    private String dualLayer;
 
     private double price;
 
@@ -32,6 +34,14 @@ public class Videotape {
         this.sku = sku;
     }
 
+    public String getDualLayer() {
+        return dualLayer;
+    }
+
+    public void setDualLayer(String dualLayer) {
+        this.dualLayer = dualLayer;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -41,7 +51,7 @@ public class Videotape {
     }
 
     public String toString() {
-        return super.toString() + "[" + sku + ", " + price + "]";
+        return super.toString() + "[" + sku + ", " + price + ", " + dualLayer + "]";
     }
 
 }

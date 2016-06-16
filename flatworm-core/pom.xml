@@ -36,6 +36,13 @@
 
     <dependencies>
 
+        <!-- Flatworm dependencies -->
+        <dependency>
+            <groupId>com.blackbear</groupId>
+            <artifactId>flatworm-test-model</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- External dependencies -->
         <dependency>
             <groupId>commons-beanutils</groupId>

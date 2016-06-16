@@ -14,44 +14,45 @@
  * and limitations under the License.
  */
 
-package domain;
+package com.blackbear.flatworm.test.domain.domain;
+
+import java.util.Date;
 
 /**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
  */
-public class Dvd {
-    private String sku;
+public class Film {
+    private Date releaseDate;
 
-    private String dualLayer;
+    private String title;
 
-    private double price;
+    private String studio;
 
-    public String getSku() {
-        return sku;
+    public Date getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setSku(String sku) {
-        this.sku = sku;
+    public void setReleaseDate(Date releaseDate) {
+        this.releaseDate = releaseDate;
     }
 
-    public String getDualLayer() {
-        return dualLayer;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDualLayer(String dualLayer) {
-        this.dualLayer = dualLayer;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public double getPrice() {
-        return price;
+    public String getStudio() {
+        return studio;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setStudio(String studio) {
+        this.studio = studio;
     }
 
     public String toString() {
-        return super.toString() + "[" + sku + ", " + price + ", " + dualLayer + "]";
+        return super.toString() + "[" + releaseDate + ", " + title + ", " + studio + "]";
     }
-
 }

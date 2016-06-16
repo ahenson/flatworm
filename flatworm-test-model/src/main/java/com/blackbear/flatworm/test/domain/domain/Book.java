@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package domain;
+package com.blackbear.flatworm.test.domain.domain;
 
 import java.util.Date;
 

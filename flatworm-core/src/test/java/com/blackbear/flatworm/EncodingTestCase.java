@@ -33,7 +33,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
-import domain.Film;
+import com.blackbear.flatworm.test.domain.domain.Film;
 
 public class EncodingTestCase extends TestCase {
     protected FileFormat ff;
@@ -47,7 +47,7 @@ public class EncodingTestCase extends TestCase {
             + "       <record-ident>\r\n"
             + "           <length-ident minlength=\"0\" maxlength=\"9999\" />\r\n"
             + "       </record-ident>\r\n" + "       <record-definition>\r\n"
-            + "           <bean name=\"film\" class=\"domain.Film\" />\r\n" + "           <line>\r\n"
+            + "           <bean name=\"film\" class=\"com.blackbear.flatworm.test.domain.domain.Film\" />\r\n" + "           <line>\r\n"
             + "               <record-element length=\"30\" beanref=\"film.title\"\r\n"
             + "                   type=\"char\">\r\n"
             + "                   <conversion-option name=\"justify\" value=\"left\" />\r\n"

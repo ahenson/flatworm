@@ -24,10 +24,10 @@ package examples;
 
 import com.blackbear.flatworm.MatchedRecord;
 
-import domain.Book;
-import domain.Dvd;
-import domain.Film;
-import domain.Videotape;
+import com.blackbear.flatworm.test.domain.domain.Book;
+import com.blackbear.flatworm.test.domain.domain.Dvd;
+import com.blackbear.flatworm.test.domain.domain.Film;
+import com.blackbear.flatworm.test.domain.domain.Videotape;
 
 /**
  * @author e50633

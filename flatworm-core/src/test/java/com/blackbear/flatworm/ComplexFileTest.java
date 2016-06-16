@@ -22,10 +22,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
-import domain.Book;
-import domain.Dvd;
-import domain.Film;
-import domain.Videotape;
+import com.blackbear.flatworm.test.domain.domain.Book;
+import com.blackbear.flatworm.test.domain.domain.Dvd;
+import com.blackbear.flatworm.test.domain.domain.Film;
+import com.blackbear.flatworm.test.domain.domain.Videotape;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

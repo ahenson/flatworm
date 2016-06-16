@@ -25,8 +25,8 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="class" class="domain.segment.ClassPeriod"/>
-            <bean name="student" class="domain.segment.Student"/>
+            <bean name="class" class="com.blackbear.flatworm.test.domain.domain.segment.ClassPeriod"/>
+            <bean name="student" class="com.blackbear.flatworm.test.domain.domain.segment.Student"/>
             <line delimit="\t">
                 <record-element length="0" type="char"/>
                 <record-element length="0" beanref="class.subject" type="char"/>
