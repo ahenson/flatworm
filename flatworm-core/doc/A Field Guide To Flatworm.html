@@ -1,0 +1,919 @@
+<!--
+  ~ Flatworm - A Java Flat File Importer/Exporter Copyright (C) 2004 James M. Turner.
+  ~ Extended by James Lawrence 2005
+  ~ Extended by Josh Brackett in 2011 and 2012
+  ~ Extended by Alan Henson in 2016
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+  ~ and limitations under the License.
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>A Field Guide To Flatworm</title>
+</head>
+<body>
+<h1 style="text-align: center;"><img alt="The handsome flatworm"
+                                     src="flatworm.jpg" style="width: 341px; height: 306px;" align="right"
+                                     hspace="20">A Field Guide to Parsing and Creating Flat Files <br>
+    Using the Humble Flatworm</h1>
+<div style="text-align: center;"><big><big>For Version
+    2.0<br>
+    Last Revised December, 2009</big></big><br>
+    <br>
+    <br>
+</div>
+Flat files.&nbsp; Much as we live in an XML/SOAP/Web Services world,
+there's still a ton of data being moved around between proprietary and
+legacy applications that consists of fixed length fields delimited by
+EOLs.&nbsp; Around about the time I wrote my 20th Java class who's only
+purpose in life was to suck up a flat file, use
+<span style="font-family: monospace;">String.substring</span>
+to break it up into pieces, and then populate a bean with it, I decided
+there had to be a better way.&nbsp; This package represents the fruit of
+that frustration.
+<br>
+<br>
+<h3>What is Flatworm?</h3>
+Flatworm is a Java library intended to allow a developer to describe the
+format of a flat file using an XML definition file, and then to be able
+to automatically read lines from that file, and have one or more beans
+be instantiated for each logical record.
+<br>
+<br>
+There are a few powerful features in Flatworm worth mentioning.&nbsp;
+For one thing, a record may consist of one or more physical lines in the
+file.&nbsp; A record may contain more than one bean once decoded.&nbsp;
+A flat file may contain more than one type of record, and Flatworm can
+use line length and substring matching to determine which type of record
+a line begins.
+<br>
+<br>
+Besides fielded buffer flat files, Flatworm also supports text files where
+the different fields are separated by a separator character, e.g. CSV (comma separated values) files.
+<br>
+<br>
+Flatworm, as of version 2.0, also supports delimited files that contain segments that may repeat. These
+are different than standard flat files that have a well defined number of fields for each record. With
+repeating segments it is possible to have a varying number of the segment in each record, so that different
+records in the file could have a different number of fields. Repeating segments are supported only for reading
+delimited files.
+<br/>
+<br/>
+Last but not least, Flatworm is able to produce flat files from beans
+and the same definition file.
+<br>
+<br>
+<h3>Requirements<br>
+</h3>
+In addition to the flatworm jar file, you will also need to have the
+following jars in your classpath in order for Flatworm to thrive:
+<br>
+<ul>
+    <li>commons-beanutils (from Apache Commons)</li>
+    <li>commons-collections (from Apache Commons)</li>
+    <li>commons-logging (from Apache Commons)</li>
+    <li>commons-lang (from Apache Commons)</li>
+    <li>log4j (www.log4j.org)(optional)</li>
+</ul>
+Recent versions of all of these packages are available in the source jar
+file.
+<br>
+<h3>Downloading</h3>
+The latest version of Flatworm is Release 2.0.&nbsp; You can download it
+from
+<a
+        href="http://sourceforge.net/project/showfiles.php?group_id=90361&amp;package_id=94975">Sourceforge</a>
+.
+<br>
+<h3>A Simple Example</h3>
+Before diving into the complexities of Flatworm, let's look at a simple
+example that illustrates the basic operation.&nbsp; Imagine the
+following input file which contains new hire data for a company:
+<br>
+<pre>NHJAMES          TURNER         M123-45-67890004224345<br>NHJOHN           JONES          M987-65-43210104356745<br></pre>
+The layout of the file is as follows:
+<br>
+<table style="text-align: left; width: 579px; height: 200px;" border="1"
+       cellpadding="2" cellspacing="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">RECORD NAME<br>
+        </td>
+        <td style="vertical-align: top;">TYPE<br>
+        </td>
+        <td style="vertical-align: top;">LENGTH<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">recordtype<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">2<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">firstname<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">15<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">lastname<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">15<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">gender<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">1<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">ssn<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">11<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">salary<br>
+        </td>
+        <td style="vertical-align: top;">double<br>
+        </td>
+        <td style="vertical-align: top;">10 (2 decimal places)<br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+We want to suck this file into a Java bean called Employee that has
+properties firstName, lastName, ssn, gender and salary.&nbsp; These are
+available via the standard JavaBean mechanisms.
+<br>
+<br>
+To do this, we start by writing the Flatworm XML descriptor for the
+file:
+<br>
+<br>
+<pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;<br>&lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;<br>&lt;file-format&gt;<br>    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/&gt;<br>    &lt;converter name="decimal" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDecimal" return-type="java.lang.Double"/&gt;<br>    &lt;record name="newhire"&gt;<br>        &lt;record-ident&gt;<br>            &lt;field-ident field-start="0" field-length="2"&gt;<br>                &lt;match-string&gt;NH&lt;/match-string&gt;<br>            &lt;/field-ident&gt;<br>        &lt;/record-ident&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="employee" class="Employee"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element length="2"/&gt;<br>                &lt;record-element length="15" beanref="employee.firstName" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="15" beanref="employee.lastName" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="1" beanref="employee.gender" type="char"/&gt;<br>                &lt;record-element length="11" beanref="employee.ssn" type="char"&gt;<br>                    &lt;conversion-option name="strip-chars" value="non-numeric"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="10" beanref="employee.salary" type="decimal"&gt;<br>                    &lt;conversion-option name="decimal-places" value="2"/&gt;<br>                    &lt;conversion-option name="decimal-implied" value="true"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>&lt;/file-format&gt;<br></pre>
+The file-format tag is required, and specifies the beginning of the
+actual description.&nbsp; The first thing that we must do is to register
+converters for the datatypes used in the file.&nbsp; There are a number
+of&nbsp; predefined converter methods in the provided class
+com.blackbear.flatworm.coverters.CoreConverters:
+<br>
+<br>
+<ul>
+    <li>convertChar - Simply returns the field specified, optionally
+        stripping leading or trailing (or both) padding characters, and
+        removing unwanted characters.
+    </li>
+    <li>convertDecimal - As above but converts the value to a Double.
+        The decimal place may be implied by position, or explicit<br>
+    </li>
+    <li>convertDate - Parses the date using the default (MM-dd-yyyy)
+        or a user defined format.
+    </li>
+    <li>convertInteger - Parses to an Integer</li>
+    <li>convertLong - Parses to a Long</li>
+    <li>covertBigDecimal - Parses to a BigDecimal</li>
+</ul>
+In order to be used in record definitions, a converter must always be
+registered first.&nbsp; Next in the file, a record is defined.&nbsp; A
+file may contain several different types of records, the record-indent
+tag is used to specify which record definition is approach for a given
+line.&nbsp; There are two different ways to identify a record, by a
+substring match on a specific section of the line, or by the overall
+length of the line.&nbsp; Later, you will see how multiple record types
+can be read from the same file, for them moment only one is defined,
+which matches on the characters NH (new hire) at locations 0-2 on the
+line.&nbsp; If no record-ident is defined, all records will match.
+<br>
+<br>
+Once we're sure that we are dealing with the correct record type, we can
+define the record.&nbsp; We start by defining the beans that will be
+returned.&nbsp; Each bean has a name which is used to reference it
+inside the definition, and a class (fully qualified) with which to
+create objects.&nbsp; The class specified must have a valid
+zero-argument instantiator.
+<br>
+<br>
+Finally the record is broken down line by line (since a record is
+allowed to span multiple lines). Record-elements (fields) may be defined
+in terms of:
+<br>
+<ul>
+    <li>&nbsp;a length alone, in which case they are considered to
+        span from the end of the last field to that position plus the specified
+        length
+    </li>
+    <li>a start position and a length, in which case they span from
+        the start position to that position plus the length
+    </li>
+    <li>a start and end position, in which case they span from the
+        start to end position&nbsp; (not inclusive of the end)
+    </li>
+    <li>an end position alone, in which case they span from the last
+        end position to the specified end position (not inclusive of the end)
+    </li>
+</ul>
+Each record element also defines the beanref (according to the standard
+used in the Apache Commons BeanUtil package), and the type (which should
+match one of the types defined at the top of the file)&nbsp; Record
+elements also may have conversion-options, which are specific to the
+converter specified.&nbsp; For example, in the above example, the
+lastName field should have any trailing spaces removed, the social
+security number show be stripped of all non-numeric characters, and the
+salary has two implied decimal places and may be left-padded with zeros
+which should be removed.
+<br>
+<br>
+Now we're ready to fire it all up.&nbsp; Here's a simple Java class that
+parses the input file and prints out the beans produced:
+<br>
+<br>
+<pre>import java.io.*;<br>import java.util.HashMap;<br><br>import com.blackbear.flatworm.ConfigurationReader;<br>import com.blackbear.flatworm.FileFormat;<br>import com.blackbear.flatworm.MatchedRecord;<br>import com.blackbear.flatworm.errors.*;<br><br>public class SimpleFlatwormExample {<br>    public static void main(String[] args) {<br>         ConfigurationReader parser = new ConfigurationReader();<br>         try {<br>             FileFormat ff = parser.loadConfigurationFile(args[0]);<br>             InputStream in = new FileInputStream(args[1]);<br>             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));<br>             MatchedRecord results;<br>             while ((results = ff.getNextRecord(bufIn)) != null) {<br>                 if (results.getRecordName().equals("newhire")) {<br>                    System.out.println(results.getBean("employee"));<br>                 }<br>             }<br><br>         } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {<br>             flatwormUnsetFieldValueError.printStackTrace();  <br>         } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {<br>             flatwormConfigurationValueError.printStackTrace();<br>         } catch (FileNotFoundException e) {<br>             e.printStackTrace();<br>         } catch (FlatwormInvalidRecordException e) {<br>             e.printStackTrace(); <br>         } catch (FlatwormInputLineLengthException e) {<br>             e.printStackTrace(); <br>         } catch (FlatwormConversionException e) {<br>             e.printStackTrace(); <br>         }<br>     }<br><br>}<br></pre>
+The location of the configuration file is passed in as the first
+argument to the method, and the file to be parsed as the second.&nbsp; A
+ConfigurationReader object is created, and the loadConfigurationFile
+method is called with the path to the file as the argument.&nbsp; A
+FileFormat is returned.&nbsp; After opening the input file and morphing
+it into a BufferedReader,&nbsp; the BufferedReader is passed in to the
+getNextRecord method of the FileFormat.&nbsp; getNextRecord either
+returns null if the input file has been exhusted, or a MatchedRecord
+object.&nbsp; The getRecordName method lets us know which type of record
+is being returned (remembering again that a file can have several types
+of records), and we can access specific beans with the getBean method.
+<br>
+<br>
+When we run this test program, the results are as expected:
+<br>
+<br>
+<pre>C:/j2sdk1.4.2_04\bin\java SimpleFlatwormExample simple-example.xml import1.txt<br>Employee@120a47e[TURNER, JAMES, 123456789, M, 42243.45]<br>Employee@f73c1[JONES, JOHN, 987654321, M, 1043567.45]<br>Process terminated with exit code 0<br></pre>
+<h3>Defining Your Own Converters</h3>
+If you want to define a novel new converter to use in your application,
+it's quite simple.&nbsp; For each type to be converted, a converter has to
+offer two methods:
+<ol>
+    <li>A method to convert a string read from the file to the target type (parsing). The signature
+        of such a method looks like this (being <tt>T</tt> the type to be parsed):
+        <pre>public T convertT(String str, HashMap options) throws FlatwormConversionException;</pre>
+    <li>A method to convert a value of the target type into a string representation (generation). The
+        signature of such a method looks like this (being <tt>T</tt> the type to be written):
+        <pre>public String convertT(Object obj, HashMap options)</pre>
+</ol>
+To become a bit more specific, let's look at the definition
+of&nbsp; ConvertDecimal from the CoreConverters file - first the parsing method:
+<br>
+<pre>
+    public Double convertDecimal(String str, HashMap options) throws FlatwormConversionException
+    {
+        try
+        {
+            int decimalPlaces = 0;
+            ConversionOption conv = (ConversionOption) options.get("decimal-places");
+
+            String decimalPlacesOption = null;
+            if (null != conv)
+                decimalPlacesOption = conv.getValue();
+
+            boolean decimalImplied = "true".equals(Util.getValue(options, "decimal-implied"));
+
+            if (decimalPlacesOption != null)
+                decimalPlaces = Integer.parseInt(decimalPlacesOption);
+
+            if (str.length() == 0)
+                return new Double(0.0D);
+
+            if (decimalImplied)
+                return new Double(Double.parseDouble(str) / Math.pow(10D, decimalPlaces));
+            else
+                return Double.valueOf(str);
+
+        } catch (NumberFormatException ex)
+        {
+            cat.error(ex);
+            throw new FlatwormConversionException(str);
+        }
+    }
+</pre>
+All parsing converter methods must accept exactly two arguments, a String and a
+HashMap.&nbsp; The String contains the substring text from the input
+line.&nbsp; The HashMap contains the key/value pairs from the
+conversion-options tags.&nbsp; It's a good policy to call removePadding
+first, since it automatically handles removing any left or right padding
+as specified by the options,&nbsp; strips out unwanted characters, and
+returns a default value if the string is empty.&nbsp; Converters should
+return an object as opposed to an intrinsic, since the value must
+eventually end up in a HashMap.&nbsp; Finally, if any errors are
+encountered during processing, you should throw a
+FlatwormConversionException with some useful diagnostic information.
+<br>
+<br>
+Now let's take a look at the definition
+of the CoreConverter's method for writing a Decimal:
+<pre>
+    public String convertDecimal(Object obj, HashMap options)
+    {
+        Double d = (Double) obj;
+        if (d == null)
+        {
+            return null;
+        }
+
+        int decimalPlaces = 0;
+        ConversionOption conv = (ConversionOption) options.get("decimal-places");
+
+        String decimalPlacesOption = null;
+        if (null != conv)
+            decimalPlacesOption = conv.getValue();
+
+        boolean decimalImplied = "true".equals(Util.getValue(options, "decimal-implied"));
+
+        if (decimalPlacesOption != null)
+            decimalPlaces = Integer.parseInt(decimalPlacesOption);
+
+        DecimalFormat format = new DecimalFormat();
+        format.setDecimalSeparatorAlwaysShown(!decimalImplied);
+        format.setGroupingUsed(false);
+        if (decimalImplied)
+        {
+            format.setMaximumFractionDigits(0);
+            d = new Double(d.doubleValue() * Math.pow(10D, decimalPlaces));
+        } else
+        {
+            format.setMinimumFractionDigits(decimalPlaces);
+            format.setMaximumFractionDigits(decimalPlaces);
+        }
+        return format.format(d);
+    }
+</pre>
+The generating converter methods have a similar restriction as the parsing methods, just
+the first parameter must be of type <tt>Object</tt>. It is not the actual attribute type, so
+Flatworm remains compatible with Java version below 5.0.
+
+<h3>Record Matching</h3>
+As promised, let's look at a more complex example now.&nbsp; This
+example combines multiple beans in a single record, and multiple record
+types in a single file:&nbsp; Let's assume we're in the IT department at
+MegaMart, and we're importing a mixed flat file containing books,
+videotapes and DVDs.&nbsp; Unfortunately, the three product types have
+three different formats.
+<br>
+<h4>DVD<br>
+</h4>
+<table style="text-align: left; width: 579px; height: 200px;" border="1"
+       cellpadding="2" cellspacing="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">RECORD NAME<br>
+        </td>
+        <td style="vertical-align: top;">TYPE<br>
+        </td>
+        <td style="vertical-align: top;">LENGTH<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">title<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">30<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">studio name<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">30<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">release date<br>
+        </td>
+        <td style="vertical-align: top;">date<br>
+        </td>
+        <td style="vertical-align: top;">8 (YYYYMMDD)<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">sku<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">9<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">price<br>
+        </td>
+        <td style="vertical-align: top;">double<br>
+        </td>
+        <td style="vertical-align: top;">7<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">dual layer<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">1<br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+The DVD record is a single-line 85 character record, 30 characters each
+for the title and studio name, an 8 character date field, 9 for the
+product SKU, 7 for the price with explicit decimal point, and a single
+character Y/N field that says if the DVD is dual layer.
+<br>
+<br>
+By contrast, the videotape record is a two-line return:
+<br>
+<h4>Videotape</h4>
+<table style="text-align: left; width: 579px; height: 117px;" border="1"
+       cellpadding="2" cellspacing="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">RECORD NAME<br>
+        </td>
+        <td style="vertical-align: top;">TYPE<br>
+        </td>
+        <td style="vertical-align: top;">LENGTH<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">recordtype<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">1 ('V')<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">sku<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">9<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">price<br>
+        </td>
+        <td style="vertical-align: top;">double<br>
+        </td>
+        <td style="vertical-align: top;">6 (implied decimal, 2 places,
+            zero pad)<br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<table style="text-align: left; width: 579px; height: 103px;" border="1"
+       cellpadding="2" cellspacing="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">RECORD NAME<br>
+        </td>
+        <td style="vertical-align: top;">TYPE<br>
+        </td>
+        <td style="vertical-align: top;">LENGTH<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">title<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">30<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">studio<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">30<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">release date<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">10 (YYYY-MM-DD)<br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+This record starts with a line with a leading 'V' character followed by
+the SKU and price without a decimal point, then a second line with
+title, studio and release date.
+<br>
+<br>
+Finally, the book record is a single-line record, similar to the DVD
+record
+<br>
+<h4>Book</h4>
+<table style="text-align: left; width: 579px; height: 174px;" border="1"
+       cellpadding="2" cellspacing="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">RECORD NAME<br>
+        </td>
+        <td style="vertical-align: top;">TYPE<br>
+        </td>
+        <td style="vertical-align: top;">LENGTH<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">sku<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">9<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">title<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">30<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">author<br>
+        </td>
+        <td style="vertical-align: top;">char<br>
+        </td>
+        <td style="vertical-align: top;">30</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">price<br>
+        </td>
+        <td style="vertical-align: top;">double<br>
+        </td>
+        <td style="vertical-align: top;">7 (explicit decimal)<br>
+        </td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">release date<br>
+        </td>
+        <td style="vertical-align: top;">date<br>
+        </td>
+        <td style="vertical-align: top;">10 (YYYY-MM-DD)<br>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+Further complicating thing, we want to use a common "Film" bean to store
+the film-related info from both the DVD and Videotape records, but store
+the rest in seperate DVD or Videotape beans.&nbsp; Finally, some of the
+date records are missing, and should be given a default value on import.
+As it turns out, this is a piece of cake for Flatworm:
+<br>
+<pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;
+&lt;file-format&gt;
+    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/&gt;
+    &lt;converter name="decimal" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDecimal" return-type="java.lang.Double"/&gt;
+    &lt;converter name="date" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDate" return-type="java.util.Date"/&gt;
+    &lt;record name="dvd"&gt;
+        &lt;record-ident&gt;
+            &lt;length-ident minlength="85" maxlength="85"/&gt;
+        &lt;/record-ident&gt;
+        &lt;record-definition&gt;
+            &lt;bean name="dvd" class="Dvd"/&gt;
+            &lt;bean name="film" class="Film"/&gt;
+            &lt;line&gt;
+                &lt;record-element length="30" beanref="film.title" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="30" beanref="film.studio" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="8" beanref="film.releaseDate" type="date"&gt;<br>                    &lt;conversion-option name="format" value="yyyyMMdd"/&gt;<br>                    &lt;conversion-option name="default-value" value="19990101"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="9" beanref="dvd.sku" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="7" beanref="dvd.price" type="decimal"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="1" beanref="dvd.dualLayer" type="char"/&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>    &lt;record name="videotape"&gt;<br>        &lt;record-ident&gt;<br>            &lt;field-ident field-start="0" field-length="1"&gt;<br>                &lt;match-string&gt;V&lt;/match-string&gt;<br>            &lt;/field-ident&gt;<br>        &lt;/record-ident&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="video" class="Videotape"/&gt;<br>            &lt;bean name="film" class="Film"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element start="1" end="10"  beanref="video.sku" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="10" end="16" beanref="video.price" type="decimal"&gt;<br>                    &lt;conversion-option name="decimal-implied" value="true"/&gt;<br>                    &lt;conversion-option name="decimal-places" value="2"/&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>            &lt;line&gt;<br>                &lt;record-element start="0" end="30" beanref="film.title" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="30" end="60" beanref="film.studio" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="60" end="70" beanref="film.releaseDate" type="date"&gt;<br>                    &lt;conversion-option name="default-value" value="1980-01-01"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>    &lt;record name="book"&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="book" class="Book"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element length="9"  beanref="book.sku" type="char"/&gt;<br>                &lt;record-element length="30" beanref="book.title" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="30" beanref="book.author" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="7" beanref="book.price" type="decimal"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="10" beanref="book.releaseDate" type="date"&gt;<br>                    &lt;conversion-option name="default-value" value="1970-01-01"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>&lt;/file-format&gt;<br><br>
+</pre>
+Without rehashing old ground, you can see that in this example, we have
+three different scenarios for matching records.&nbsp; Dvds are matched
+based on record length. Videotapes are matched based on a leading V
+character.&nbsp; And books, with no record matching tags, match anything
+that remains.&nbsp; Flatworm processes record definitions in the order
+they are defined in the file, and applies the first on that successfully
+matches.
+<br>
+<br>
+You can also see multiple beans being defined in a single record, and
+the use of the format conversion option with a date. Given this input
+file:
+<br>
+<pre>DIAL J FOR JAVA               RUN ANYWHERE STUDIO           2004011555512121   49.95Y<br>546234476HE KNOWS WHEN YOU"RE CODING   JAVALANG OBJECT                 13.952003-11-10<br>V002346542002355<br>WHEN A STRANGER IMPLEMENTS    NULL POINTER PRODUCTIONS      2003-03-12<br>546543476THE GC ALWAYS RINGS TWICE     JAVAUTIL HASHMAP                23.432004-12-19<br>V002435542001955<br>DATA AND DATATYPES            PRETENTIOUS FILMS LTD                   <br></pre>
+And the following test program:
+<br>
+<span style="font-family: monospace;"></span>
+<pre>import java.io.*;<br>import java.util.HashMap;<br><br>import com.blackbear.flatworm.ConfigurationReader;<br>import com.blackbear.flatworm.FileFormat;<br>import com.blackbear.flatworm.MatchedRecord;<br>import com.blackbear.flatworm.errors.*;<br><br>public class ComplexFlatwormExample {<br>    public static void main(String[] args) {<br>         ConfigurationReader parser = new ConfigurationReader();<br>         try {<br>             FileFormat ff = parser.loadConfigurationFile(args[0]);<br>             InputStream in = new FileInputStream(args[1]);<br>             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));<br><br>             MatchedRecord results;<br>             while ((results = ff.getNextRecord(bufIn)) != null) {<br>                 if (results.getRecordName().equals("dvd")) {<br>                    System.out.println(results.getBean("dvd"));<br>                     System.out.println(results.getBean("film"));<br>                 }<br>                 if (results.getRecordName().equals("videotape")) {<br>                    System.out.println(results.getBean("video"));<br>                     System.out.println(results.getBean("film"));<br>                 }<br>                 if (results.getRecordName().equals("book")) {<br>                    System.out.println(results.getBean("book"));<br>                 }<br>                 System.out.println("");<br>             }<br><br>         } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {<br>             flatwormUnsetFieldValueError.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {<br>             flatwormConfigurationValueError.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FileNotFoundException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormInvalidRecordException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormInputLineLengthException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormConversionException e) {<br>             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.<br>         }<br>     }<br><br><br><br>}<br></pre>
+The following output is produced:
+<br>
+<pre>Dvd@3901c6[55512121, 49.95, Y]<br>Film@a37368[Thu Jan 15 00:00:00 EST 2004, DIAL J FOR JAVA, RUN ANYWHERE STUDIO]<br><br>Book@ae506e[Mon Nov 10 00:00:00 EST 2003, HE KNOWS WHEN YOU"RE CODING, JAVALANG OBJECT,546234476,13.95]<br><br>Videotape@ba6c83[2346542, 23.55]<br>Film@12a1e44[Wed Mar 12 00:00:00 EST 2003, WHEN A STRANGER IMPLEMENTS, NULL POINTER PRODUCTIONS]<br><br>Book@29428e[Sun Dec 19 00:00:00 EST 2004, THE GC ALWAYS RINGS TWICE, JAVAUTIL HASHMAP,546543476,23.43]<br><br>Videotape@161f10f[2435542, 19.55]<br>Film@1193779[Tue Jan 01 00:00:00 EST 1980, DATA AND DATATYPES, PRETENTIOUS FILMS LTD]<br></pre>
+
+<h3>CSV files</h3>
+Flatworm also supports reading and writing of CSV (comma separated values) files.
+The CSV mode is activated by the optional <tt>delimit</tt> attribute of the <tt>&lt;line&gt;</tt> tag,
+where the delimiter character (e.g. a comma, a semicolon, etc.) is specified. The following
+example shows the respective part of the XML descriptor:
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;file-format&gt;
+
+    ...
+    
+    &lt;record name="header"&gt;
+        &lt;record-ident&gt;
+            &lt;field-ident field-start="0" field-length="14"&gt;
+                &lt;match-string&gt;foobar&lt;/match-string&gt;
+            &lt;/field-ident&gt;
+        &lt;/record-ident&gt;
+        &lt;record-definition&gt;
+            &lt;line <b>delimit=";"</b>&gt;
+                &lt;record-element length="0" type="char"&gt;
+                    &lt;conversion-option name="default-value" value="field1" /&gt;
+                &lt;/record-element&gt;
+                &lt;record-element length="0" type="char"&gt;
+                    &lt;conversion-option name="default-value" value="field2" /&gt;
+                &lt;/record-element&gt;
+            &lt;/line&gt;
+        &lt;/record-definition&gt;
+    &lt;/record&gt;
+&lt;/file-format&gt;
+</pre>
+The example shows also that the <tt>length</tt> attribute of record elements must be set to 0, since
+in CSV files the length of each field is variable, hence meaningless.
+
+<h3>Encodings</h3>
+By default, Flatworm uses the platform's default charset to read/write the files.
+You can explicitely specify the file's encoding in the respective XML descriptor
+by the optional <tt>encoding</tt> attribute of the <tt>file-format</tt> element. Example:
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;file-format encoding="iso-8859-1"&gt;
+
+    ...
+    
+&lt;/file-format&gt;
+</pre>
+Don't confuse the encoding attributes of the XML preamble and that of the <tt>file-format</tt> element:
+While the encoding attribute of the preamble defines the encoding of the XML descriptor file, the encoding
+attribute of the <tt>file-format</tt> element defines the encoding to be used on reading/writing the flat files.
+
+<h3>Repeating Segments</h3>
+A very simple example of using repeating segments could be describing the classes at a school, with the students taking
+each class. The class attributes could be subject, period, teacher, grade level, and students. Student attributes
+might be first name, last name, grade. With a standard flat file it would be necessary to choose a number of students to be
+supported, and to allow for this number of students in each class. If we were to allow for 30 students, then every record would
+require 94 fields (whether fixed-length or delimited). If most classes had 20-24 students, and some as few as 10 or 12, there
+could potentially be a lot of empty space in a file. Now consider an enterprise application where there could be 10s of millions
+of records with a dozen repeating segments. The amount of empty space could be huge.
+
+The simple class example could be described with the following configuration:<br/>
+<pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
+&lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;
+&lt;file-format&gt;
+    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/&gt;
+    &lt;converter name="int" class="com.blackbear.flatworm.converters.CoreConverters" method="convertInteger" return-type="java.lang.Integer"/&gt;
+    &lt;record name="class"&gt;
+        &lt;record-ident&gt;
+            &lt;field-ident field-start="0" field-length="2"&gt;
+                &lt;match-string&gt;CL&lt;/match-string&gt;
+            &lt;/field-ident&gt;
+        &lt;/record-ident&gt;
+        &lt;record-definition&gt;
+            &lt;bean name="class" class="ClassPeriod"/&gt;
+            &lt;bean name="student" class="Student"/&gt;
+            &lt;line delimit="|"&gt;
+                &lt;record-element length="0" type="char"/&gt;
+                &lt;record-element length="0" beanref="class.subject" type="char"/&gt;
+                &lt;record-element length="0" beanref="class.period" type="int"/&gt;
+                &lt;record-element length="0" beanref="class.teacher" type="char"/&gt;
+                &lt;record-element length="0" beanref="class.gradeLevel" type="int"/&gt;
+                &lt;segment-element parent-beanref="class" addMethod="addStudent" beanref="student" minCount="1" maxCount="30"&gt;
+                    &lt;field-ident field-start="0" field-length="1"&gt;
+                        &lt;match-string&gt;S&lt;/match-string&gt;
+                    &lt;/field-ident&gt;
+                    &lt;record-element length="0"/&gt;
+                    &lt;record-element length="0" beanref="student.firstName" type="char"/&gt;
+                    &lt;record-element length="0" beanref="student.lastName" type="char"/&gt;
+                    &lt;record-element length="0" beanref="student.grade" type="int"/&gt;
+                &lt;/segment-element&gt;
+            &lt;/line&gt;
+        &lt;/record-definition&gt;
+    &lt;/record&gt;
+&lt;/file-format&gt;
+</pre>
+
+There are a few things to be noted about the &lt;segment-element&gt; tag. Repeating segments are supported only for delimited files,
+so they must have a &lt;field-ident&gt; element. Since &lt;field-ident&gt; element is <b>required</b> it in't necessary to enclose it in
+a &lt;record-ident&gt; element. The identifier must be the first field in the segment; if it is not a property of
+the Java class it can just be consumed. There must be a beanref attribute because Flatworm will construct an instance of the specified bean
+for
+each segment that it encounters. It then invokes the addMethod on the parent-beanref, which must have a Collection property for that
+type. There is an additional attribute that is not shown here; cardinality-mode. This attribute defines how to handle segments that don't
+adhere to the specified cardinality; that is when there are fewer than the minCount, or more than the maxCount. The default mode is
+LOOSE, which means that an error is logged for any violations, but no other action is taken. For cardinality mode RESTRICTED,
+in addition to logging an error, no more than the maxCount instances will be added to the parent collection. If the cardinality mode
+is set to STRICT, then an exception will be thrown for any violation, either too few, or too many. It is also possible to nest
+segment-elements
+within segment-elements.
+<br/><br/>
+This configuration would allow us to read a file such as this (the class size here is much smaller!)<br/><br/>
+CL|English|2|Ms Buffington|4|S|Bill|Smith|78|S|Peter|Jackson|91|S|Mary|Hardmann|87|S|Susan|Benet|88<br/>
+CL|Arithmetic|2|Mr Hermann|3|S|Harry|Mirtle|93|S|Helen|Peters|87|S|Johnny|Jones|76<br/>
+CL|Science|4|Mrs Darbie|4|S|Peter|Jackson|86|S|Susan|Benet|85|S|Kelley|Laver|87|S|Bobbie|Jones|73|S|Pauline|Sturgis|84<br/>
+<br/>
+For this to work, the ClassPeriod class would look similar to
+<br/>
+<pre>
+public class ClassPeriod
+{
+   private String subject;
+   private int period;
+   private String teacher;
+   private int gradeLevel;
+   private List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+
+   // The usual getters/setters required for JavaBeans
+   ....
+
+   public void addStudent(Student _student)
+   {
+      students.add(_student);
+   }
+}
+</pre>
+<br>
+<h4>Attributes for segment-element tag</h4>
+<table style="text-align: left; width: 780px; height: 117px;" border="1"
+       cellpadding="2" cellspacing="2">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top;">ATTRIBUTE NAME</td>
+        <td style="vertical-align: top;">VALUE</td>
+        <td style="vertical-align: top;">REQUIRED</td>
+        <td style="vertical-align: top;">DEFAULT</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">name</td>
+        <td style="vertical-align: top;">A name for the segment</td>
+        <td style="vertical-align: top;">no</td>
+        <td style="vertical-align: top;">none</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">minCount</td>
+        <td style="vertical-align: top;">The least number of this segment allowed per record</td>
+        <td style="vertical-align: top;">yes</td>
+        <td style="vertical-align: top;">none</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">maxCount</td>
+        <td style="vertical-align: top;">The greatest number of this segment allowed per record</td>
+        <td style="vertical-align: top;">yes</td>
+        <td style="vertical-align: top;">none</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">parent-beanref</td>
+        <td style="vertical-align: top;">The name of the beanref for the parent that contains the segment</td>
+        <td style="vertical-align: top;">yes</td>
+        <td style="vertical-align: top;">none</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">addMethod</td>
+        <td style="vertical-align: top;">The name of the method in the parent-beanref for adding an instance of this beanref</td>
+        <td style="vertical-align: top;">no</td>
+        <td style="vertical-align: top;">"add" + the name of the segment if specified or the beanref if the name is not specified</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">beanref</td>
+        <td style="vertical-align: top;">The name of the bean to hold the fields for this segment type</td>
+        <td style="vertical-align: top;">no - if the name is specified<br/>yes - if no name is specified</td>
+        <td style="vertical-align: top;">The name of the segment if specified (there must be a bean with the same name declared)</td>
+    </tr>
+    <tr>
+        <td style="vertical-align: top;">cardinality-mode</td>
+        <td style="vertical-align: top;">Specifies how to handle violations of the specified cardinality</td>
+        <td style="vertical-align: top;">no</td>
+        <td style="vertical-align: top;">loose - violations are ignored</td>
+    </tr>
+    </tbody>
+</table>
+<br/>
+<br/>
+<h3>Simplifying Usage With FileParser</h3>
+The examples which have been presented earlier showing how to use Flatworm to retrieve records from your files (SimpleFlatwormExample and
+ComplexFlatwormExample) have required that you load the configuration file. Then you create an InputStream which is used (along with the
+FileFormat that you got back from parsing the configuration file) to retrieve the records from the data file. This works very well, and
+provides you with a good bit of control over the process. But if you would prefer something a little bit simpler you can use the FileParser
+(since version 1.2). To use the FileParser, you instantiate an instance with the name of the configuration file, and the data file. For each
+record type that you have defined you call the setBeanHandler(String, Object, String) method, passing the name of the record type, the
+object
+to be invoked on the callback, and the callback method to be invoked. You also set an exception handler by calling the
+setExceptionHandler(Object,
+String) method, passing the object to be invoked on the callback and the callback method to be invoked in case of an exception. You then
+call
+the open() method (which can throw FileNotFoundException or UnsupportedEncodingException). The file is read by calling the read() method,
+and
+when it is finished call the close() method. As each record is read, the callback for that record type will be invoked, passing the
+MatchedRecord
+that was generated. From the matched record you can extract the beans that were created for that record. Lets see what the
+SimpleFlatwormExample
+might look rewritten to use the FileParser.<br/>
+<pre>
+public class SimpleFlatwormExample
+{
+   public static void main(String[] args)
+   {
+      new SimpleFlatwormExample(args[0], args[1]).run();
+   }
+
+   public void run(String configurationFile, String dataFile)
+   {
+      FileParser parser = new FileParser(configurationFile, dataFile);
+      parser.setBeanHandler("newhire", this, "processNewHire");
+      parser.setExceptionHandler(this, "processException");
+      try
+      {
+         parser.open();
+      }
+      catch(Exception e)
+      {
+         // handle the exception
+      }
+      parser.read();
+      try
+      {
+         parser.close();
+      }
+      catch(IOException ignore)
+      {}
+   }
+
+   public void processHewHire(MatchedRecord record)
+   {
+      Employee emp = (Employee)record.getBean("employee");
+      System.out.println(emp);
+   }
+
+   public void processException(String exception, String inputLine)
+   {
+      // Do whatever processing you wish for the exception
+   }
+}
+</pre>
+<br/>
+With version 2.0 a new object based callback mechanism has been introduced. Passing a class that implements RecordCallback to the
+FileParser's
+addRecordCallback(String, RecordCallback) method for each record type to be processed avoids the reflective method invocation of the
+previous
+callback mechanism. The previous mechanism is still supported, but will likely be removed in a future version. To set an exception callback
+with
+the new mechanism, pass a class that implements ExceptionCallback to the FileParser's setExceptionCallback(ExceptionCallback) method. with
+either
+callback mechanism only one exception callback is supported, and if none is set and an exception occurs, a RuntimeException will now be
+thrown.
+If you are not interested in processing any record types that are included in the configuration you don't need to add a callback for that
+type.
+
+<br/>
+<br/>
+<h3>Code Examples</h3>
+Examples of Flatworm usage (including the examples presented in this guide) can be found in the Examples package and in the Test package.
+Many of the unit tests are more properly integration tests since they test at a high level of granularity. They therefore do provide good
+examples of how the library can be used.
+<br/>
+<br/>
+<h3>Further Reading</h3>
+The
+<a href="javadoc/index.html">JavaDoc</a>
+for Flatworm provides details on the core converters provided with the
+package.
+<br>
+<br>
+<br>
+</body>
+</html>

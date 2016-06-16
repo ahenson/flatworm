@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Flatworm - A Java Flat File Importer/Exporter Copyright (C) 2004 James M. Turner.
+  ~ Extended by James Lawrence 2005
+  ~ Extended by Josh Brackett in 2011 and 2012
+  ~ Extended by Alan Henson in 2016
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+  ~ and limitations under the License.
+  -->
+
+<file-format>
+    <converter name="char"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertChar" return-type="java.lang.String"/>
+    <converter name="decimal"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertDecimal" return-type="java.lang.Double"/>
+    <converter name="int"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertInteger" return-type="java.lang.Integer"/>
+    <converter name="date"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertDate" return-type="java.lang.Date"/>
+    <record name="account">
+        <record-ident>
+            <field-ident field-start="0" field-length="2">
+                <match-string>AC</match-string>
+            </field-ident>
+        </record-ident>
+        <record-definition>
+            <bean name="account" class="domain.segment.Account"/>
+            <bean name="consumer" class="domain.segment.Consumer"/>
+            <bean name="id" class="domain.segment.Identity"/>
+            <bean name="phone" class="domain.segment.Phone"/>
+            <bean name="address" class="domain.segment.Address"/>
+            <line delimit="|">
+                <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
+                <record-element beanref="account.reportingDate" length="0" type="date">
+                    <conversion-option name="format" value="yyyyMMdd"/>
+                </record-element>
+                <record-element beanref="account.accountCode" length="0" type="char"/>
+                <record-element beanref="account.accountType" length="0" type="int"/>
+                <record-element beanref="account.accountNumber" length="0" type="char"/>
+                <record-element beanref="account.serviceType" length="0" type="char"/>
+                <record-element beanref="account.companyId" length="0" type="char"/>
+                <segment-element name="consumer" minCount="0" maxCount="5" parent-beanref="account" addMethod="addConsumer"
+                                 beanref="consumer" cardinality-mode="restrict">
+                    <field-ident field-start="0" field-length="2">
+                        <match-string>ID</match-string>
+                    </field-ident>
+                    <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
+                    <record-element beanref="consumer.consumerNumber" length="0" type="int"/>
+                    <record-element beanref="consumer.lastName" length="0" type="char"/>
+                    <record-element beanref="consumer.firstName" length="0" type="char"/>
+                    <record-element beanref="consumer.middleName" length="0" type="char"/>
+                    <record-element beanref="consumer.gender" length="0" type="char"/>
+                    <segment-element name="identity" minCount="0" maxCount="6" parent-beanref="consumer" addMethod="addId" beanref="id">
+                        <field-ident field-start="0" field-length="2">
+                            <match-string>II</match-string>
+                        </field-ident>
+                        <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
+                        <record-element beanref="id.type" length="0" type="char"/>
+                        <record-element beanref="id.state" length="0" type="char"/>
+                        <record-element beanref="id.value" length="0" type="char"/>
+                    </segment-element>
+                    <segment-element name="phone" minCount="0" maxCount="7" parent-beanref="consumer" addMethod="addPhone" beanref="phone">
+                        <field-ident field-start="0" field-length="2">
+                            <match-string>PH</match-string>
+                        </field-ident>
+                        <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
+                        <record-element beanref="phone.type" length="0" type="char"/>
+                        <record-element beanref="phone.publishInd" length="0" type="char"/>
+                        <record-element beanref="phone.number" length="0" type="char"/>
+                    </segment-element>
+                </segment-element>
+                <segment-element name="address" minCount="0" maxCount="4" parent-beanref="account" addMethod="addAddress" beanref="address">
+                    <field-ident field-start="0" field-length="2">
+                        <match-string>AD</match-string>
+                    </field-ident>
+                    <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
+                    <record-element beanref="address.type" length="0" type="char"/>
+                    <record-element beanref="address.number" length="0" type="char"/>
+                    <record-element beanref="address.street" length="0" type="char"/>
+                    <record-element beanref="address.streetType" length="0" type="char"/>
+                    <record-element beanref="address.city" length="0" type="char"/>
+                    <record-element beanref="address.state" length="0" type="char"/>
+                    <record-element beanref="address.zip" length="0" type="char"/>
+                </segment-element>
+            </line>
+        </record-definition>
+    </record>
+</file-format>

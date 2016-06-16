@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Flatworm - A Java Flat File Importer/Exporter Copyright (C) 2004 James M. Turner.
+  ~ Extended by James Lawrence 2005
+  ~ Extended by Josh Brackett in 2011 and 2012
+  ~ Extended by Alan Henson in 2016
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+  ~ and limitations under the License.
+  -->
+
+<file-format>
+    <converter name="char2" class="examples.MyConverters"
+               method="convertChar" return-type="java.lang.String"/>
+    <converter name="char"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertChar" return-type="java.lang.String"/>
+    <converter name="decimal"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertDecimal" return-type="java.lang.Double"/>
+    <record name="newhire">
+        <record-ident>
+            <field-ident field-start="0" field-length="2">
+                <match-string>NH</match-string>
+            </field-ident>
+        </record-ident>
+        <record-definition>
+            <bean name="employee" class="domain.Employee"/>
+            <line delimit=",">
+                <record-element length="2"/>
+                <record-element length="15" beanref="employee.firstName"
+                                type="char2">
+                    <conversion-option name="justify" value="left"
+                                       type="both"/>
+                </record-element>
+                <record-element length="15" beanref="employee.lastName"
+                                type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element length="1" beanref="employee.gender"
+                                type="char"/>
+                <record-element length="11" beanref="employee.ssn"
+                                type="char">
+                    <conversion-option name="strip-chars"
+                                       value="non-numeric"/>
+                    <conversion-option name="default-value"
+                                       value="xxx-xx-xxxx"/>
+                </record-element>
+                <record-element length="10" beanref="employee.salary"
+                                type="decimal">
+                    <conversion-option name="decimal-places" value="2"/>
+                    <conversion-option name="decimal-implied"
+                                       value="true"/>
+                    <conversion-option name="pad-character" value="0"/>
+                    <conversion-option name="justify" value="right"/>
+                    <conversion-option name="default-value" value="999"/>
+                </record-element>
+                <record-element length="9" beanref="employee.misc"
+                                type="char">
+                    <conversion-option name="substring" value="1,10"/>
+                </record-element>
+            </line>
+        </record-definition>
+    </record>
+</file-format>

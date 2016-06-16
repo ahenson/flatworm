@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ Flatworm - A Java Flat File Importer/Exporter Copyright (C) 2004 James M. Turner.
+  ~ Extended by James Lawrence 2005
+  ~ Extended by Josh Brackett in 2011 and 2012
+  ~ Extended by Alan Henson in 2016
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+  ~ and limitations under the License.
+  -->
+
+<file-format>
+    <converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/>
+    <converter name="int" class="com.blackbear.flatworm.converters.CoreConverters" method="convertInteger" return-type="java.lang.Integer"/>
+    <record name="class">
+        <record-ident>
+            <field-ident field-start="0" field-length="2">
+                <match-string>CL</match-string>
+            </field-ident>
+        </record-ident>
+        <record-definition>
+            <bean name="class" class="domain.segment.ClassPeriod"/>
+            <bean name="student" class="domain.segment.Student"/>
+            <line delimit="\t">
+                <record-element length="0" type="char"/>
+                <record-element length="0" beanref="class.subject" type="char"/>
+                <record-element length="0" beanref="class.period" type="int"/>
+                <record-element length="0" beanref="class.teacher" type="char"/>
+                <record-element length="0" beanref="class.gradeLevel" type="int"/>
+                <segment-element name="student" parent-beanref="class" minCount="1" maxCount="30">
+                    <field-ident field-start="0" field-length="1">
+                        <match-string>S</match-string>
+                    </field-ident>
+                    <record-element length="0"/>
+                    <record-element length="0" beanref="student.firstName" type="char"/>
+                    <record-element length="0" beanref="student.lastName" type="char"/>
+                    <record-element length="0" beanref="student.grade" type="int"/>
+                </segment-element>
+                <record-element length="0" beanref="class.room" type="char"/>
+            </line>
+        </record-definition>
+    </record>
+</file-format>

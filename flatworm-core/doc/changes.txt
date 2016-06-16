@@ -1,0 +1,82 @@
+Changes in Version 4.0.0
+=====================
+- Rebuilt the directories to support Maven and moved from an ANT build to a Maven 3.0 build.
+
+Changes in Version 3.0
+======================
+- See https://github.com/trx/flatworm for a list of changes that were applied in 3.0.x.
+
+Changes in Version 2.0
+======================
+
+- Collection classes upgraded to Java 5 classes
+
+  The version number was bumped to 2.0 since this change requires the use of Java 5, and so this version is not
+  really compatible with earlier versions.
+
+- Removed the deprecated log4j Category throughout and replaced with commons-logging Log
+
+- Created a test module and added a number of unit tests.
+
+- Added support for reading records that contain "segments"; sections that may repeat.
+
+  For example; a record could be for an account. Accounts may include up to X consumers, and Y phone numbers.
+  With a typical flat file format, accounts that contain fewer than X consumers and/or Y phone numbers would
+  include a lot of blank space, or empty delimiters. With segment support, each segment type must be identified
+  by an indicator field (must be the first field in the segment). The record would contain fields for only the 
+  consumers and phone numbers actually present in the account.
+  For an idea of how to use this feature see the SegmentedFileWriterTest or the SegmentFileTest in the test module.
+
+- Added a object based callback mechanism to FileParser. 
+
+  The reflective mechanism which takes an object and a callback method is still supported, but will likely be removed 
+  in a future version.
+
+
+
+Changes in Version 1.3  (never released; carried into version 2.0)
+======================
+
+- Encoding support
+
+  Up to version 1.2, flatworm used the platform's default charset for reading/writing flat files.
+  Now you can specify the file's encoding in the respective XML descriptor by specifying an
+  "encoding" attribute in the "file-format" element.
+
+
+Changes in Version 1.2
+======================
+
+- Stream support
+
+  Besides passing file names or files to the classes 'ConfigurationReader' 
+  and 'FileCreator', you can now pass Input-/Outputstreams. This helps 
+  to avoid path configuration issues - e.g. you simply can add your config
+  files to java's classpath.
+
+- Conversion methods for file generation
+
+  Up to version 1.1, during file creation only some basic types were 
+  supported; the converters have been used only for parsing.
+  Now the converters are responsible for conversions in both directions.
+  A converter has to offer an additional method to convert from bean to
+  string (the opposite direction); its signature is
+  
+      public String convertT(Object obj, HashMap options)
+
+  (The 'T' in 'convertT' should be replaced with a sensible description
+  of the type, e.g. 'convertChar', 'convertGender' and so forth.)      
+
+- Multiple padding characters
+
+  The "conversion-option" element for "pad-character" recognizes
+  all characters in the given "value" string - each of these
+  characters will be stripped during parsing. On generating a file
+  the value will be padded with the string's first character.
+
+- Navigational expressions in 'beanref' attributes
+
+  Up to version 1.1, the 'beanref' attributes in flatworm's XML
+  descriptors only worked for "single hop" expressions like
+  "customer.city". This has been fixed to support expressions like
+  "customer.shippingAddress.city".

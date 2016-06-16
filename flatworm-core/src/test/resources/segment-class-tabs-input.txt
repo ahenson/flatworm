@@ -1,0 +1,3 @@
+CL	English	2	Ms Buffington	4	S	Bill	Smith	78	S	Peter	Jackson	91	S	Mary	Hardmann	87	S	Susan	Benet	88	109
+CL	Arithmetic	2	Mr Hermann	3	S	Harry	Mirtle	93	S	Helen	Peters	87	S	Johnny	Jones	76	214
+CL	Science	4	Mrs Darbie	4	S	Peter	Jackson	86	S	Susan	Benet	85	S	Kelley	Laver	87	S	Bobbie	Jones	73	S	Pauline	Sturgis	84	112
