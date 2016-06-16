@@ -44,8 +44,10 @@ public class FileFormat {
     private Map<String, Record> records;
     private List<Record> recordOrder;
     private ConversionHelper convHelper;
+    private int lineNumber;
 
     // JBL - Used when parsing fails, gives access to bad line
+    @Getter
     private String lastLine = "";
 
     @Getter
@@ -61,18 +63,8 @@ public class FileFormat {
         convHelper = new ConversionHelper();
     }
 
-    // JBL - getter
-    public String getLastLine() {
-        return lastLine;
-    }
-
     public Map<String, Record> getRecords() {
         return Collections.unmodifiableMap(records);
-    }
-
-    public void setRecords(Map<String, Record> records) {
-        this.records.clear();
-        this.records.putAll(records);
     }
 
     public void addRecord(Record r) {
@@ -121,23 +113,23 @@ public class FileFormat {
      */
     public MatchedRecord nextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException {
-        try {
-            String firstLine;
-            firstLine = in.readLine();
-            lastLine = firstLine;
+            FlatwormUnsetFieldValueException, FlatwormCreatorException, IOException {
 
-            if (firstLine == null)
-                return null;
-            Record rd;
-            rd = findMatchingRecord(firstLine);
+        MatchedRecord matchedRecord = null;
+        String currentLine = in.readLine();
+        lastLine = currentLine;
+
+        if (currentLine != null) {
+            Record rd = findMatchingRecord(currentLine);
             if (rd == null)
-                throw new FlatwormInvalidRecordException("Unmatched line in input file");
+                throw new FlatwormInvalidRecordException(String.format(
+                        "Configuration not found for line in input file [line: %d] - %s", lineNumber, currentLine
+                ));
 
-            Map<String, Object> beans = rd.parseRecord(firstLine, in, convHelper);
-            return new MatchedRecord(rd.getName(), beans);
-        } catch (IOException e) {
-            return null;
+            Map<String, Object> beans = rd.parseRecord(currentLine, in, convHelper);
+            matchedRecord = new MatchedRecord(rd.getName(), beans);
         }
+
+        return matchedRecord;
     }
 }

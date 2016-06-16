@@ -72,7 +72,7 @@ public class EncodingTestCase extends TestCase {
 
     protected Object getNextBean() throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException {
+            FlatwormUnsetFieldValueException, FlatwormCreatorException, IOException {
         MatchedRecord results = ff.nextRecord(reader);
         return results.getBean(getBeanName());
     }
