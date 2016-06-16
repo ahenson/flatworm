@@ -40,8 +40,21 @@
     <developers>
         <developer>
             <name>James M. Turner</name>
-
         </developer>
+        <developer>
+            <name>James Lawrence</name>
+        </developer>
+        <developer>
+            <name>Dave Derry</name>
+        </developer>
+        <developer>
+            <name>Josh Brackett</name>
+        </developer>
+        <developer>
+            <name>Alan Henson</name>
+            <organization>Optify Software, LLC.</organization>
+        </developer>
+
     </developers>
 
     <properties>
