@@ -47,22 +47,8 @@ public class SimpleFlatwormExample {
                 }
             }
 
-        } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {
-            flatwormUnsetFieldValueError.printStackTrace(); // To change body of catch statement use Options | File
-            // Templates.
-        } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {
-            flatwormConfigurationValueError.printStackTrace(); // To change body of catch statement use Options | File
-            // Templates.
-        } catch (FileNotFoundException e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File Templates.
-        } catch (FlatwormInvalidRecordException e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File Templates.
-        } catch (FlatwormInputLineLengthException e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File Templates.
-        } catch (FlatwormConversionException e) {
-            e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
-        } catch (FlatwormCreatorException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace(); // To change body of catch statement use Options | File
         }
     }
 
