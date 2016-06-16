@@ -54,7 +54,9 @@ class Line {
      * <b>NOTE:</b> Only the first character in the string is considered
      */
     public void setQuoteChar(String quote) {
-        chrQuote = quote.charAt(0);
+        if(quote != null) {
+            chrQuote = quote.charAt(0);
+        }
     }
 
     public boolean isDelimited() {
