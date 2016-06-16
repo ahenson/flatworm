@@ -43,7 +43,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * The
- * <code>ConfigurationReader<code> class is used to initialize Flatworm with an XML configuration file which
+ * {@code ConfigurationReader} class is used to initialize Flatworm with an XML configuration file which
  *  describes the format and conversion options to be applied to the input file to produce output beans.
  */
 public class ConfigurationReader {

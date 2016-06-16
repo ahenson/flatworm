@@ -111,9 +111,15 @@ public class FileFormat {
 
     /**
      * When called with a {@code BufferedReader}, reads sufficient lines to parse a record, and returns the beans created.
-     *
      * @param in The stream to read from
      * @return The created beans in a MatchedRecord object
+     * @throws FlatwormInvalidRecordException TODO This needs to be simplified.
+     * @throws FlatwormInputLineLengthException TODO This needs to be simplified.
+     * @throws FlatwormConversionException TODO This needs to be simplified.
+     * @throws FlatwormUnsetFieldValueException TODO This needs to be simplified.
+     * @throws FlatwormCreatorException TODO This needs to be simplified.
+     * @throws FlatwormParserException TODO This needs to be simplified.
+     * @throws IOException TODO This needs to be simplified.
      */
     public MatchedRecord nextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,

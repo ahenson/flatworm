@@ -54,12 +54,12 @@ public class FileCreator {
     private OutputStream outputStream;
 
     /**
-     * Constructor for FileCreator<br>
+     * Constructor for FileCreator.
      *
-     * @param config Full path to the FlatWorm XML configuration file
-     * @param file   Full path to output file
-     * @throws FlatwormCreatorException - wraps FlatwormConfigurationValueException & FlatwormUnsetFieldValueException (to reduce number of
-     *                                  exceptions clients have to be aware of)
+     * @param config Full path to the FlatWorm XML configuration file.
+     * @param file   Full path to output file.
+     * @throws FlatwormCreatorException - wraps FlatwormConfigurationValueException and FlatwormUnsetFieldValueException (to reduce number
+     *                                  of exceptions clients have to be aware of).
      */
     public FileCreator(String config, String file) throws FlatwormCreatorException {
         this.file = file;
@@ -110,18 +110,17 @@ public class FileCreator {
     }
 
     /**
-     * Open the newfile for writing<br>
+     * Open the file for writing.
+     *
+     * @throws FileNotFoundException        should the file specified not exist.
+     * @throws UnsupportedEncodingException should the format of the file not be supported.
      */
-    public void open() throws FlatwormCreatorException, UnsupportedEncodingException {
+    public void open() throws FileNotFoundException, UnsupportedEncodingException {
         // Setup buffered writer
-        try {
-            if (file != null) {
-                outputStream = new FileOutputStream(file);
-            }
-            bufOut = new BufferedWriter(new OutputStreamWriter(outputStream, ff.getEncoding()));
-        } catch (FileNotFoundException ex) {
-            throw new FlatwormCreatorException(ex.getMessage(), ex);
+        if (file != null) {
+            outputStream = new FileOutputStream(file);
         }
+        bufOut = new BufferedWriter(new OutputStreamWriter(outputStream, ff.getEncoding()));
     }
 
     /**
@@ -154,7 +153,7 @@ public class FileCreator {
 
     /**
      * Write information to the output file. Make sure you have called the setBean() method with the needed beans before calling this
-     * method.<br>
+     * method.
      *
      * @param recordName The name specified in your flatworm configuration file for this record
      * @throws IOException              - If the file system has a problem with you writing information to the recently opened file.

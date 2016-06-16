@@ -70,10 +70,14 @@
     </developers>
 
     <properties>
-        <!-- Compiler Properties -->
+        <!-- Plugin Properties -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.source.plugin.version>3.0.0</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- Dependency Properties -->
         <commons.beanutils.version>1.9.2</commons.beanutils.version>
         <commons.collections.version>3.2.1</commons.collections.version>
         <commons.lang.version>2.6</commons.lang.version>
@@ -181,6 +185,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.plugin.version}</version>
               <executions>
                 <execution>
                   <id>attach-sources</id>
@@ -193,6 +198,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
               <executions>
                 <execution>
                   <id>attach-javadocs</id>

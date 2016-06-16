@@ -59,7 +59,7 @@ public class FileParser {
      *
      * @param config full path to the FlatWorm XML configuration file
      * @param file   full path to input file
-     * @throws FlatwormParserException - wraps FlatwormConfigurationValueException & FlatwormUnsetFieldValueException (to reduce number of
+     * @throws FlatwormParserException - wraps FlatwormConfigurationValueException and FlatwormUnsetFieldValueException (to reduce number of
      *                                 exceptions clients have to be aware of)
      */
     public FileParser(String config, String file) throws FlatwormParserException {
@@ -74,10 +74,11 @@ public class FileParser {
     }
 
     /**
-     * Provide a callback object that doesn't require reflection to be invoked. The <code>MatchedRecord</code> will be passed back to the
+     * Provide a callback object that doesn't require reflection to be invoked. The {@code MatchedRecord} will be passed back to the
      * callback. Add a callback for each record type specified in the configuration file.
      *
-     * @since 2.0
+     * @param recordName The name of the record.
+     * @param callback   The {@link RecordCallback} instance to register.
      */
     public void addRecordCallback(String recordName, RecordCallback callback) {
         recordCallbacks.put(recordName, callback);
@@ -88,14 +89,14 @@ public class FileParser {
      * be passed to the callback, along with the input line that caused the exception. Should only be invoked once as any subsequent
      * invocations will replace the previous callback.
      *
-     * @since 2.0
+     * @param callback The {@link ExceptionCallback} instance to register.
      */
     public void setExceptionCallback(ExceptionCallback callback) {
         exceptionCallback = callback;
     }
 
     /**
-     * Open the buffered reader for the input file<br>
+     * Open the buffered reader for the input file.
      *
      * @throws IOException should the {@link InputStream} fail to properly open.
      */
@@ -106,7 +107,7 @@ public class FileParser {
     }
 
     /**
-     * Close the input file<br>
+     * Close the input file.
      *
      * @throws IOException - Should the file system choose to complain about closing an existing file opened for reading.
      */
@@ -119,7 +120,7 @@ public class FileParser {
     /**
      * Read the entire input file. This method will call your handler methods, if defined, to handle Records it parses. <br> <br>
      * <b>NOTE:</b> All exceptions are consumed and passed to the exception handler method you defined (The offending line is provided just
-     * in case you want to do something with it.<br>
+     * in case you want to do something with it.
      */
     public void read() {
 
@@ -145,13 +146,13 @@ public class FileParser {
     }
 
     /**
-     * Encapsulated details about calling client's handler methods (for exceptions too)
+     * Encapsulated details about calling client's handler methods (for exceptions too).
      *
      * @param callback The Callback object to be invoked
      * @param arg1     first argument for callback - used for record handlers and exceptions
      * @param arg2     second argument for callback - used for only for exceptions. Contains a string that contains the offending line from
      *                 the input file <br> <br> <b>NOTE:</b> All exceptions are consumed and passed to the exception handler method you
-     *                 defined (The offending line is provided just in case you want to do something with it.<br>
+     *                 defined (The offending line is provided just in case you want to do something with it.
      */
     private void doCallback(Callback callback, Object arg1, Object arg2) {
         try {

@@ -30,16 +30,16 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <p>{@code CoreConverters} contains methods to convert the most commonly encountered text types to native Java types. It can be used as
- * the {@code class} parameter in a Flatworm {@code converter} tag, with one of the public methods listed below as the {@code method}
- * parameter. <p/> All converters (included the ones listed here and any supplied by the user) should expect to accept and handle the
- * following {@code conversion-option}s: <p/> <dl> <dt>{@code justify}</dt> <dd>Defines the justification rule used to strip/add pad
- * characters to this field. Used in conjunction with the {@code pad-character} option. Valid values are: <ul> <li>{@code left} to strip the
- * right hand side of the field of pad chars</li> <li>{@code right} to strip the left hand side of the field of pad chars</li> <li>{@code
- * both} to strip both end of the field of pad chars</li> </ul> The default if no value is specified is {@code both}</dd> <dt>{@code
- * pad-character}</dt> <dd>Defines the character to be used in conjunction with the {@code justify} option when removing or adding pad
- * characters from a field. The default value is the space character.</dd> <dt>{@code default-value}</dt> <dd>Defines the default value to
- * be used if the field is empty after being stripped of pad characters.</dd> </dl>
+ * {@code CoreConverters} contains methods to convert the most commonly encountered text types to native Java types. It can be used as the
+ * {@code class} parameter in a Flatworm {@code converter} tag, with one of the public methods listed below as the {@code method} parameter.
+ *  All converters (included the ones listed here and any supplied by the user) should expect to accept and handle the following {@code
+ * conversion-option}s:  <dl> <dt>{@code justify}</dt> <dd>Defines the justification rule used to strip/add pad characters to this field.
+ * Used in conjunction with the {@code pad-character} option. Valid values are: <ul> <li>{@code left} to strip the right hand side of the
+ * field of pad chars</li> <li>{@code right} to strip the left hand side of the field of pad chars</li> <li>{@code both} to strip both end
+ * of the field of pad chars</li> </ul> The default if no value is specified is {@code both}</dd> <dt>{@code pad-character}</dt> <dd>Defines
+ * the character to be used in conjunction with the {@code justify} option when removing or adding pad characters from a field. The default
+ * value is the space character.</dd> <dt>{@code default-value}</dt> <dd>Defines the default value to be used if the field is empty after
+ * being stripped of pad characters.</dd> </dl>
  *
  * @author James M. Turner
  * @version $Id: CoreConverters.java,v 1.8 2009/12/07 00:50:53 dderry Exp $
@@ -61,7 +61,7 @@ public class CoreConverters {
     }
 
     /**
-     * Object->String conversion function.
+     * Object to String conversion function.
      *
      * @param obj     source object
      * @param options The conversion-option values for the field
@@ -72,9 +72,9 @@ public class CoreConverters {
     }
 
     /**
-     * <p>Conversion function for {@code Date}, returns the source string with padding removed if requested, converted into a date. <p/> In
-     * addition to the standard conversion options, dates also support the following: <p/> <dl> <dt>{@code format}</dt> <dd>A date format
-     * string in {@code SimpleDateFormat} syntax that defines the format to expect, default is yyyy-MM-dd.</dd> </dl>
+     * Conversion function for {@code Date}, returns the source string with padding removed if requested, converted into a date.  In
+     * addition to the standard conversion options, dates also support the following:  <dl> <dt>{@code format}</dt> <dd>A date format string
+     * in {@code SimpleDateFormat} syntax that defines the format to expect, default is yyyy-MM-dd.</dd> </dl>
      *
      * @param str     The source string
      * @param options The conversion-option values for the field
@@ -101,7 +101,7 @@ public class CoreConverters {
     }
 
     /**
-     * Date->String conversion function.
+     * Date to String conversion function.
      *
      * @param obj     source object of type {@link Date}.
      * @param options The conversion-option values for the field
@@ -119,13 +119,13 @@ public class CoreConverters {
     }
 
     /**
-     * <p> Conversion function for {@code Double}, returns the source string with padding removed if requested, converted into a double.
-     * <p/>
+     * Conversion function for {@code Double}, returns the source string with padding removed if requested, converted into a double.
      *
-     * <p> In addition to the standard conversion options, doubles also support the following: <p/> <dl> <dt>{@code decimal-implied}</dt>
-     * <dd>If set to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places}
-     * is required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point,
-     * if {@code decimal-implied} is set.</dd> </dl>
+     *
+     * In addition to the standard conversion options, doubles also support the following:  <dl> <dt>{@code decimal-implied}</dt> <dd>If set
+     * to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places} is
+     * required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point, if
+     * {@code decimal-implied} is set.</dd> </dl>
      *
      * @param str     The source string
      * @param options The conversion-option values for the field
@@ -257,8 +257,8 @@ public class CoreConverters {
     }
 
     /**
-     * <p> Conversion function for {@code BigDecimal}, returns the source string with padding removed if requested, converted into a big
-     * decimal. <p/> <p> In addition to the standard conversion options, big decimals also support the following: <p/> <dl> <dt>{@code
+     * Conversion function for {@code BigDecimal}, returns the source string with padding removed if requested, converted into a big
+     * decimal. In addition to the standard conversion options, big decimals also support the following:  <dl> <dt>{@code
      * decimal-implied}</dt> <dd>If set to {@code true}, the decimal point is positionally implied rather than explicitly included. If set,
      * {@code decimal-places} is required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the
      * right of the decimal point, if {@code decimal-implied} is set.</dd> </dl>
