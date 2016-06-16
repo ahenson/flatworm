@@ -26,7 +26,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,7 +36,6 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * The
@@ -89,8 +87,7 @@ public class ConfigurationReader {
             children = document.getChildNodes();
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
-                if (("file-format".equals(child.getNodeName()))
-                        && (child.getNodeType() == Node.ELEMENT_NODE)) {
+                if (("file-format".equals(child.getNodeName())) && (child.getNodeType() == Node.ELEMENT_NODE)) {
                     result = (FileFormat) traverse(child);
                     break;
                 }
@@ -116,16 +113,12 @@ public class ConfigurationReader {
         return nodes;
     }
 
-    private boolean isElementNodeOfType(String type, Node node) {
-        return type.equals(node.getNodeName()) && node.getNodeType() == 1;
-    }
-
     private Node getChildElementNodeOfType(String type, Node node) {
         NodeList children = node.getChildNodes();
         if (children != null) {
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
-                if (type.equals(child.getNodeName()) && child.getNodeType() == 1)
+                if (type.equals(child.getNodeName()) && child.getNodeType() == Node.ELEMENT_NODE)
                     return child;
             }
         }
@@ -133,12 +126,12 @@ public class ConfigurationReader {
     }
 
     private List<Node> getChildElementNodesOfType(String type, Node node) {
-        List<Node> nodes = new ArrayList<Node>();
+        List<Node> nodes = new ArrayList<>();
         NodeList children = node.getChildNodes();
         if (children != null) {
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
-                if (type.equals(child.getNodeName()) && child.getNodeType() == 1)
+                if (type.equals(child.getNodeName()) && child.getNodeType() == Node.ELEMENT_NODE)
                     nodes.add(child);
             }
         }
@@ -150,7 +143,7 @@ public class ConfigurationReader {
         if (children != null) {
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
-                if (child.getNodeType() == 3)
+                if (child.getNodeType() == Node.TEXT_NODE)
                     return child.getNodeValue();
             }
         }
@@ -158,12 +151,11 @@ public class ConfigurationReader {
     }
 
     private boolean hasAttributeValueNamed(Node node, String name) {
-        return node.getAttributes().getNamedItem(name) != null;
+        return (node != null && node.getAttributes().getNamedItem(name) != null);
     }
 
     private String getAttributeValueNamed(Node node, String name) {
-        return hasAttributeValueNamed(node, name) ? node.getAttributes().getNamedItem(name)
-                .getNodeValue() : null;
+        return hasAttributeValueNamed(node, name) ? node.getAttributes().getNamedItem(name).getNodeValue() : null;
     }
 
     private Node getAttributeNamed(Node node, String name) {
@@ -171,38 +163,43 @@ public class ConfigurationReader {
         return map.getNamedItem(name);
     }
 
-    private Object traverse(Node node) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException {
+    private Object traverse(Node node) throws FlatwormUnsetFieldValueException, FlatwormConfigurationValueException {
         int type = node.getNodeType();
         if (type == Node.ELEMENT_NODE) {
             String nodeName = node.getNodeName();
+
+            // File Format.
             if (nodeName.equals("file-format")) {
-                FileFormat f = new FileFormat();
+                FileFormat fileFormat = new FileFormat();
                 String encoding = Charset.defaultCharset().name();
                 if (hasAttributeValueNamed(node, "encoding")) {
                     encoding = getAttributeValueNamed(node, "encoding");
                 }
-                f.setEncoding(encoding);
+                fileFormat.setEncoding(encoding);
 
-                List<Object> children = getChildNodes(node);
-                for (int i = 0; i < children.size(); i++) {
-                    if (children.get(i).getClass().equals(Converter.class)) {
-                        f.addConverter((Converter) children.get(i));
+                List<Object> childNodes = getChildNodes(node);
+                childNodes.forEach(childNode -> {
+                    if(childNode.getClass().isAssignableFrom(Converter.class)) {
+                        fileFormat.addConverter(Converter.class.cast(childNode));
                     }
-                    if (children.get(i).getClass().equals(Record.class)) {
-                        f.addRecord((Record) children.get(i));
+                    else if(childNode.getClass().isAssignableFrom(Record.class)) {
+                        fileFormat.addRecord(Record.class.cast(childNode));
                     }
-                }
-                return f;
+                });
+                return fileFormat;
             }
+
+            // Converter.
             if (nodeName.equals("converter")) {
-                Converter c = new Converter();
-                c.setConverterClass(getAttributeValueNamed(node, "class"));
-                c.setMethod(getAttributeValueNamed(node, "method"));
-                c.setReturnType(getAttributeValueNamed(node, "return-type"));
-                c.setName(getAttributeValueNamed(node, "name"));
-                return c;
+                return Converter.builder()
+                        .converterClass(getAttributeValueNamed(node, "class"))
+                        .method(getAttributeValueNamed(node, "method"))
+                        .returnType(getAttributeValueNamed(node, "return-type"))
+                        .name(getAttributeValueNamed(node, "name"))
+                        .build();
             }
+
+            // Record.
             if (nodeName.equals("record")) {
                 Record r = new Record();
                 r.setName(getAttributeValueNamed(node, "name"));
@@ -211,39 +208,40 @@ public class ConfigurationReader {
                     Node fieldChild = getChildElementNodeOfType("field-ident", identChild);
                     Node lengthChild = getChildElementNodeOfType("length-ident", identChild);
                     if (lengthChild != null) {
-                        r.setLengthIdentMin(Integer.parseInt(getAttributeValueNamed(lengthChild, "minlength")));
-                        r.setLengthIdentMax(Integer.parseInt(getAttributeValueNamed(lengthChild, "maxlength")));
+                        r.setLengthIdentMin(Util.tryParseInt(getAttributeValueNamed(lengthChild, "minlength")));
+                        r.setLengthIdentMax(Util.tryParseInt(getAttributeValueNamed(lengthChild, "maxlength")));
                         r.setIdentTypeFlag('L');
                     } else if (fieldChild != null) {
-                        r.setFieldIdentStart(Integer
-                                .parseInt(getAttributeValueNamed(fieldChild, "field-start")));
-                        r.setFieldIdentLength(Integer.parseInt(getAttributeValueNamed(fieldChild,
-                                "field-length")));
-                        List<Node> matchNodes = getChildElementNodesOfType("match-string", fieldChild);
-                        for (int j = 0; j < matchNodes.size(); j++) {
-                            r.addFieldIdentMatchString(getChildTextNodeValue(matchNodes.get(j)));
-                        }
+                        r.setFieldIdentStart(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-start")));
+                        r.setFieldIdentLength(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-length")));
                         r.setIdentTypeFlag('F');
+
+                        List<Node> matchNodes = getChildElementNodesOfType("match-string", fieldChild);
+                        matchNodes.forEach(matchNode -> r.addFieldIdentMatchString(getChildTextNodeValue(matchNode)));
                     }
                 }
                 Node recordChild = getChildElementNodeOfType("record-definition", node);
                 r.setRecordDefinition((RecordDefinition) traverse(recordChild));
                 return r;
             }
+
+            // Record Definition.
             if (nodeName.equals("record-definition")) {
                 RecordDefinition rd = new RecordDefinition();
-                List<Object> children = getChildNodes(node);
-                for (int i = 0; i < children.size(); i++) {
-                    Object o = children.get(i);
-                    if (o.getClass().equals(Bean.class)) {
-                        rd.addBeanUsed((Bean) o);
+
+                List<Object> childNodes = getChildNodes(node);
+                childNodes.forEach(childNode -> {
+                    if(childNode.getClass().isAssignableFrom(Bean.class)) {
+                        rd.addBeanUsed(Bean.class.cast(childNode));
                     }
-                    if (o.getClass().equals(Line.class)) {
-                        rd.addLine((Line) o);
+                    else if(childNode.getClass().isAssignableFrom(Line.class)) {
+                        rd.addLine(Line.class.cast(childNode));
                     }
-                }
+                });
                 return rd;
             }
+
+            // Bean.
             if (nodeName.equals("bean")) {
                 Bean b = new Bean();
                 b.setBeanName(getAttributeValueNamed(node, "name"));
@@ -255,35 +253,33 @@ public class ConfigurationReader {
                 }
                 return b;
             }
+
+            // Line.
             if (nodeName.equals("line")) {
                 Line li = new Line();
 
                 // JBL - Determine if this line is delimited
                 // Determine value of quote character, default = "
-                // These field is optional
-                Node delimit = getAttributeNamed(node, "delimit");
-                Node quote = getAttributeNamed(node, "quote");
-                if (delimit != null) {
-                    li.setDelimiter(getAttributeValueNamed(node, "delimit"));
-                }
-                if (quote != null) {
-                    li.setQuoteChar(getAttributeValueNamed(node, "quote"));
-                }
-                List<Object> v = getChildNodes(node);
-                for (int i = 0; i < v.size(); i++) {
-                    Object o = v.get(i);
-                    if (o instanceof LineElement) {
-                        li.addElement((LineElement) o);
-                    }
-                }
+                // These fields are optional
+                li.setDelimiter(getAttributeValueNamed(node, "delimit"));
+                li.setQuoteChar(getAttributeValueNamed(node, "quote"));
+
+                List<Object> childNodes = getChildNodes(node);
+                childNodes.stream()
+                        .filter(childNode -> childNode instanceof LineElement)
+                        .map(LineElement.class::cast)
+                        .forEach(li::addElement);
+
                 return li;
             }
+
+            // Segments.
             if (nodeName.equals("segment-element")) {
                 SegmentElement segment = new SegmentElement();
                 segment.setCardinalityMode(CardinalityMode.LOOSE);
                 segment.setName(getAttributeValueNamed(node, "name"));
-                segment.setMinCount(Integer.parseInt(getAttributeValueNamed(node, "minCount")));
-                segment.setMaxCount(Integer.parseInt(getAttributeValueNamed(node, "maxCount")));
+                segment.setMinCount(Util.tryParseInt(getAttributeValueNamed(node, "minCount")));
+                segment.setMaxCount(Util.tryParseInt(getAttributeValueNamed(node, "maxCount")));
                 segment.setBeanRef(getAttributeValueNamed(node, "beanref"));
                 segment.setParentBeanRef(getAttributeValueNamed(node, "parent-beanref"));
                 segment.setAddMethod(getAttributeValueNamed(node, "addMethod"));
@@ -298,25 +294,22 @@ public class ConfigurationReader {
 
                 Node fieldChild = getChildElementNodeOfType("field-ident", node);
                 if (fieldChild != null) {
-                    segment.setFieldIdentStart(Integer.parseInt(getAttributeValueNamed(fieldChild,
-                            "field-start")));
-                    segment.setFieldIdentLength(Integer.parseInt(getAttributeValueNamed(fieldChild,
-                            "field-length")));
+                    segment.setFieldIdentStart(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-start")));
+                    segment.setFieldIdentLength(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-length")));
                     List<Node> matchNodes = getChildElementNodesOfType("match-string", fieldChild);
-                    for (int j = 0; j < matchNodes.size(); j++) {
-                        segment.addFieldIdentMatchString(getChildTextNodeValue((Node) matchNodes.get(j)));
-                    }
+                    matchNodes.forEach(matchNode -> segment.addFieldIdentMatchString(getChildTextNodeValue(matchNode)));
                 }
                 validateSegmentConfiguration(segment);
-                List<Object> v = getChildNodes(node);
-                for (int i = 0; i < v.size(); i++) {
-                    Object o = v.get(i);
-                    if (o instanceof LineElement) {
-                        segment.addElement((LineElement) o);
-                    }
-                }
+                List<Object> childNodes = getChildNodes(node);
+                childNodes.stream()
+                        .filter(childNode -> childNode instanceof LineElement)
+                        .map(LineElement.class::cast)
+                        .forEach(segment::addElement);
+
                 return segment;
             }
+
+            // Records.
             if (nodeName.equals("record-element")) {
                 RecordElement re = new RecordElement();
 
@@ -326,23 +319,19 @@ public class ConfigurationReader {
                 Node beanref = getAttributeNamed(node, "beanref");
                 Node beanType = getAttributeNamed(node, "type");
                 if ((end == null) && (length == null)) {
-                    FlatwormConfigurationValueException err = new FlatwormConfigurationValueException(
-                            "Must set either the 'end' or 'length' properties");
-                    throw err;
+                    throw new FlatwormConfigurationValueException("Must set either the 'end' or 'length' properties");
                 }
                 if ((end != null) && (length != null)) {
-                    FlatwormConfigurationValueException err = new FlatwormConfigurationValueException(
-                            "Can't specify both the 'end' or 'length' properties");
-                    throw err;
+                    throw new FlatwormConfigurationValueException("Can't specify both the 'end' or 'length' properties");
                 }
                 if (start != null) {
-                    re.setFieldStart(Integer.parseInt(start.getNodeValue()));
+                    re.setFieldStart(Util.tryParseInt(start.getNodeValue()));
                 }
                 if (end != null) {
-                    re.setFieldEnd(Integer.parseInt(end.getNodeValue()));
+                    re.setFieldEnd(Util.tryParseInt(end.getNodeValue()));
                 }
                 if (length != null) {
-                    re.setFieldLength(Integer.parseInt(length.getNodeValue()));
+                    re.setFieldLength(Util.tryParseInt(length.getNodeValue()));
                 }
                 if (beanref != null) {
                     re.setBeanRef(beanref.getNodeValue());
@@ -350,42 +339,37 @@ public class ConfigurationReader {
                 if (beanType != null) {
                     re.setType(beanType.getNodeValue());
                 }
-                List<Node> children = getChildElementNodesOfType("conversion-option", node);
-                for (int i = 0; i < children.size(); i++) {
-                    Node o = (Node) children.get(i);
-
+                List<Node> childNodes = getChildElementNodesOfType("conversion-option", node);
+                for (Node o : childNodes) {
                     String name = getAttributeValueNamed(o, "name");
                     String value = getAttributeValueNamed(o, "value");
                     ConversionOption co = new ConversionOption(name, value);
-
                     re.addConversionOption(name, co);
                 }
                 return re;
             }
-
         }
         return null;
     }
 
-    private void validateSegmentConfiguration(SegmentElement segment)
-            throws FlatwormConfigurationValueException {
+    private void validateSegmentConfiguration(SegmentElement segment) throws FlatwormConfigurationValueException {
         StringBuilder errors = new StringBuilder();
         if (StringUtils.isBlank(segment.getBeanRef())) {
             if (!StringUtils.isBlank(segment.getName())) {
                 segment.setBeanRef(segment.getName());
             } else {
-                errors
-                        .append("Must specify the beanref to be used, or a segment name that matches a bean name.\n");
+                errors.append("Must specify the beanref to be used, or a segment name that matches a bean name.\n");
             }
         }
         if (StringUtils.isBlank(segment.getParentBeanRef())) {
-            errors.append("Must specify the beanref for the parent onject.");
+            errors.append("Must specify the beanref for the parent object.");
         }
         if (StringUtils.isBlank(segment.getAddMethod())) {
             if (errors.length() == 0) {
                 segment.setAddMethod("add"
-                        + StringUtils.capitalize(StringUtils.isBlank(segment.getName()) ? segment.getBeanRef()
-                        : segment.getName()));
+                        + StringUtils.capitalize(StringUtils.isBlank(segment.getName())
+                            ? segment.getBeanRef()
+                            : segment.getName()));
             }
         }
         if (segment.getFieldIdentMatchStrings().size() == 0) {
