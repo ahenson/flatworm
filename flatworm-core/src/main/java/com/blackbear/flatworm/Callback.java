@@ -18,26 +18,18 @@ package com.blackbear.flatworm;
 
 import java.lang.reflect.Method;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * Used primarily by FileParser to store information about object and methods
- * used to hadle parse events.
+ * used to handle parse events.
  */
+@AllArgsConstructor
 public class Callback {
+    @Getter
     private Object instance;
 
+    @Getter
     private Method method;
-
-    public Callback(Object instance, Method method) {
-        this.instance = instance;
-        this.method = method;
-    }
-
-    public Object getInstance() {
-        return instance;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
 }
