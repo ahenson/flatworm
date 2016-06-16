@@ -16,8 +16,6 @@
 
 package com.blackbear.flatworm;
 
-import com.google.common.base.Preconditions;
-
 import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
@@ -42,22 +40,20 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
- * The
- * {@code ConfigurationReader} class is used to initialize Flatworm with an XML configuration file which
- *  describes the format and conversion options to be applied to the input file to produce output beans.
+ * The {@code ConfigurationReader} class is used to initialize Flatworm with an XML configuration file which describes the format and
+ * conversion options to be applied to the input file to produce output beans.
  */
 public class ConfigurationReader {
     /**
-     * {@code loadConfigurationFile} takes an XML configuration file, and
-     * returns a {@code FileFormat} object, which can be used to parse an
+     * {@code loadConfigurationFile} takes an XML configuration file, and returns a {@code FileFormat} object, which can be used to parse an
      * input file into beans.
      *
      * @param xmlFile An XML file which contains a valid Flatworm configuration.
      * @return A {@code FileFormat} object which can parse the specified format.
-     * @throws FlatwormUnsetFieldValueException If a required parameter of a tag is not set.
+     * @throws FlatwormUnsetFieldValueException    If a required parameter of a tag is not set.
      * @throws FlatwormConfigurationValueException If the file contains invalid syntax.
-     * @throws FlatwormParserException Should the {@code xmlFile} fail to parse.
-     * @throws IOException If the XML file cannot be opened for parsing.
+     * @throws FlatwormParserException             Should the {@code xmlFile} fail to parse.
+     * @throws IOException                         If the XML file cannot be opened for parsing.
      */
     public FileFormat loadConfigurationFile(String xmlFile) throws FlatwormUnsetFieldValueException,
             FlatwormConfigurationValueException, FlatwormParserException, IOException {
@@ -65,8 +61,7 @@ public class ConfigurationReader {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(xmlFile)) {
             if (in != null) {
                 fileFormat = loadConfigurationFile(in);
-            }
-            else {
+            } else {
                 try (InputStream inTakeTwo = new FileInputStream(xmlFile)) {
                     fileFormat = loadConfigurationFile(inTakeTwo);
                 }
@@ -75,12 +70,23 @@ public class ConfigurationReader {
         return fileFormat;
     }
 
+    /**
+     * {@code loadConfigurationFile} takes an {@link InputStream} and returns a {@code FileFormat} object, which can be used to parse an
+     * input file into beans.
+     *
+     * @param in The {@link InputStream} instance to use in parsing the configuration file.
+     * @return a constructed {@link FileFormat} if the parsing was successful.
+     * @throws FlatwormUnsetFieldValueException    If a required parameter of a tag is not set.
+     * @throws FlatwormConfigurationValueException If the file contains invalid syntax.
+     * @throws FlatwormParserException             Should the {@code xmlFile} fail to parse.
+     * @throws IOException                         If the XML file cannot be opened for parsing.
+     */
     public FileFormat loadConfigurationFile(InputStream in) throws FlatwormUnsetFieldValueException,
             FlatwormConfigurationValueException, FlatwormParserException, IOException {
         DocumentBuilder parser;
         Document document;
         NodeList children;
-        FileFormat result = null;
+        FileFormat fileFormat = null;
 
         try {
             DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -90,14 +96,22 @@ public class ConfigurationReader {
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
                 if (("file-format".equals(child.getNodeName())) && (child.getNodeType() == Node.ELEMENT_NODE)) {
-                    result = (FileFormat) traverse(child);
+                    fileFormat = (FileFormat) traverse(child);
                     break;
+                }
+            }
+
+            if (fileFormat != null) {
+                // Make sure we haven't double dipped the default handling of data.
+                if (fileFormat.hasDefaultRecord() && fileFormat.isIgnoreUnmappedRecords()) {
+                    throw new FlatwormParserException("You cannot have default Records (those lacking identifier configuration) and " +
+                            "the ignore-unmapped-records flag set to true - you must have one or the other.");
                 }
             }
         } catch (Exception e) {
             throw new FlatwormParserException(e.getMessage(), e);
         }
-        return result;
+        return fileFormat;
     }
 
     private List<Object> getChildNodes(Node node) throws FlatwormUnsetFieldValueException,
@@ -160,7 +174,7 @@ public class ConfigurationReader {
                 Node child = children.item(i);
                 if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
                     result = CharacterData.class.cast(child).getData();
-                    if(result != null) {
+                    if (result != null) {
                         result = result.trim();
                     }
                     break;
@@ -198,12 +212,13 @@ public class ConfigurationReader {
                 }
                 fileFormat.setEncoding(encoding);
 
+                fileFormat.setIgnoreUnmappedRecords(Boolean.parseBoolean(getAttributeValueNamed(node, "ignore-unmapped-records")));
+
                 List<Object> childNodes = getChildNodes(node);
                 childNodes.forEach(childNode -> {
-                    if(childNode.getClass().isAssignableFrom(Converter.class)) {
+                    if (childNode.getClass().isAssignableFrom(Converter.class)) {
                         fileFormat.addConverter(Converter.class.cast(childNode));
-                    }
-                    else if(childNode.getClass().isAssignableFrom(Record.class)) {
+                    } else if (childNode.getClass().isAssignableFrom(Record.class)) {
                         fileFormat.addRecord(Record.class.cast(childNode));
                     }
                 });
@@ -261,10 +276,9 @@ public class ConfigurationReader {
 
                 List<Object> childNodes = getChildNodes(node);
                 childNodes.forEach(childNode -> {
-                    if(childNode.getClass().isAssignableFrom(Bean.class)) {
+                    if (childNode.getClass().isAssignableFrom(Bean.class)) {
                         rd.addBeanUsed(Bean.class.cast(childNode));
-                    }
-                    else if(childNode.getClass().isAssignableFrom(Line.class)) {
+                    } else if (childNode.getClass().isAssignableFrom(Line.class)) {
                         rd.addLine(Line.class.cast(childNode));
                     }
                 });

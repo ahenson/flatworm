@@ -13,7 +13,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
+
 package com.blackbear.flatworm;
+
+import com.blackbear.flatworm.test.domain.Dvd;
+import com.blackbear.flatworm.test.domain.Film;
+import com.blackbear.flatworm.test.domain.Header;
+import com.blackbear.flatworm.test.domain.Videotape;
 
 import org.junit.Test;
 
@@ -22,24 +28,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
-import com.blackbear.flatworm.test.domain.Book;
-import com.blackbear.flatworm.test.domain.Dvd;
-import com.blackbear.flatworm.test.domain.Film;
-import com.blackbear.flatworm.test.domain.Header;
-import com.blackbear.flatworm.test.domain.Videotape;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-public class ComplexFileTest {
+public class UnmappedRecords {
     @Test
     public void testFileRead() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
         ConfigurationReader parser = new ConfigurationReader();
         try {
-            FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("complex-example.xml"));
-            InputStream in = getClass().getClassLoader().getResourceAsStream("complex_input.txt");
+            FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("unmapped-records.xml"));
+            InputStream in = getClass().getClassLoader().getResourceAsStream("unmapped_records.txt");
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
             MatchedRecord results;
 
@@ -61,15 +61,6 @@ public class ComplexFileTest {
             assertEquals("RUN ANYWHERE STUDIO", film.getStudio());
 
             results = ff.nextRecord(bufIn);
-            assertEquals("book", results.getRecordName());
-            Book book = (Book) results.getBean("book");
-            assertEquals("546234476", book.getSku());
-            assertEquals("HE KNOWS WHEN YOU\"RE CODING", book.getTitle());
-            assertEquals("JAVALANG OBJECT", book.getAuthor());
-            assertEquals(13.95, book.getPrice(), 0.01);
-            assertEquals("2003/11/10", format.format(book.getReleaseDate()));
-
-            results = ff.nextRecord(bufIn);
             assertEquals("videotape", results.getRecordName());
             Videotape tape = (Videotape) results.getBean("video");
             film = (Film) results.getBean("film");
@@ -78,12 +69,6 @@ public class ComplexFileTest {
             assertEquals("2003/03/12", format.format(film.getReleaseDate()));
             assertEquals("WHEN A STRANGER IMPLEMENTS", film.getTitle());
             assertEquals("NULL POINTER PRODUCTIONS", film.getStudio());
-
-            results = ff.nextRecord(bufIn);
-            assertEquals("book", results.getRecordName());
-
-            results = ff.nextRecord(bufIn);
-            assertEquals("videotape", results.getRecordName());
 
             // This should not do anything as we are ignoring unmatched lines.
             results = ff.nextRecord(bufIn);

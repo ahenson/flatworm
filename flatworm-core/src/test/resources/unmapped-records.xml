@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  ~ Flatworm - A Java Flat File Importer/Exporter Copyright (C) 2004 James M. Turner.
+  ~ Extended by James Lawrence 2005
+  ~ Extended by Josh Brackett in 2011 and 2012
+  ~ Extended by Alan Henson in 2016
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+  ~ obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+  ~ and limitations under the License.
+  -->
+
+<file-format ignore-unmapped-records="true">
+    <converter name="char"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertChar" return-type="java.lang.String"/>
+    <converter name="decimal"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertDecimal" return-type="java.lang.Double"/>
+    <converter name="date"
+               class="com.blackbear.flatworm.converters.CoreConverters"
+               method="convertDate" return-type="java.lang.Date"/>
+
+    <record name="header">
+        <record-ident>
+            <script-ident>
+                <![CDATA[
+
+                function matchesLine(fileFormat) {
+                    return fileFormat.getLineNumber() == 1;
+                }
+
+                ]]>
+            </script-ident>
+        </record-ident>
+        <record-definition>
+            <bean name="header" class="com.blackbear.flatworm.test.domain.Header"/>
+            <line>
+                <record-element length="10" beanref="header.source" type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element length="10" beanref="header.version" type="decimal">
+                    <conversion-option name="justify" value="left"/>
+                    <conversion-option name="decimal-places" value="2"/>
+                </record-element>
+            </line>
+        </record-definition>
+    </record>
+
+    <record name="dvd">
+        <record-ident>
+            <length-ident minlength="85" maxlength="85"/>
+        </record-ident>
+        <record-definition>
+            <bean name="dvd" class="com.blackbear.flatworm.test.domain.Dvd"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
+            <line>
+                <record-element length="30" beanref="film.title" type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element length="30" beanref="film.studio" type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element length="8" beanref="film.releaseDate" type="date">
+                    <conversion-option name="format" value="yyyyMMdd"/>
+                    <conversion-option name="default-value" value="19990101"/>
+                </record-element>
+                <record-element length="9" beanref="dvd.sku" type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element length="7" beanref="dvd.price" type="decimal">
+                    <conversion-option name="justify" value="right"/>
+                    <conversion-option name="decimal-places" value="2"/>
+                </record-element>
+                <record-element length="1" beanref="dvd.dualLayer" type="char"/>
+            </line>
+        </record-definition>
+    </record>
+    <record name="videotape">
+        <record-ident>
+            <field-ident field-start="0" field-length="1">
+                <match-string>V</match-string>
+            </field-ident>
+        </record-ident>
+        <record-definition>
+            <bean name="video" class="com.blackbear.flatworm.test.domain.Videotape"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
+            <line>
+                <record-element start="1" end="10" beanref="video.sku" type="char">
+                    <conversion-option name="justify" value="right"/>
+                    <conversion-option name="pad-character" value="0"/>
+                </record-element>
+                <record-element start="10" end="16"
+                                beanref="video.price" type="decimal">
+                    <conversion-option name="decimal-implied" value="true"/>
+                    <conversion-option name="decimal-places" value="2"/>
+                    <conversion-option name="justify" value="right"/>
+                    <conversion-option name="pad-character" value="0"/>
+                </record-element>
+            </line>
+            <line>
+                <record-element start="0" end="30" beanref="film.title" type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element start="30" end="60" beanref="film.studio" type="char">
+                    <conversion-option name="justify" value="left"/>
+                </record-element>
+                <record-element start="60" end="70" beanref="film.releaseDate" type="date">
+                    <conversion-option name="default-value" value="1980-01-01"/>
+                </record-element>
+            </line>
+        </record-definition>
+    </record>
+</file-format>

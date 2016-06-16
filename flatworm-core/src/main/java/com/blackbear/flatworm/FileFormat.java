@@ -25,11 +25,13 @@ import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -56,6 +58,10 @@ public class FileFormat {
     @Getter
     @Setter
     private String encoding;
+
+    @Getter
+    @Setter
+    private boolean ignoreUnmappedRecords;
 
     public FileFormat() {
         records = new HashMap<>();
@@ -89,6 +95,19 @@ public class FileFormat {
             }
         }
         return result;
+    }
+
+    /**
+     * See if any of the {@code Record} instances collected thus far are "default" records in that they lack a
+     * record identifier.
+     * @return {@code true} if there is a {@code Record} that lacks an identifier.
+     */
+    public boolean hasDefaultRecord() {
+        return records.values()
+                .stream()
+                .filter(record -> record.getIdentTypeFlag() == '\0')
+                .findAny()
+                .isPresent();
     }
 
     /**
@@ -132,15 +151,41 @@ public class FileFormat {
 
         if (currentParsedLine != null) {
             Record rd = findMatchingRecord(currentParsedLine);
-            if (rd == null)
+            if (rd != null) {
+                Map<String, Object> beans = rd.parseRecord(currentParsedLine, in, convHelper);
+                matchedRecord = new MatchedRecord(rd.getName(), beans);
+            }
+            else if (!ignoreUnmappedRecords) {
                 throw new FlatwormInvalidRecordException(String.format(
                         "Configuration not found for line in input file [line: %d] - %s", lineNumber, currentParsedLine
                 ));
-
-            Map<String, Object> beans = rd.parseRecord(currentParsedLine, in, convHelper);
-            matchedRecord = new MatchedRecord(rd.getName(), beans);
+            }
         }
 
+        return matchedRecord;
+    }
+
+    public MatchedRecord nextRecord(String line) throws FlatwormParserException {
+        MatchedRecord matchedRecord;
+        try {
+            matchedRecord = nextRecord(new BufferedReader(new StringReader(line)));
+        }
+        catch(Exception e) {
+            throw new FlatwormParserException(e.getMessage(), e);
+        }
+        return matchedRecord;
+    }
+
+    public MatchedRecord nextRecord(List<String> lines) throws FlatwormParserException {
+        MatchedRecord matchedRecord;
+        try {
+            StringBuilder builder = new StringBuilder();
+            lines.forEach(line -> builder.append(line).append(String.format("%n")));
+            matchedRecord = nextRecord(new BufferedReader(new StringReader(builder.toString())));
+        }
+        catch(Exception e) {
+            throw new FlatwormParserException(e.getMessage(), e);
+        }
         return matchedRecord;
     }
 }

@@ -93,9 +93,11 @@ class Record {
         boolean matchesLine = true;
         switch (identTypeFlag) {
 
+            // TODO How to handle default configurations (no record-ident) and ignore-unmapped-lines - these are currently in conflict.
+            // TODO one consideration is to not allow ignore-unmapped-lines == true and default records in the same file
+
             // Recognition by value in a certain field
             // TODO: Will this work for delimited lines?
-            // TODO: No - this won't - need some other way of identifying the record - thinking a line handler that maintains state.
             case 'F':
                 if (line.length() < fieldIdentStart + fieldIdentLength) {
                     matchesLine = false;
@@ -147,12 +149,12 @@ class Record {
     }
 
     /**
-     * Parse the record into the bean(s) <br>
+     * Parse the record into the bean(s).
      *
-     * @param firstLine  first line to be considered
-     * @param in         used to retrieve additional lines of input for parsing multi-line records
-     * @param convHelper used to help convert datatypes and format strings
-     * @return HashMap collection of beans populated with file data
+     * @param firstLine  first line to be considered.
+     * @param in         used to retrieve additional lines of input for parsing multi-line records.
+     * @param convHelper used to help convert datatypes and format strings.
+     * @return collection of beans populated with file data.
      */
     public Map<String, Object> parseRecord(String firstLine, BufferedReader in,
                                            ConversionHelper convHelper) throws FlatwormInputLineLengthException,
