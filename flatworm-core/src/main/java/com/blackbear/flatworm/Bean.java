@@ -16,33 +16,15 @@
 
 package com.blackbear.flatworm;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@Data
+@ToString
+@EqualsAndHashCode
 class Bean {
     private String beanName;
     private String beanClass;
     private Class beanObjectClass;
-
-    public String getBeanName() {
-        return beanName;
-    }
-
-    public void setBeanName(String beanName) {
-        this.beanName = beanName;
-    }
-
-    public String getBeanClass() {
-        return beanClass;
-    }
-
-    public void setBeanClass(String beanClass) {
-        this.beanClass = beanClass;
-    }
-
-    public Class getBeanObjectClass() {
-        return beanObjectClass;
-    }
-
-    public void setBeanObjectClass(Class beanObjectClass) {
-        this.beanObjectClass = beanObjectClass;
-    }
-
 }
