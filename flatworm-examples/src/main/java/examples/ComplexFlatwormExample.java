@@ -19,16 +19,9 @@ package examples;
 import com.blackbear.flatworm.ConfigurationReader;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.MatchedRecord;
-import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -56,21 +49,7 @@ public class ComplexFlatwormExample {
                 System.out.println("");
             }
 
-        } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {
-            flatwormUnsetFieldValueError.printStackTrace(); // To change body of catch statement use Options | File
-            // Templates.
-        } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {
-            flatwormConfigurationValueError.printStackTrace(); // To change body of catch statement use Options | File
-            // Templates.
-        } catch (FileNotFoundException e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File Templates.
-        } catch (FlatwormInvalidRecordException e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File Templates.
-        } catch (FlatwormInputLineLengthException e) {
-            e.printStackTrace(); // To change body of catch statement use Options | File Templates.
-        } catch (FlatwormConversionException e) {
-            e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
-        } catch (FlatwormCreatorException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

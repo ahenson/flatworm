@@ -17,6 +17,7 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import org.apache.commons.lang.StringUtils;
@@ -24,6 +25,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.FileInputStream;
@@ -42,7 +44,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * <code>ConfigurationReader<code> class is used to initialize Flatworm with an XML configuration file which
  *  describes the format and conversion options to be applied to the input file to produce output beans.
  */
-
 public class ConfigurationReader {
     /**
      * <code>loadConfigurationFile</code> takes an XML configuration file, and
@@ -53,64 +54,56 @@ public class ConfigurationReader {
      *          An XML file which contains a valid Flatworm configuration
      * @return A <code>FileFormat</code> object which can parse the specified
      *         format.
-     * @throws FlatwormUnsetFieldValueException
-     *           If a required parameter of a tag is not set.
-     * @throws FlatwormConfigurationValueException
-     *           If the file contains invalid syntax.
+     * @throws FlatwormUnsetFieldValueException If a required parameter of a tag is not set.
+     * @throws FlatwormConfigurationValueException If the file contains invalid syntax.
+     * @throws FlatwormParserException Should the {@code xmlFile} fail to parse.
+     * @throws IOException If the XML file cannot be opened for parsing.
      */
     public FileFormat loadConfigurationFile(String xmlFile) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException {
-        InputStream in = null;
-        try {
-            in = this.getClass().getClassLoader().getResourceAsStream(xmlFile);
-            if (in == null) {
-                in = (new FileInputStream(xmlFile));
-            }
-            return loadConfigurationFile(in);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+            FlatwormConfigurationValueException, FlatwormParserException, IOException {
+        FileFormat fileFormat;
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(xmlFile)) {
             if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
+                fileFormat = loadConfigurationFile(in);
+            }
+            else {
+                try (InputStream inTakeTwo = new FileInputStream(xmlFile)) {
+                    fileFormat = loadConfigurationFile(inTakeTwo);
                 }
             }
         }
-        return null;
+        return fileFormat;
     }
 
     public FileFormat loadConfigurationFile(InputStream in) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException {
+            FlatwormConfigurationValueException, FlatwormParserException, IOException {
         DocumentBuilder parser;
         Document document;
         NodeList children;
+        FileFormat result = null;
 
         try {
             DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
             parser = fact.newDocumentBuilder();
-            document = parser.parse((new org.xml.sax.InputSource(in)));
+            document = parser.parse((new InputSource(in)));
             children = document.getChildNodes();
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
                 if (("file-format".equals(child.getNodeName()))
                         && (child.getNodeType() == Node.ELEMENT_NODE)) {
-                    return (FileFormat) traverse(child);
+                    result = (FileFormat) traverse(child);
+                    break;
                 }
             }
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new FlatwormParserException(e.getMessage(), e);
         }
-        return null;
+        return result;
     }
 
     private List<Object> getChildNodes(Node node) throws FlatwormUnsetFieldValueException,
             FlatwormConfigurationValueException {
-        List<Object> nodes = new ArrayList<Object>();
+        List<Object> nodes = new ArrayList<>();
         NodeList children = node.getChildNodes();
         if (children != null) {
             for (int i = 0; i < children.getLength(); i++) {

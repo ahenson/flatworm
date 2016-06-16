@@ -79,13 +79,9 @@ public class FileParser {
         this.file = file;
 
         try {
-
             ConfigurationReader parser = new ConfigurationReader();
             ff = parser.loadConfigurationFile(config);
-
-        } catch (FlatwormConfigurationValueException ex) {
-            throw new FlatwormParserException(ex.getMessage());
-        } catch (FlatwormUnsetFieldValueException ex) {
+        } catch (Exception ex) {
             throw new FlatwormParserException(ex.getMessage());
         }
     }
@@ -117,16 +113,12 @@ public class FileParser {
     /**
      * Open the buffered reader for the input file<br>
      *
-     * @throws FileNotFoundException
-     *           - If the file you supplied does not happen to exist.
-     * @throws UnsupportedEncodingException
-     * @throws IOException
+     * @throws IOException should the {@link InputStream} fail to properly open.
      */
-    public void open() throws FileNotFoundException, UnsupportedEncodingException, IOException {
+    public void open() throws IOException {
         InputStream in = new FileInputStream(file);
         String encoding = ff.getEncoding();
         bufIn = new BufferedReader(new InputStreamReader(in, encoding));
-
     }
 
     /**
@@ -149,13 +141,11 @@ public class FileParser {
      * <b>NOTE:</b> All exceptions are consumed and passed to the exception
      * handler method you defined (The offending line is provided just in case you
      * want to do something with it.<br>
-     *
-     * @throws FlatwormConfigurationValueException
      */
     public void read() {
 
         MatchedRecord results = null;
-        boolean exception = false;
+        boolean exception;
         do {
             exception = true;
 
@@ -163,15 +153,6 @@ public class FileParser {
             try {
                 results = ff.getNextRecord(bufIn);
                 exception = false;
-            } catch (FlatwormInvalidRecordException ex) {
-                doExceptionCallback(ex, "FlatwormInvalidRecordException", ff.getLastLine());
-            } catch (FlatwormInputLineLengthException ex) {
-                log.warn("Exception", ex);
-                doExceptionCallback(ex, "FlatwormInputLineLengthException", ff.getLastLine());
-            } catch (FlatwormUnsetFieldValueException ex) {
-                doExceptionCallback(ex, "FlatwormUnsetFieldValueException", ff.getLastLine());
-            } catch (FlatwormConversionException ex) {
-                doExceptionCallback(ex, "FlatwormConversionException", ff.getLastLine());
             } catch (Exception ex) {
                 doExceptionCallback(ex, ex.getMessage(), ff.getLastLine());
             }
@@ -201,12 +182,11 @@ public class FileParser {
      *          <b>NOTE:</b> All exceptions are consumed and passed to the
      *          exception handler method you defined (The offending line is
      *          provided just in case you want to do something with it.<br>
-     * @throws FlatwormConfigurationValueException
      */
     private void doCallback(Callback callback, Object arg1, Object arg2) {
         try {
             Method method = callback.getMethod();
-            Object[] args = null;
+            Object[] args;
 
             if (null == arg2) {
                 args = new Object[1];

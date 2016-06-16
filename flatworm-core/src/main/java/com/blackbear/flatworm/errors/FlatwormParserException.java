@@ -26,4 +26,8 @@ public class FlatwormParserException extends FlatwormException {
     public FlatwormParserException(String s) {
         super(s);
     }
+
+    public FlatwormParserException(String s, Exception e) {
+        super(s, e);
+    }
 }

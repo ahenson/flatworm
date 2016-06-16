@@ -16,9 +16,6 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
-
 import org.junit.Test;
 
 import java.util.List;
@@ -36,10 +33,9 @@ public class ConfigurationReaderTest {
         ConfigurationReader reader = new ConfigurationReader();
         try {
             format = reader.loadConfigurationFile(configFile);
-        } catch (FlatwormUnsetFieldValueException e) {
-            fail("Got a FlatwormUnsetFieldValueException - " + e);
-        } catch (FlatwormConfigurationValueException e) {
-            fail("Got a FlatwormConfigurationValueException - " + e);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail(String.format("Got an %s - %s", e.getClass().getSimpleName(), e.getMessage()));
         }
     }
 
