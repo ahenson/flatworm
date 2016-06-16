@@ -202,7 +202,7 @@ public class FileCreator {
         for (Iterator<Line> itLines = lines.iterator(); itLines.hasNext(); ) {
             Line line = itLines.next();
 
-            String delimit = line.getDelimeter();
+            String delimit = line.getDelimiter();
             if (null == delimit)
                 delimit = "";
 

@@ -22,9 +22,6 @@ import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
 import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,15 +55,15 @@ class Line {
         chrQuote = quote.charAt(0);
     }
 
-    public boolean isDelimeted() {
+    public boolean isDelimited() {
         return (null != delimit);
     }
 
-    public void setDelimeter(String delimit) {
+    public void setDelimiter(String delimit) {
         this.delimit = delimit;
     }
 
-    public String getDelimeter() {
+    public String getDelimiter() {
         return delimit;
     }
 
@@ -115,7 +112,7 @@ class Line {
         this.beans = beans;
 
         // JBL - check for delimited status
-        if (isDelimeted()) {
+        if (isDelimited()) {
             // Don't parse empty lines
             if (inputLine != null && !inputLine.isEmpty()) {
                 parseInputDelimited(inputLine);

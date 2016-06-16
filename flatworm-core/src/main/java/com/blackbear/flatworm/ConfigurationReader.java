@@ -271,7 +271,7 @@ public class ConfigurationReader {
                 Node delimit = getAttributeNamed(node, "delimit");
                 Node quote = getAttributeNamed(node, "quote");
                 if (delimit != null) {
-                    li.setDelimeter(getAttributeValueNamed(node, "delimit"));
+                    li.setDelimiter(getAttributeValueNamed(node, "delimit"));
                 }
                 if (quote != null) {
                     li.setQuoteChar(getAttributeValueNamed(node, "quote"));
