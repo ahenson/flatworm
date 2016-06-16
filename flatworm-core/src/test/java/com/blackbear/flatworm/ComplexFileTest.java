@@ -22,10 +22,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
-import com.blackbear.flatworm.test.domain.domain.Book;
-import com.blackbear.flatworm.test.domain.domain.Dvd;
-import com.blackbear.flatworm.test.domain.domain.Film;
-import com.blackbear.flatworm.test.domain.domain.Videotape;
+import com.blackbear.flatworm.test.domain.Book;
+import com.blackbear.flatworm.test.domain.Dvd;
+import com.blackbear.flatworm.test.domain.Film;
+import com.blackbear.flatworm.test.domain.Header;
+import com.blackbear.flatworm.test.domain.Videotape;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -39,8 +40,15 @@ public class ComplexFileTest {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("complex-example.xml"));
             InputStream in = getClass().getClassLoader().getResourceAsStream("complex_input.txt");
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
+            MatchedRecord results;
 
-            MatchedRecord results = ff.nextRecord(bufIn);
+            results = ff.nextRecord(bufIn);
+            assertEquals("header", results.getRecordName());
+            Header header = (Header) results.getBean("header");
+            assertEquals("IMDB", header.getSource());
+            assertEquals(2016.1, header.getVersion(), 0.001);
+
+            results = ff.nextRecord(bufIn);
             assertEquals("dvd", results.getRecordName());
             Dvd dvd = (Dvd) results.getBean("dvd");
             Film film = (Film) results.getBean("film");

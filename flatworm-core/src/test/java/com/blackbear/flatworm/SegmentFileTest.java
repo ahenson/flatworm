@@ -25,10 +25,10 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import com.blackbear.flatworm.test.domain.domain.segment.Account;
-import com.blackbear.flatworm.test.domain.domain.segment.Address;
-import com.blackbear.flatworm.test.domain.domain.segment.Consumer;
-import com.blackbear.flatworm.test.domain.domain.segment.Phone;
+import com.blackbear.flatworm.test.domain.segment.Account;
+import com.blackbear.flatworm.test.domain.segment.Address;
+import com.blackbear.flatworm.test.domain.segment.Consumer;
+import com.blackbear.flatworm.test.domain.segment.Phone;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

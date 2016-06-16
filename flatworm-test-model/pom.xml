@@ -33,6 +33,12 @@
     <packaging>jar</packaging>
 
     <name>Flatworm Test Model</name>
-
     <description>Common objects shared between testing and the examples.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
 </project>

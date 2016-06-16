@@ -20,7 +20,9 @@ import com.blackbear.flatworm.errors.FlatwormConversionException;
 import com.blackbear.flatworm.errors.FlatwormCreatorException;
 import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
 import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
+import com.blackbear.flatworm.test.domain.Film;
 
 import junit.framework.TestCase;
 
@@ -31,9 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-
-import com.blackbear.flatworm.test.domain.domain.Film;
 
 public class EncodingTestCase extends TestCase {
     protected FileFormat ff;
@@ -47,7 +46,7 @@ public class EncodingTestCase extends TestCase {
             + "       <record-ident>\r\n"
             + "           <length-ident minlength=\"0\" maxlength=\"9999\" />\r\n"
             + "       </record-ident>\r\n" + "       <record-definition>\r\n"
-            + "           <bean name=\"film\" class=\"com.blackbear.flatworm.test.domain.domain.Film\" />\r\n" + "           <line>\r\n"
+            + "           <bean name=\"film\" class=\"com.blackbear.flatworm.test.domain.Film\" />\r\n" + "           <line>\r\n"
             + "               <record-element length=\"30\" beanref=\"film.title\"\r\n"
             + "                   type=\"char\">\r\n"
             + "                   <conversion-option name=\"justify\" value=\"left\" />\r\n"
@@ -72,7 +71,8 @@ public class EncodingTestCase extends TestCase {
 
     protected Object getNextBean() throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException, IOException {
+            FlatwormUnsetFieldValueException, FlatwormCreatorException,
+            FlatwormParserException, IOException {
         MatchedRecord results = ff.nextRecord(reader);
         return results.getBean(getBeanName());
     }
@@ -95,8 +95,7 @@ public class EncodingTestCase extends TestCase {
         assertEquals("\u0104", film.getTitle());
     }
 
-    private void prepareContent(String string) throws UnsupportedEncodingException, IOException,
-            Exception {
+    private void prepareContent(String string) throws Exception {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         OutputStreamWriter sw = new OutputStreamWriter(os, "iso-8859-2");
         sw.write(string);

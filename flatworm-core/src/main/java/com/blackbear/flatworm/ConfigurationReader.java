@@ -21,6 +21,7 @@ import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -34,6 +35,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -99,7 +101,7 @@ public class ConfigurationReader {
     }
 
     private List<Object> getChildNodes(Node node) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException {
+            FlatwormConfigurationValueException, FlatwormParserException {
         List<Object> nodes = new ArrayList<>();
         NodeList children = node.getChildNodes();
         if (children != null) {
@@ -150,6 +152,24 @@ public class ConfigurationReader {
         return null;
     }
 
+    private String getChildCDataNodeValue(Node node) {
+        String result = null;
+        NodeList children = node.getChildNodes();
+        if (children != null) {
+            for (int i = 0; i < children.getLength(); i++) {
+                Node child = children.item(i);
+                if (child.getNodeType() == Node.CDATA_SECTION_NODE) {
+                    result = CharacterData.class.cast(child).getData();
+                    if(result != null) {
+                        result = result.trim();
+                    }
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private boolean hasAttributeValueNamed(Node node, String name) {
         return (node != null && node.getAttributes().getNamedItem(name) != null);
     }
@@ -163,7 +183,8 @@ public class ConfigurationReader {
         return map.getNamedItem(name);
     }
 
-    private Object traverse(Node node) throws FlatwormUnsetFieldValueException, FlatwormConfigurationValueException {
+    private Object traverse(Node node) throws FlatwormUnsetFieldValueException, FlatwormConfigurationValueException,
+            FlatwormParserException {
         int type = node.getNodeType();
         if (type == Node.ELEMENT_NODE) {
             String nodeName = node.getNodeName();
@@ -201,28 +222,37 @@ public class ConfigurationReader {
 
             // Record.
             if (nodeName.equals("record")) {
-                Record r = new Record();
-                r.setName(getAttributeValueNamed(node, "name"));
+                Record record = new Record();
+                record.setName(getAttributeValueNamed(node, "name"));
                 Node identChild = getChildElementNodeOfType("record-ident", node);
                 if (identChild != null) {
                     Node fieldChild = getChildElementNodeOfType("field-ident", identChild);
                     Node lengthChild = getChildElementNodeOfType("length-ident", identChild);
+                    Node scriptChild = getChildElementNodeOfType("script-ident", identChild);
                     if (lengthChild != null) {
-                        r.setLengthIdentMin(Util.tryParseInt(getAttributeValueNamed(lengthChild, "minlength")));
-                        r.setLengthIdentMax(Util.tryParseInt(getAttributeValueNamed(lengthChild, "maxlength")));
-                        r.setIdentTypeFlag('L');
+                        record.setLengthIdentMin(Util.tryParseInt(getAttributeValueNamed(lengthChild, "minlength")));
+                        record.setLengthIdentMax(Util.tryParseInt(getAttributeValueNamed(lengthChild, "maxlength")));
+                        record.setIdentTypeFlag('L');
                     } else if (fieldChild != null) {
-                        r.setFieldIdentStart(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-start")));
-                        r.setFieldIdentLength(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-length")));
-                        r.setIdentTypeFlag('F');
+                        record.setFieldIdentStart(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-start")));
+                        record.setFieldIdentLength(Util.tryParseInt(getAttributeValueNamed(fieldChild, "field-length")));
+                        record.setIdentTypeFlag('F');
 
                         List<Node> matchNodes = getChildElementNodesOfType("match-string", fieldChild);
-                        matchNodes.forEach(matchNode -> r.addFieldIdentMatchString(getChildTextNodeValue(matchNode)));
+                        matchNodes.forEach(matchNode -> record.addFieldIdentMatchString(getChildTextNodeValue(matchNode)));
+                    } else if (scriptChild != null) {
+                        try {
+                            record.setFieldIdentScript(getChildCDataNodeValue(scriptChild));
+                            record.setIdentTypeFlag('S');
+                        } catch (ScriptException e) {
+                            throw new FlatwormParserException(String.format("Record entry %s has an invalid script. Err: %s",
+                                    record.getName(), e.getMessage()), e);
+                        }
                     }
                 }
                 Node recordChild = getChildElementNodeOfType("record-definition", node);
-                r.setRecordDefinition((RecordDefinition) traverse(recordChild));
-                return r;
+                record.setRecordDefinition((RecordDefinition) traverse(recordChild));
+                return record;
             }
 
             // Record Definition.

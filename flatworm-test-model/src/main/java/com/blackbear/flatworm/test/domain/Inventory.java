@@ -20,7 +20,7 @@
  * To change the template for this generated file go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  * Comments
  */
-package com.blackbear.flatworm.test.domain.domain;
+package com.blackbear.flatworm.test.domain;
 
 /**
  * @author e50633

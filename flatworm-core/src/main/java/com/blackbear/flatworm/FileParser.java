@@ -133,7 +133,7 @@ public class FileParser {
                 results = ff.nextRecord(bufIn);
                 exception = false;
             } catch (Exception ex) {
-                doExceptionCallback(ex, ex.getMessage(), ff.getLastLine());
+                doExceptionCallback(ex, ex.getMessage(), ff.getCurrentParsedLine());
             }
 
             if (null != results) {

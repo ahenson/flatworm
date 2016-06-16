@@ -20,6 +20,7 @@ import com.blackbear.flatworm.errors.FlatwormConversionException;
 import com.blackbear.flatworm.errors.FlatwormCreatorException;
 import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
 import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import java.io.BufferedReader;
@@ -44,11 +45,13 @@ public class FileFormat {
     private Map<String, Record> records;
     private List<Record> recordOrder;
     private ConversionHelper convHelper;
+
+    @Getter
     private int lineNumber;
 
     // JBL - Used when parsing fails, gives access to bad line
     @Getter
-    private String lastLine = "";
+    private String currentParsedLine = "";
 
     @Getter
     @Setter
@@ -57,7 +60,8 @@ public class FileFormat {
     public FileFormat() {
         records = new HashMap<>();
         recordOrder = new ArrayList<>();
-        lastLine = "";
+        currentParsedLine = "";
+        lineNumber = 0;
 
         // JBL
         convHelper = new ConversionHelper();
@@ -76,7 +80,7 @@ public class FileFormat {
         return records.get(name);
     }
 
-    private Record findMatchingRecord(String firstLine) {
+    private Record findMatchingRecord(String firstLine) throws FlatwormParserException {
         Record result = null;
         for (Record record : recordOrder) {
             if (record.matchesLine(firstLine, this)) {
@@ -113,20 +117,21 @@ public class FileFormat {
      */
     public MatchedRecord nextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException, IOException {
+            FlatwormUnsetFieldValueException, FlatwormCreatorException,
+            FlatwormParserException, IOException {
 
         MatchedRecord matchedRecord = null;
-        String currentLine = in.readLine();
-        lastLine = currentLine;
+        currentParsedLine = in.readLine();
+        lineNumber++;
 
-        if (currentLine != null) {
-            Record rd = findMatchingRecord(currentLine);
+        if (currentParsedLine != null) {
+            Record rd = findMatchingRecord(currentParsedLine);
             if (rd == null)
                 throw new FlatwormInvalidRecordException(String.format(
-                        "Configuration not found for line in input file [line: %d] - %s", lineNumber, currentLine
+                        "Configuration not found for line in input file [line: %d] - %s", lineNumber, currentParsedLine
                 ));
 
-            Map<String, Object> beans = rd.parseRecord(currentLine, in, convHelper);
+            Map<String, Object> beans = rd.parseRecord(currentParsedLine, in, convHelper);
             matchedRecord = new MatchedRecord(rd.getName(), beans);
         }
 

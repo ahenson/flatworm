@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.domain.segment;
+package com.blackbear.flatworm.test.domain.segment;
 
 import java.util.ArrayList;
 import java.util.Collections;

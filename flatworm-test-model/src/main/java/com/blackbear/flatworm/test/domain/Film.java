@@ -14,23 +14,19 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.domain;
+package com.blackbear.flatworm.test.domain;
 
 import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
  */
-public class Book {
+public class Film {
     private Date releaseDate;
 
     private String title;
 
-    private String author;
-
-    private double price;
-
-    private String sku;
+    private String studio;
 
     public Date getReleaseDate() {
         return releaseDate;
@@ -48,32 +44,15 @@ public class Book {
         this.title = title;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getStudio() {
+        return studio;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setStudio(String studio) {
+        this.studio = studio;
     }
 
     public String toString() {
-        return super.toString() + "[" + releaseDate + ", " + title + ", " + author + "," + getSku()
-                + "," + getPrice() + "]";
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
+        return super.toString() + "[" + releaseDate + ", " + title + ", " + studio + "]";
     }
 }

@@ -30,8 +30,8 @@
             <length-ident minlength="85" maxlength="85"/>
         </record-ident>
         <record-definition>
-            <bean name="dvd" class="com.blackbear.flatworm.test.domain.domain.Dvd"/>
-            <bean name="film" class="com.blackbear.flatworm.test.domain.domain.Film"/>
+            <bean name="dvd" class="com.blackbear.flatworm.test.domain.Dvd"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
             <line>
                 <record-element length="30" beanref="film.title"
                                 type="char">
@@ -67,8 +67,8 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="video" class="com.blackbear.flatworm.test.domain.domain.Videotape"/>
-            <bean name="film" class="com.blackbear.flatworm.test.domain.domain.Film"/>
+            <bean name="video" class="com.blackbear.flatworm.test.domain.Videotape"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
             <line>
                 <record-element start="1" end="10" beanref="video.sku"
                                 type="char">
@@ -103,7 +103,7 @@
     </record>
     <record name="book">
         <record-definition>
-            <bean name="book" class="com.blackbear.flatworm.test.domain.domain.Book"/>
+            <bean name="book" class="com.blackbear.flatworm.test.domain.Book"/>
             <line>
                 <record-element length="9" beanref="book.sku"
                                 type="char"/>

@@ -20,7 +20,10 @@ import com.blackbear.flatworm.errors.FlatwormConversionException;
 import com.blackbear.flatworm.errors.FlatwormCreatorException;
 import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
 import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
+
+import org.apache.logging.log4j.util.Strings;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +31,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import lombok.Data;
 import lombok.ToString;
@@ -40,14 +48,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ToString
 class Record {
+
+    public static final String FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME = "matchesLine";
+
     private String name;
     private int lengthIdentMin;
     private int lengthIdentMax;
     private int fieldIdentStart;
     private int fieldIdentLength;
+    private String fieldIdentScript;
     private List<String> fieldIdentMatchStrings;
     private char identTypeFlag;
     private RecordDefinition recordDefinition;
+    private Invocable scriptInvocable;
+    private ScriptEngine scriptEngine;
 
     public Record() {
         lengthIdentMin = 0;
@@ -56,6 +70,10 @@ class Record {
         fieldIdentLength = 0;
         fieldIdentMatchStrings = new ArrayList<>();
         identTypeFlag = '\0';
+
+        ScriptEngineManager engineManager = new ScriptEngineManager();
+        scriptEngine = engineManager.getEngineByName("nashorn");
+        scriptInvocable = (Invocable) scriptEngine;
     }
 
     public void addFieldIdentMatchString(String fieldIdentMatch) {
@@ -67,8 +85,11 @@ class Record {
      * @param line the input line from the file being parsed.
      * @param ff   not used at this time, for later expansion?
      * @return boolean does this line match according to the defined criteria?
+     * @throws FlatwormParserException should the script function lack the {@code FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME} function, which
+     * should take one parameter, the {@link FileFormat} instance - the method should return {@code true} if the line should
+     * be parsed by this {@code Record} instance and {@code false} if not.
      */
-    public boolean matchesLine(String line, FileFormat ff) {
+    public boolean matchesLine(String line, FileFormat ff) throws FlatwormParserException {
         boolean matchesLine = true;
         switch (identTypeFlag) {
 
@@ -98,8 +119,31 @@ class Record {
             case 'L':
                 matchesLine = line.length() >= lengthIdentMin && line.length() <= lengthIdentMax;
                 break;
+            case 'S':
+                if(scriptInvocable != null && !Strings.isBlank(fieldIdentScript)) {
+                    try {
+                        Object result = scriptInvocable.invokeFunction(FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME, ff);
+                        if(result instanceof Boolean) {
+                            matchesLine = Boolean.class.cast(result);
+                        }
+                        else if(result != null) {
+                            throw new FlatwormParserException(String.format("Record %s has a script identifier that does not return" +
+                                    "a boolean value - a type of %s was returned.", name, result.getClass().getName()));
+                        }
+                    } catch (Exception e) {
+                        throw new FlatwormParserException(e.getMessage(), e);
+                    }
+                }
+                break;
         }
         return matchesLine;
+    }
+
+    public void setFieldIdentScript(String fieldIdentScript) throws ScriptException {
+        this.fieldIdentScript = fieldIdentScript;
+        if(scriptEngine != null && !Strings.isBlank(fieldIdentScript)) {
+            scriptEngine.eval(this.fieldIdentScript);
+        }
     }
 
     /**

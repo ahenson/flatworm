@@ -14,12 +14,16 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.domain.segment;
+package com.blackbear.flatworm.test.domain.segment;
 
-public class Phone {
+public class Address {
     private String type;
-    private String publishInd;
     private String number;
+    private String street;
+    private String streetType;
+    private String city;
+    private String state;
+    private String zip;
 
     public String getType() {
         return type;
@@ -29,19 +33,51 @@ public class Phone {
         this.type = type;
     }
 
-    public String getPublishInd() {
-        return publishInd;
-    }
-
-    public void setPublishInd(String publishInd) {
-        this.publishInd = publishInd;
-    }
-
     public String getNumber() {
         return number;
     }
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getStreetType() {
+        return streetType;
+    }
+
+    public void setStreetType(String streetType) {
+        this.streetType = streetType;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
     }
 }
