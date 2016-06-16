@@ -21,12 +21,13 @@ import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Bean class used to store the values from the Record-Element XML tag
  */
-@Data
+
 class RecordElement implements LineElement {
 
     private Integer fieldEnd;
@@ -41,6 +42,8 @@ class RecordElement implements LineElement {
 
     private String beanRef;
 
+    @Getter
+    @Setter
     private String type;
 
     private Map<String, ConversionOption> conversionOptions;
@@ -75,11 +78,19 @@ class RecordElement implements LineElement {
             return fieldStart;
     }
 
+    public void setFieldStart(int fieldStart) {
+        this.fieldStart = fieldStart;
+    }
+
     public int getFieldEnd() throws FlatwormUnsetFieldValueException {
         if (fieldEnd == null)
             throw new FlatwormUnsetFieldValueException("fieldEnd is unset");
         else
             return fieldEnd;
+    }
+
+    public void setFieldEnd(int fieldEnd) {
+        this.fieldEnd = fieldEnd;
     }
 
     public int getFieldLength() throws FlatwormUnsetFieldValueException {
@@ -93,6 +104,10 @@ class RecordElement implements LineElement {
             return fieldLength;
     }
 
+    public void setFieldLength(int fieldLength) {
+        this.fieldLength = fieldLength;
+    }
+
     public Map<String, ConversionOption> getConversionOptions() {
         return conversionOptions;
     }
@@ -103,5 +118,14 @@ class RecordElement implements LineElement {
 
     public void addConversionOption(String name, ConversionOption option) {
         conversionOptions.put(name, option);
+    }
+
+    @Override
+    public String getBeanRef() {
+        return beanRef;
+    }
+
+    public void setBeanRef(String beanRef) {
+        this.beanRef = beanRef;
     }
 }

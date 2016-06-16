@@ -20,10 +20,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 class SegmentElement implements LineElement {
     private int fieldIdentStart = 0;
     private int fieldIdentLength = 0;
-    private List<String> fieldIdentMatchStrings = new ArrayList<String>();
+    private List<String> fieldIdentMatchStrings = new ArrayList<>();
     private int minCount;
     private int maxCount;
     private String name;
@@ -31,31 +34,7 @@ class SegmentElement implements LineElement {
     private String parentBeanRef;
     private String addMethod;
     private CardinalityMode cardinalityMode;
-    private List<LineElement> elements = new ArrayList<LineElement>();
-
-    public int getFieldIdentStart() {
-        return fieldIdentStart;
-    }
-
-    public void setFieldIdentStart(int fieldIdentStart) {
-        this.fieldIdentStart = fieldIdentStart;
-    }
-
-    public int getFieldIdentLength() {
-        return fieldIdentLength;
-    }
-
-    public void setFieldIdentLength(int fieldIdentLength) {
-        this.fieldIdentLength = fieldIdentLength;
-    }
-
-    public List<String> getFieldIdentMatchStrings() {
-        return fieldIdentMatchStrings;
-    }
-
-    public void setFieldIdentMatchStrings(List<String> fieldIdentMatchStrings) {
-        this.fieldIdentMatchStrings = fieldIdentMatchStrings;
-    }
+    private List<LineElement> elements = new ArrayList<>();
 
     public void addFieldIdentMatchString(String s) {
         fieldIdentMatchStrings.add(s);
@@ -69,60 +48,13 @@ class SegmentElement implements LineElement {
         return 'F';
     }
 
-    public int getMinCount() {
-        return minCount;
-    }
-
-    public void setMinCount(int minCount) {
-        this.minCount = minCount;
-    }
-
-    public int getMaxCount() {
-        return maxCount;
-    }
-
-    public void setMaxCount(int maxCount) {
-        this.maxCount = maxCount;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    @Override
     public String getBeanRef() {
         return beanRef;
     }
 
     public void setBeanRef(String beanRef) {
         this.beanRef = beanRef;
-    }
-
-    public String getParentBeanRef() {
-        return parentBeanRef;
-    }
-
-    public void setParentBeanRef(String parentBeanRef) {
-        this.parentBeanRef = parentBeanRef;
-    }
-
-    public String getAddMethod() {
-        return addMethod;
-    }
-
-    public void setAddMethod(String addMethod) {
-        this.addMethod = addMethod;
-    }
-
-    public CardinalityMode getCardinalityMode() {
-        return cardinalityMode;
-    }
-
-    public void setCardinalityMode(CardinalityMode cardinalityMode) {
-        this.cardinalityMode = cardinalityMode;
     }
 
     public List<LineElement> getElements() {
