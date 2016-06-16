@@ -21,10 +21,12 @@ import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Data;
+
 /**
  * Bean class used to store the values from the Record-Element XML tag
  */
-
+@Data
 class RecordElement implements LineElement {
 
     private Integer fieldEnd;
@@ -51,7 +53,7 @@ class RecordElement implements LineElement {
         fieldType = '\0';
         beanRef = null;
         type = null;
-        conversionOptions = new HashMap<String, ConversionOption>();
+        conversionOptions = new HashMap<>();
     }
 
     public boolean isFieldStartSet() {
@@ -70,22 +72,14 @@ class RecordElement implements LineElement {
         if (fieldStart == null)
             throw new FlatwormUnsetFieldValueException("fieldStart is unset");
         else
-            return fieldStart.intValue();
-    }
-
-    public void setFieldStart(int fieldStart) {
-        this.fieldStart = new Integer(fieldStart);
+            return fieldStart;
     }
 
     public int getFieldEnd() throws FlatwormUnsetFieldValueException {
         if (fieldEnd == null)
             throw new FlatwormUnsetFieldValueException("fieldEnd is unset");
         else
-            return fieldEnd.intValue();
-    }
-
-    public void setFieldEnd(int fieldEnd) {
-        this.fieldEnd = new Integer(fieldEnd);
+            return fieldEnd;
     }
 
     public int getFieldLength() throws FlatwormUnsetFieldValueException {
@@ -94,21 +88,9 @@ class RecordElement implements LineElement {
                 throw new FlatwormUnsetFieldValueException("length is unset");
             else
                 // Derive length from start and end position
-                return fieldEnd.intValue() - fieldStart.intValue();
+                return fieldEnd - fieldStart;
         else
-            return fieldLength.intValue();
-    }
-
-    public void setFieldLength(int fieldLength) {
-        this.fieldLength = new Integer(fieldLength);
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+            return fieldLength;
     }
 
     public Map<String, ConversionOption> getConversionOptions() {
@@ -122,13 +104,4 @@ class RecordElement implements LineElement {
     public void addConversionOption(String name, ConversionOption option) {
         conversionOptions.put(name, option);
     }
-
-    public String getBeanRef() {
-        return beanRef;
-    }
-
-    public void setBeanRef(String beanRef) {
-        this.beanRef = beanRef;
-    }
-
 }
