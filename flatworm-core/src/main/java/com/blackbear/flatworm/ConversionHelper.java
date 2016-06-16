@@ -18,26 +18,21 @@ package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.errors.FlatwormConversionException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
- * The
- * <code>ConversionHelper<code> was created to separate formatting responsibility into a separate class.
- *  This class also makes writing your own converter more of a reality by separating type conversion from string formatting.
- *  String formatting has moved to a separate class called Util.
+ * The {@code ConversionHelper} was created to separate formatting responsibility into a separate class. This class also makes writing your
+ * own converter more of a reality by separating type conversion from string formatting. String formatting has moved to a separate class
+ * called Util.
  */
-
+@Slf4j
 public class ConversionHelper {
-    private static Log log = LogFactory.getLog(ConversionHelper.class);
-
     private Map<String, Converter> converters;
 
     private Map<Converter, Method> converterMethodCache;
@@ -47,33 +42,24 @@ public class ConversionHelper {
     private Map<String, Object> converterObjectCache;
 
     public ConversionHelper() {
-        converters = new HashMap<String, Converter>();
-        converterMethodCache = new HashMap<Converter, Method>();
-        converterToStringMethodCache = new HashMap<Converter, Method>();
-        converterObjectCache = new HashMap<String, Object>();
+        converters = new HashMap<>();
+        converterMethodCache = new HashMap<>();
+        converterToStringMethodCache = new HashMap<>();
+        converterObjectCache = new HashMap<>();
     }
 
     /**
-     *
-     * @param type
-     *          The name of the converter from the xml configuration file
-     * @param fieldChars
-     *          The value of the field as read from the input file
-     * @param options
-     *          Map of ConversionOptions (if any) for this field
-     * @param beanRef
-     *          "class.property", used for more descriptive exception messages,
-     *          should something go wrong
-     *
-     * @throws FlatwormConversionException
-     *           - if problems are encountered during the conversion process
-     *           (wraps other exceptions)
+     * @param type       The name of the converter from the xml configuration file
+     * @param fieldChars The value of the field as read from the input file
+     * @param options    Map of ConversionOptions (if any) for this field
+     * @param beanRef    "class.property", used for more descriptive exception messages, should something go wrong
      * @return Java type corresponding to the field type, post conversion
+     * @throws FlatwormConversionException - if problems are encountered during the conversion process (wraps other exceptions)
      */
     public Object convert(String type, String fieldChars, Map<String, ConversionOption> options,
                           String beanRef) throws FlatwormConversionException {
 
-        Object value = null;
+        Object value;
 
         try {
             Object object = getConverterObject(type);
@@ -83,16 +69,7 @@ public class ConversionHelper {
 
             Object[] args = {fieldChars, options};
             value = method.invoke(object, args);
-
-        } catch (IllegalAccessException e) {
-            log.error("While running convert method for " + beanRef, e);
-            throw new FlatwormConversionException("Converting field " + beanRef + " with value '"
-                    + fieldChars + "'");
-        } catch (InvocationTargetException e) {
-            log.error("While running convert method for " + beanRef, e);
-            throw new FlatwormConversionException("Converting field " + beanRef + " with value '"
-                    + fieldChars + "'");
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             log.error("While running convert method for " + beanRef, e);
             throw new FlatwormConversionException("Converting field " + beanRef + " with value '"
                     + fieldChars + "'");
@@ -102,37 +79,26 @@ public class ConversionHelper {
 
     public String convert(String type, Object obj, Map<String, ConversionOption> options,
                           String beanRef) throws FlatwormConversionException {
+        String result;
         try {
             Object converter = getConverterObject(type);
             Method method = getToStringConverterMethod(type);
             Object[] args = {obj, options};
-            String result = (String) method.invoke(converter, args);
-            return result;
-        } catch (IllegalArgumentException e) {
-            log.error("While running toString convert method for " + beanRef, e);
-            throw new FlatwormConversionException("Converting field " + beanRef
-                    + " to string for value '" + obj + "'");
-        } catch (IllegalAccessException e) {
-            log.error("While running toString convert method for " + beanRef, e);
-            throw new FlatwormConversionException("Converting field " + beanRef
-                    + " to string for value '" + obj + "'");
-        } catch (InvocationTargetException e) {
+            result = (String) method.invoke(converter, args);
+        } catch (Exception e) {
             log.error("While running toString convert method for " + beanRef, e);
             throw new FlatwormConversionException("Converting field " + beanRef
                     + " to string for value '" + obj + "'");
         }
+        return result;
     }
 
     /**
      * Handles the processing of the Conversion-Options from the flatworm XML file
      *
-     * @param fieldChars
-     *          The string to be transformed
-     * @param options
-     *          Collection of ConversionOption objects
-     * @param length
-     *          Used in justification to ensure proper formatting
-     *
+     * @param fieldChars The string to be transformed
+     * @param options    Collection of ConversionOption objects
+     * @param length     Used in justification to ensure proper formatting
      * @return The transformed string
      */
     public String transformString(String fieldChars, Map<String, ConversionOption> options, int length) {
@@ -141,8 +107,8 @@ public class ConversionHelper {
         // can drive the order of conversions, instead of having them
         // hard-coded like in 'removePadding' (old way)
         Set<String> keys = options.keySet();
-        for (Iterator<String> it = keys.iterator(); it.hasNext(); ) {
-            ConversionOption conv = options.get(it.next());
+        for (String key : keys) {
+            ConversionOption conv = options.get(key);
 
             if (conv.getName().equals("justify"))
                 fieldChars = Util.justify(fieldChars, conv.getValue(), options, length);
@@ -162,11 +128,9 @@ public class ConversionHelper {
     }
 
     /**
-     * Facilitates the storage of multiple converters used by the
-     * <code>convert</code> method during processing
+     * Facilitates the storage of multiple converters used by the <code>convert</code> method during processing
      *
-     * @param converter
-     *          The converter to be added
+     * @param converter The converter to be added
      */
     public void addConverter(Converter converter) {
         converters.put(converter.getName(), converter);
@@ -187,17 +151,16 @@ public class ConversionHelper {
     }
 
     /**
-     * @param key
-     *          The name of the converter. Used for lookup
+     * @param type The name of the converter. Used for lookup
      * @return Java reflection Object used to represent the conversion method
      */
     private Method getConverterMethod(String type) throws FlatwormConversionException {
         try {
-            Converter c = (Converter) converters.get(type);
+            Converter c = converters.get(type);
             if (converterMethodCache.get(c) != null)
-                return (Method) converterMethodCache.get(c);
+                return converterMethodCache.get(c);
             Method meth;
-            Class<? extends Object> cl = Class.forName(c.getConverterClass());
+            Class<?> cl = Class.forName(c.getConverterClass());
             Class args[] = {String.class, Map.class};
             meth = cl.getMethod(c.getMethod(), args);
             converterMethodCache.put(c, meth);
@@ -212,12 +175,12 @@ public class ConversionHelper {
     }
 
     private Method getToStringConverterMethod(String type) throws FlatwormConversionException {
-        Converter c = (Converter) converters.get(type);
+        Converter c = converters.get(type);
         if (converterToStringMethodCache.get(c) != null)
-            return (Method) converterToStringMethodCache.get(c);
+            return converterToStringMethodCache.get(c);
         try {
             Method meth;
-            Class<? extends Object> cl = Class.forName(c.getConverterClass());
+            Class<?> cl = Class.forName(c.getConverterClass());
             Class args[] = {Object.class, Map.class};
             meth = cl.getMethod(c.getMethod(), args);
             converterToStringMethodCache.put(c, meth);
@@ -233,22 +196,20 @@ public class ConversionHelper {
     }
 
     /**
-     * @param key
-     *          The name of the converter. Used for lookup
+     * @param type The name of the converter. Used for lookup
      * @return An instance of the conversion class
-     * @throws FlatwormConversionException
-     *           if there is no Converter registered with the specified name.
+     * @throws FlatwormConversionException if there is no Converter registered with the specified name.
      */
     private Object getConverterObject(String type) throws FlatwormConversionException {
         try {
-            Converter c = (Converter) converters.get(type);
+            Converter c = converters.get(type);
             if (c == null) {
                 throw new FlatwormConversionException("type '" + type + "' not registered");
             }
             if (converterObjectCache.get(c.getConverterClass()) != null)
                 return converterObjectCache.get(c.getConverterClass());
             Object o;
-            Class<? extends Object> cl = Class.forName(c.getConverterClass());
+            Class<?> cl = Class.forName(c.getConverterClass());
             Class args[] = new Class[0];
             Object objArgs[] = new Object[0];
             o = cl.getConstructor(args).newInstance(objArgs);
