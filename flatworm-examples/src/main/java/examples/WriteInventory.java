@@ -18,7 +18,7 @@ package examples;
 
 import com.blackbear.flatworm.FileCreator;
 import com.blackbear.flatworm.FileParser;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.IOException;
@@ -64,16 +64,11 @@ public class WriteInventory {
 //                            + ex.getMessage());
 //        }
         catch (IOException ex) {
-            System.out.println("IOException: Something bad happend while opening,reading,closing the input file: "
-                    + ex.getMessage());
+            System.out.println("Something bad happened while opening,reading,closing the input file: " + ex.getMessage());
         } catch (FlatwormParserException ex) {
-            System.out.println("FlatwormParserException: Something happened that the parser did not like: "
-                    + ex.getMessage());
-        } catch (FlatwormCreatorException ex) {
-            System.out.println("FlatwormCreatorException: Something happened that the creator did not like: "
-                    + ex.getMessage());
+            System.out.println("Something happened that the parser did not like: " + ex.getMessage());
+        } catch (FlatwormConfigurationException ex) {
+            System.out.println("Something happened that the creator did not like: " + ex.getMessage());
         }
-
     }
-
 }

@@ -16,12 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import org.apache.logging.log4j.util.Strings;
 
@@ -157,9 +152,7 @@ class Record {
      * @return collection of beans populated with file data.
      */
     public Map<String, Object> parseRecord(String firstLine, BufferedReader in,
-                                           ConversionHelper convHelper) throws FlatwormInputLineLengthException,
-            FlatwormConversionException, FlatwormUnsetFieldValueException,
-            FlatwormInvalidRecordException, FlatwormCreatorException {
+                                           ConversionHelper convHelper) throws FlatwormParserException {
         Map<String, Object> beans = new HashMap<>();
         try {
             Map<String, Bean> beanHash = recordDefinition.getBeansUsed();
@@ -181,16 +174,16 @@ class Record {
 
         } catch (SecurityException e) {
             log.error("Invoking method", e);
-            throw new FlatwormConversionException("Couldn't invoke Method");
+            throw new FlatwormParserException("Couldn't invoke Method");
         } catch (IOException e) {
             log.error("Reading input", e);
-            throw new FlatwormConversionException("Couldn't read line");
+            throw new FlatwormParserException("Couldn't read line");
         } catch (InstantiationException e) {
             log.error("Creating bean", e);
-            throw new FlatwormConversionException("Couldn't create bean");
+            throw new FlatwormParserException("Couldn't create bean");
         } catch (IllegalAccessException e) {
             log.error("No access to class", e);
-            throw new FlatwormConversionException("Couldn't access class");
+            throw new FlatwormParserException("Couldn't access class");
         }
         return beans;
     }

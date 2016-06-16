@@ -18,11 +18,7 @@ package com.blackbear.flatworm;
 
 import com.google.common.base.Strings;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,11 +84,9 @@ class Line {
      * @param inputLine  A single line from file to be parsed into its corresponding bean
      * @param beans      A Hashmap containing a collection of beans which will be populated with parsed data
      * @param convHelper A ConversionHelper which aids in the conversion of datatypes and string formatting
-     * @throws FlatwormInputLineLengthException , FlatwormConversionException, FlatwormUnsetFieldValueException
+     * @throws FlatwormParserException should any issues occur while parsing the data.
      */
-    public void parseInput(String inputLine, Map<String, Object> beans, ConversionHelper convHelper)
-            throws FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormInvalidRecordException, FlatwormCreatorException {
+    public void parseInput(String inputLine, Map<String, Object> beans, ConversionHelper convHelper) throws FlatwormParserException {
         this.convHelper = convHelper;
         this.beans = beans;
 
@@ -122,7 +116,7 @@ class Line {
                     charPos = end;
                 }
                 if (end > inputLine.length())
-                    throw new FlatwormInputLineLengthException("Looking for field " + re.getBeanRef()
+                    throw new FlatwormParserException("Looking for field " + re.getBeanRef()
                             + " at pos " + start + ", end " + end + ", input length = " + inputLine.length());
                 String beanRef = re.getBeanRef();
                 if (beanRef != null) {
@@ -150,7 +144,7 @@ class Line {
                     charPos = end;
                 }
                 if (end > inputLine.length())
-                    throw new FlatwormInputLineLengthException("Looking for field " + se.getBeanRef() + " at pos " + start
+                    throw new FlatwormParseException("Looking for field " + se.getBeanRef() + " at pos " + start
                             + ", end " + end + ", input length = " + inputLine.length());
                 String beanRef = se.getBeanRef();
                 if (beanRef != null)
@@ -170,13 +164,9 @@ class Line {
      *
      * @param fieldChars the raw string data read from the field
      * @param re         the RecordElement, which contains detailed information about the field
-     * @throws FlatwormConversionException, FlatwormUnsetFieldValueException - wraps IllegalAccessException, InvocationTargetException,
-     *                                      NoSuchMethodException
+     * @throws FlatwormParserException should any issues occur while parsing the data.
      */
-    private void mapField(String fieldChars, RecordElement re)
-            throws FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException {
-
+    private void mapField(String fieldChars, RecordElement re) throws FlatwormParserException {
         Object value = convHelper.convert(re.getType(), fieldChars, re.getConversionOptions(),
                 re.getBeanRef());
 
@@ -194,12 +184,9 @@ class Line {
      * Convert string field from file into appropriate type and set bean's value. This is used for delimited files only<br>
      *
      * @param inputLine the line of data read from the data file
-     * @throws FlatwormInputLineLengthException , FlatwormConversionException, FlatwormUnsetFieldValueException - wraps
-     *                                          IllegalAccessException, InvocationTargetException, NoSuchMethodException
+     * @throws FlatwormParserException should any issues occur while parsing the data.
      */
-    private void parseInputDelimited(String inputLine) throws FlatwormInputLineLengthException,
-            FlatwormConversionException, FlatwormUnsetFieldValueException,
-            FlatwormInvalidRecordException, FlatwormCreatorException {
+    private void parseInputDelimited(String inputLine) throws FlatwormParserException {
 
         char split = delimit.charAt(0);
         if (delimit.length() == 2 && delimit.charAt(0) == '\\') {
@@ -229,9 +216,7 @@ class Line {
         doParseDelimitedInput(elements);
     }
 
-    private void doParseDelimitedInput(List<LineElement> elements)
-            throws FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException, FlatwormInvalidRecordException {
+    private void doParseDelimitedInput(List<LineElement> elements) throws FlatwormParserException {
         for (int i = 0; i < elements.size(); ++i) {
             LineElement le = elements.get(i);
             if (le instanceof RecordElement) {
@@ -240,9 +225,6 @@ class Line {
                     ++currentField;
                 } catch (ArrayIndexOutOfBoundsException ex) {
                     log.warn("Ran out of data on field " + i);
-                    // throw new
-                    // FlatwormInputLineLengthException("No data available for record-element "
-                    // + i);
                 }
             } else if (le instanceof SegmentElement) {
                 parseDelimitedSegmentElement((SegmentElement) le);
@@ -250,9 +232,7 @@ class Line {
         }
     }
 
-    private void parseDelimitedRecordElement(RecordElement re, String fieldStr)
-            throws FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException {
+    private void parseDelimitedRecordElement(RecordElement re, String fieldStr) throws FlatwormParserException {
         String beanRef = re.getBeanRef();
         if (beanRef != null) {
             // JBL - to keep from dup. code, moved this to a private method
@@ -260,9 +240,7 @@ class Line {
         }
     }
 
-    private void parseDelimitedSegmentElement(SegmentElement segment)
-            throws FlatwormCreatorException, FlatwormInputLineLengthException,
-            FlatwormConversionException, FlatwormUnsetFieldValueException, FlatwormInvalidRecordException {
+    private void parseDelimitedSegmentElement(SegmentElement segment) throws FlatwormParserException {
         int minCount = segment.getMinCount();
         int maxCount = segment.getMaxCount();
         if (maxCount <= 0) {
@@ -275,8 +253,7 @@ class Line {
         // than a list
         String beanRef = segment.getBeanRef();
         if (!segment.matchesId(delimitedFields[currentField]) && minCount > 0) {
-            log.error("Segment " + segment.getCollectionPropertyName() + " with minimun required count of " + minCount
-                    + " missing.");
+            log.error("Segment " + segment.getCollectionPropertyName() + " with minimum required count of " + minCount + " missing.");
         }
         int cardinality = 0;
         try {
@@ -286,11 +263,11 @@ class Line {
                     ++cardinality;
                     String parentRef = segment.getParentBeanRef();
                     if (parentRef != null) {
-                        Object instance = ParseUtils.newBeanInstance(beans.get(beanRef));
+                        Object instance =  ParseUtils.newBeanInstance(beans.get(beanRef));
                         beans.put(beanRef, instance);
                         if (cardinality > maxCount) {
                             if (segment.getCardinalityMode() == CardinalityMode.STRICT) {
-                                throw new FlatwormInvalidRecordException("Cardinality exceeded with mode set to STRICT");
+                                throw new FlatwormParserException("Cardinality exceeded with mode set to STRICT");
                             } else if (segment.getCardinalityMode() != CardinalityMode.RESTRICTED) {
                                 ParseUtils.addValueToCollection(segment, beans.get(parentRef), instance);
                             }

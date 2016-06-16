@@ -17,7 +17,7 @@
 package examples;
 
 import com.blackbear.flatworm.FileCreator;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
 import java.io.IOException;
 import java.util.Date;
@@ -94,14 +94,9 @@ public class WriteFixedMovies {
             // Close buffered output to write contents
             creator.close();
 
-        } catch (FlatwormCreatorException ex) {
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-            ex.printStackTrace();
-
         }
     }
-
 }

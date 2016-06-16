@@ -16,9 +16,8 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.CharacterData;
@@ -50,13 +49,10 @@ public class ConfigurationReader {
      *
      * @param xmlFile An XML file which contains a valid Flatworm configuration.
      * @return A {@code FileFormat} object which can parse the specified format.
-     * @throws FlatwormUnsetFieldValueException    If a required parameter of a tag is not set.
-     * @throws FlatwormConfigurationValueException If the file contains invalid syntax.
-     * @throws FlatwormParserException             Should the {@code xmlFile} fail to parse.
-     * @throws IOException                         If the XML file cannot be opened for parsing.
+     * @throws FlatwormConfigurationException If the configuration data contains invalid syntax.
+     * @throws IOException                    If issues occur while reading from I/O.
      */
-    public FileFormat loadConfigurationFile(String xmlFile) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException, FlatwormParserException, IOException {
+    public FileFormat loadConfigurationFile(String xmlFile) throws FlatwormConfigurationException, IOException {
         FileFormat fileFormat;
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(xmlFile)) {
             if (in != null) {
@@ -76,13 +72,10 @@ public class ConfigurationReader {
      *
      * @param in The {@link InputStream} instance to use in parsing the configuration file.
      * @return a constructed {@link FileFormat} if the parsing was successful.
-     * @throws FlatwormUnsetFieldValueException    If a required parameter of a tag is not set.
-     * @throws FlatwormConfigurationValueException If the file contains invalid syntax.
-     * @throws FlatwormParserException             Should the {@code xmlFile} fail to parse.
-     * @throws IOException                         If the XML file cannot be opened for parsing.
+     * @throws FlatwormConfigurationException If the configuration data contains invalid syntax.
+     * @throws IOException                    If issues occur while reading from I/O.
      */
-    public FileFormat loadConfigurationFile(InputStream in) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException, FlatwormParserException, IOException {
+    public FileFormat loadConfigurationFile(InputStream in) throws FlatwormConfigurationException, IOException {
         DocumentBuilder parser;
         Document document;
         NodeList children;
@@ -109,13 +102,12 @@ public class ConfigurationReader {
                 }
             }
         } catch (Exception e) {
-            throw new FlatwormParserException(e.getMessage(), e);
+            throw new FlatwormConfigurationException(e.getMessage(), e);
         }
         return fileFormat;
     }
 
-    private List<Object> getChildNodes(Node node) throws FlatwormUnsetFieldValueException,
-            FlatwormConfigurationValueException, FlatwormParserException {
+    private List<Object> getChildNodes(Node node) throws FlatwormConfigurationException {
         List<Object> nodes = new ArrayList<>();
         NodeList children = node.getChildNodes();
         if (children != null) {
@@ -197,8 +189,7 @@ public class ConfigurationReader {
         return map.getNamedItem(name);
     }
 
-    private Object traverse(Node node) throws FlatwormUnsetFieldValueException, FlatwormConfigurationValueException,
-            FlatwormParserException {
+    private Object traverse(Node node) throws FlatwormConfigurationException {
         int type = node.getNodeType();
         if (type == Node.ELEMENT_NODE) {
             String nodeName = node.getNodeName();
@@ -260,8 +251,8 @@ public class ConfigurationReader {
                             record.setFieldIdentScript(getChildCDataNodeValue(scriptChild));
                             record.setIdentTypeFlag('S');
                         } catch (ScriptException e) {
-                            throw new FlatwormParserException(String.format("Record entry %s has an invalid script. Err: %s",
-                                    record.getName(), e.getMessage()), e);
+                            throw new FlatwormConfigurationException(
+                                    String.format("Record entry %s has an invalid script. Err: %s", record.getName(), e.getMessage()), e);
                         }
                     }
                 }
@@ -293,7 +284,7 @@ public class ConfigurationReader {
                 try {
                     b.setBeanObjectClass(Class.forName(b.getBeanClass()));
                 } catch (ClassNotFoundException e) {
-                    throw new FlatwormConfigurationValueException("Unable to load class " + b.getBeanClass());
+                    throw new FlatwormConfigurationException("Unable to load class " + b.getBeanClass());
                 }
                 return b;
             }
@@ -363,10 +354,10 @@ public class ConfigurationReader {
                 Node beanref = getAttributeNamed(node, "beanref");
                 Node beanType = getAttributeNamed(node, "type");
                 if ((end == null) && (length == null)) {
-                    throw new FlatwormConfigurationValueException("Must set either the 'end' or 'length' properties");
+                    throw new FlatwormConfigurationException("Must set either the 'end' or 'length' properties");
                 }
                 if ((end != null) && (length != null)) {
-                    throw new FlatwormConfigurationValueException("Can't specify both the 'end' or 'length' properties");
+                    throw new FlatwormConfigurationException("Can't specify both the 'end' or 'length' properties");
                 }
                 if (start != null) {
                     re.setFieldStart(Util.tryParseInt(start.getNodeValue()));
@@ -396,7 +387,7 @@ public class ConfigurationReader {
         return null;
     }
 
-    private void validateSegmentConfiguration(SegmentElement segment) throws FlatwormConfigurationValueException {
+    private void validateSegmentConfiguration(SegmentElement segment) throws FlatwormConfigurationException {
         StringBuilder errors = new StringBuilder();
         if (StringUtils.isBlank(segment.getParentBeanRef())) {
             errors.append(String.format("Must specify the parent-beanref attribute for segment-elements.%n"));
@@ -411,7 +402,7 @@ public class ConfigurationReader {
             errors.append(String.format("Must specify the segment identifier.%n"));
         }
         if (errors.length() > 0) {
-            throw new FlatwormConfigurationValueException(errors.toString());
+            throw new FlatwormConfigurationException(errors.toString());
         }
     }
 }

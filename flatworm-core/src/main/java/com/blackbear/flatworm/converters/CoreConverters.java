@@ -18,7 +18,7 @@ package com.blackbear.flatworm.converters;
 
 import com.blackbear.flatworm.ConversionOption;
 import com.blackbear.flatworm.Util;
-import com.blackbear.flatworm.errors.FlatwormConversionException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -79,11 +79,11 @@ public class CoreConverters {
      * @param str     The source string
      * @param options The conversion-option values for the field
      * @return The converted date
-     * @throws FlatwormConversionException if the date fails to parse correctly.
+     * @throws FlatwormParserException if the date fails to parse correctly.
      */
 
     public Date convertDate(String str, Map<String, ConversionOption> options)
-            throws FlatwormConversionException {
+            throws FlatwormParserException {
         try {
             String format = Util.getValue(options, "format");
 
@@ -96,7 +96,7 @@ public class CoreConverters {
             return sdf.parse(str);
         } catch (ParseException ex) {
             log.error("Failed to parse date", ex);
-            throw new FlatwormConversionException(str);
+            throw new FlatwormParserException(str);
         }
     }
 
@@ -130,12 +130,12 @@ public class CoreConverters {
      * @param str     The source string
      * @param options The conversion-option values for the field
      * @return The converted double value
-     * @throws FlatwormConversionException If the source number fails to parse as a double or the decimal places option fails to parse as an
+     * @throws FlatwormParserException If the source number fails to parse as a double or the decimal places option fails to parse as an
      *                                     integer value.
      */
 
     public Double convertDecimal(String str, Map<String, ConversionOption> options)
-            throws FlatwormConversionException {
+            throws FlatwormParserException {
         try {
             int decimalPlaces = 0;
             ConversionOption conv = options.get("decimal-places");
@@ -159,7 +159,7 @@ public class CoreConverters {
 
         } catch (NumberFormatException ex) {
             log.error("Failed to parse double value", ex);
-            throw new FlatwormConversionException(str);
+            throw new FlatwormParserException(str);
         }
     }
 
@@ -200,11 +200,11 @@ public class CoreConverters {
      * @param str     The source string
      * @param options The conversion-option values for the field
      * @return The converted integer value
-     * @throws FlatwormConversionException If the source number fails to parse as an integer value.
+     * @throws FlatwormParserException If the source number fails to parse as an integer value.
      */
 
     public Integer convertInteger(String str, Map<String, ConversionOption> options)
-            throws FlatwormConversionException {
+            throws FlatwormParserException {
         try {
             if (str.length() == 0) {
                 return 0;
@@ -213,7 +213,7 @@ public class CoreConverters {
             }
         } catch (NumberFormatException ex) {
             log.error("Failed to parse Integer", ex);
-            throw new FlatwormConversionException(str);
+            throw new FlatwormParserException(str);
         }
     }
 
@@ -231,11 +231,11 @@ public class CoreConverters {
      * @param str     The source string
      * @param options The conversion-option values for the field
      * @return The converted long value
-     * @throws FlatwormConversionException If the source number fails to parse as an long value.
+     * @throws FlatwormParserException If the source number fails to parse as an long value.
      */
 
     public Long convertLong(String str, Map<String, ConversionOption> options)
-            throws FlatwormConversionException {
+            throws FlatwormParserException {
         try {
             if (str.length() == 0) {
                 return 0L;
@@ -244,7 +244,7 @@ public class CoreConverters {
             }
         } catch (NumberFormatException ex) {
             log.error("Failed to parse Long", ex);
-            throw new FlatwormConversionException(str);
+            throw new FlatwormParserException(str);
         }
     }
 
@@ -266,12 +266,12 @@ public class CoreConverters {
      * @param str     The source string.
      * @param options The conversion-option values for the field.
      * @return The converted big decimal value.
-     * @throws FlatwormConversionException If the source number fails to parse as a big decimal or the decimal places option fails to parse
+     * @throws FlatwormParserException If the source number fails to parse as a big decimal or the decimal places option fails to parse
      *                                     as an integer value.
      */
 
     public BigDecimal convertBigDecimal(String str, Map<String, ConversionOption> options)
-            throws FlatwormConversionException {
+            throws FlatwormParserException {
         try {
             int decimalPlaces = 0;
             String decimalPlacesOption = (String) Util.getValue(options, "decimal-places");
@@ -289,7 +289,7 @@ public class CoreConverters {
                 return new BigDecimal(Double.parseDouble(str));
         } catch (NumberFormatException ex) {
             log.error("Failed to convert BigDecimal", ex);
-            throw new FlatwormConversionException(str);
+            throw new FlatwormParserException(str);
         }
     }
 

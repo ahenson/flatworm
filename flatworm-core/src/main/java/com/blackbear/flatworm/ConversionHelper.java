@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -54,10 +54,10 @@ public class ConversionHelper {
      * @param options    Map of ConversionOptions (if any) for this field
      * @param beanRef    "class.property", used for more descriptive exception messages, should something go wrong
      * @return Java type corresponding to the field type, post conversion
-     * @throws FlatwormConversionException - if problems are encountered during the conversion process (wraps other exceptions)
+     * @throws FlatwormParserException - if problems are encountered during the conversion process (wraps other exceptions)
      */
     public Object convert(String type, String fieldChars, Map<String, ConversionOption> options,
-                          String beanRef) throws FlatwormConversionException {
+                          String beanRef) throws FlatwormParserException {
 
         Object value;
 
@@ -71,14 +71,14 @@ public class ConversionHelper {
             value = method.invoke(object, args);
         } catch (Exception e) {
             log.error("While running convert method for " + beanRef, e);
-            throw new FlatwormConversionException("Converting field " + beanRef + " with value '"
+            throw new FlatwormParserException("Converting field " + beanRef + " with value '"
                     + fieldChars + "'");
         }
         return value;
     }
 
     public String convert(String type, Object obj, Map<String, ConversionOption> options,
-                          String beanRef) throws FlatwormConversionException {
+                          String beanRef) throws FlatwormParserException {
         String result;
         try {
             Object converter = getConverterObject(type);
@@ -87,7 +87,7 @@ public class ConversionHelper {
             result = (String) method.invoke(converter, args);
         } catch (Exception e) {
             log.error("While running toString convert method for " + beanRef, e);
-            throw new FlatwormConversionException("Converting field " + beanRef
+            throw new FlatwormParserException("Converting field " + beanRef
                     + " to string for value '" + obj + "'");
         }
         return result;
@@ -154,7 +154,7 @@ public class ConversionHelper {
      * @param type The name of the converter. Used for lookup
      * @return Java reflection Object used to represent the conversion method
      */
-    private Method getConverterMethod(String type) throws FlatwormConversionException {
+    private Method getConverterMethod(String type) throws FlatwormParserException {
         try {
             Converter c = converters.get(type);
             if (converterMethodCache.get(c) != null)
@@ -167,14 +167,14 @@ public class ConversionHelper {
             return meth;
         } catch (NoSuchMethodException e) {
             log.error("Finding method", e);
-            throw new FlatwormConversionException("Couldn't Find Method");
+            throw new FlatwormParserException("Couldn't Find Method");
         } catch (ClassNotFoundException e) {
             log.error("Finding class", e);
-            throw new FlatwormConversionException("Couldn't Find Class");
+            throw new FlatwormParserException("Couldn't Find Class");
         }
     }
 
-    private Method getToStringConverterMethod(String type) throws FlatwormConversionException {
+    private Method getToStringConverterMethod(String type) throws FlatwormParserException {
         Converter c = converters.get(type);
         if (converterToStringMethodCache.get(c) != null)
             return converterToStringMethodCache.get(c);
@@ -187,24 +187,24 @@ public class ConversionHelper {
             return meth;
         } catch (NoSuchMethodException e) {
             log.error("Finding method", e);
-            throw new FlatwormConversionException("Couldn't Find Method 'String " + c.getMethod()
+            throw new FlatwormParserException("Couldn't Find Method 'String " + c.getMethod()
                     + "(Object, HashMap)'");
         } catch (ClassNotFoundException e) {
             log.error("Finding class", e);
-            throw new FlatwormConversionException("Couldn't Find Class");
+            throw new FlatwormParserException("Couldn't Find Class");
         }
     }
 
     /**
      * @param type The name of the converter. Used for lookup
      * @return An instance of the conversion class
-     * @throws FlatwormConversionException if there is no Converter registered with the specified name.
+     * @throws FlatwormParserException if there is no Converter registered with the specified name.
      */
-    private Object getConverterObject(String type) throws FlatwormConversionException {
+    private Object getConverterObject(String type) throws FlatwormParserException {
         try {
             Converter c = converters.get(type);
             if (c == null) {
-                throw new FlatwormConversionException("type '" + type + "' not registered");
+                throw new FlatwormParserException("type '" + type + "' not registered");
             }
             if (converterObjectCache.get(c.getConverterClass()) != null)
                 return converterObjectCache.get(c.getConverterClass());
@@ -217,19 +217,19 @@ public class ConversionHelper {
             return o;
         } catch (NoSuchMethodException e) {
             log.error("Finding method", e);
-            throw new FlatwormConversionException("Couldn't Find Method");
+            throw new FlatwormParserException("Couldn't Find Method");
         } catch (IllegalAccessException e) {
             log.error("No access to class", e);
-            throw new FlatwormConversionException("Couldn't access class");
+            throw new FlatwormParserException("Couldn't access class");
         } catch (InvocationTargetException e) {
             log.error("Invoking method", e);
-            throw new FlatwormConversionException("Couldn't invoke method");
+            throw new FlatwormParserException("Couldn't invoke method");
         } catch (InstantiationException e) {
             log.error("Instantiating", e);
-            throw new FlatwormConversionException("Couldn't instantiate converter");
+            throw new FlatwormParserException("Couldn't instantiate converter");
         } catch (ClassNotFoundException e) {
             log.error("Finding class", e);
-            throw new FlatwormConversionException("Couldn't Find Class");
+            throw new FlatwormParserException("Couldn't Find Class");
         }
     }
 

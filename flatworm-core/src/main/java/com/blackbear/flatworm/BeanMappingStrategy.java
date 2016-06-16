@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.util.Map;
 
@@ -29,5 +29,5 @@ import java.util.Map;
  */
 public interface BeanMappingStrategy {
     void mapBean(Object bean, String beanName, String property, Object value,
-                 Map<String, ConversionOption> conv) throws FlatwormConversionException;
+                 Map<String, ConversionOption> conv) throws FlatwormParserException;
 }

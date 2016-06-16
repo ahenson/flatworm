@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
@@ -58,43 +58,42 @@ public class FileCreator {
      *
      * @param config Full path to the FlatWorm XML configuration file.
      * @param file   Full path to output file.
-     * @throws FlatwormCreatorException - wraps FlatwormConfigurationValueException and FlatwormUnsetFieldValueException (to reduce number
-     *                                  of exceptions clients have to be aware of).
+     * @throws FlatwormConfigurationException should any issues occur in parsing the configuration data.
      */
-    public FileCreator(String config, String file) throws FlatwormCreatorException {
+    public FileCreator(String config, String file) throws FlatwormConfigurationException {
         this.file = file;
         this.outputStream = null;
         loadConfigurationFile(config);
     }
 
-    public FileCreator(String config, OutputStream stream) throws FlatwormCreatorException {
+    public FileCreator(String config, OutputStream stream) throws FlatwormConfigurationException {
         this.file = null;
         this.outputStream = stream;
         loadConfigurationFile(config);
     }
 
-    public FileCreator(InputStream config, String file) throws FlatwormCreatorException {
+    public FileCreator(InputStream config, String file) throws FlatwormConfigurationException {
         this.file = file;
         this.outputStream = null;
         loadConfigurationFile(config);
     }
 
-    public FileCreator(InputStream config, OutputStream stream) throws FlatwormCreatorException {
+    public FileCreator(InputStream config, OutputStream stream) throws FlatwormConfigurationException {
         this.file = null;
         this.outputStream = stream;
         loadConfigurationFile(config);
     }
 
-    private void loadConfigurationFile(InputStream configStream) throws FlatwormCreatorException {
+    private void loadConfigurationFile(InputStream configStream) throws FlatwormConfigurationException {
         ConfigurationReader parser = new ConfigurationReader();
         try {
             ff = parser.loadConfigurationFile(configStream);
         } catch (Exception ex) {
-            throw new FlatwormCreatorException(ex.getMessage(), ex);
+            throw new FlatwormConfigurationException(ex.getMessage(), ex);
         }
     }
 
-    private void loadConfigurationFile(String config) throws FlatwormCreatorException {
+    private void loadConfigurationFile(String config) throws FlatwormConfigurationException {
         // Load configuration xml file
         try {
             ConfigurationReader parser = new ConfigurationReader();
@@ -105,7 +104,7 @@ public class FileCreator {
                 ff = parser.loadConfigurationFile(config);
             }
         } catch (Exception ex) {
-            throw new FlatwormCreatorException(ex.getMessage(), ex);
+            throw new FlatwormConfigurationException(ex.getMessage(), ex);
         }
     }
 
@@ -157,9 +156,9 @@ public class FileCreator {
      *
      * @param recordName The name specified in your flatworm configuration file for this record
      * @throws IOException              - If the file system has a problem with you writing information to the recently opened file.
-     * @throws FlatwormCreatorException - wraps various Exceptions so client doesn't have to handle too many
+     * @throws FlatwormConfigurationException - wraps various Exceptions so client doesn't have to handle too many
      */
-    public void write(String recordName) throws IOException, FlatwormCreatorException {
+    public void write(String recordName) throws IOException, FlatwormConfigurationException {
         Record record = ff.getRecord(recordName);
         RecordDefinition recDef = record.getRecordDefinition();
 
@@ -194,7 +193,7 @@ public class FileCreator {
                     String type = recElement.getType();
 
                     if (recElement.getFieldLength() == null) {
-                        throw new FlatwormCreatorException(
+                        throw new FlatwormConfigurationException(
                                 String.format("Could not deduce field length (please provide more data in your xml file for : %s)",
                                         beanRef));
                     }
@@ -213,7 +212,7 @@ public class FileCreator {
                                 bean = beans.get(beanRef.substring(0, posOfFirstDot));
                                 property = beanRef.substring(posOfFirstDot + 1);
                             } catch (ArrayIndexOutOfBoundsException ex) {
-                                throw new FlatwormCreatorException("Had trouble parsing : " + beanRef
+                                throw new FlatwormConfigurationException("Had trouble parsing : " + beanRef
                                         + " Its format should be <bean_name>.<property_name>");
                             }
 
@@ -235,7 +234,7 @@ public class FileCreator {
                             bufOut.write(val);
 
                     } catch (Exception ex) {
-                        throw new FlatwormCreatorException("Exception getting/converting bean property : "
+                        throw new FlatwormConfigurationException("Exception getting/converting bean property : "
                                 + beanRef + " : " + ex.getMessage());
                     }
                 }

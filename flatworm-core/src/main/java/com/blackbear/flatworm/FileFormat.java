@@ -16,12 +16,8 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.MatchResult;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -132,18 +127,15 @@ public class FileFormat {
      * When called with a {@code BufferedReader}, reads sufficient lines to parse a record, and returns the beans created.
      * @param in The stream to read from
      * @return The created beans in a MatchedRecord object
-     * @throws FlatwormInvalidRecordException TODO This needs to be simplified.
-     * @throws FlatwormInputLineLengthException TODO This needs to be simplified.
-     * @throws FlatwormConversionException TODO This needs to be simplified.
-     * @throws FlatwormUnsetFieldValueException TODO This needs to be simplified.
-     * @throws FlatwormCreatorException TODO This needs to be simplified.
+     * @throws FlatwormParserException TODO This needs to be simplified.
+     * @throws FlatwormParserException TODO This needs to be simplified.
+     * @throws FlatwormParserException TODO This needs to be simplified.
+     * @throws FlatwormParserException TODO This needs to be simplified.
+     * @throws FlatwormConfigurationException TODO This needs to be simplified.
      * @throws FlatwormParserException TODO This needs to be simplified.
      * @throws IOException TODO This needs to be simplified.
      */
-    public MatchedRecord nextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
-            FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException,
-            FlatwormParserException, IOException {
+    public MatchedRecord nextRecord(BufferedReader in) throws FlatwormParserException, IOException {
 
         MatchedRecord matchedRecord = null;
         currentParsedLine = in.readLine();
@@ -156,7 +148,7 @@ public class FileFormat {
                 matchedRecord = new MatchedRecord(rd.getName(), beans);
             }
             else if (!ignoreUnmappedRecords) {
-                throw new FlatwormInvalidRecordException(String.format(
+                throw new FlatwormParserException(String.format(
                         "Configuration not found for line in input file [line: %d] - %s", lineNumber, currentParsedLine
                 ));
             }

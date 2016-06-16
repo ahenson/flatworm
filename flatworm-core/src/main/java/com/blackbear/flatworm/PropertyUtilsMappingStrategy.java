@@ -16,13 +16,10 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
+import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
     @Override
     public void mapBean(Object bean, String beanName, String property, Object value,
-                        Map<String, ConversionOption> conv) throws FlatwormConversionException {
+                        Map<String, ConversionOption> conv) throws FlatwormParserException {
         try {
             ConversionOption option = conv.get("append");
             if (option != null && "true".equalsIgnoreCase(option.getValue())) {
@@ -50,7 +47,7 @@ public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
         } catch (Exception e) {
             log.error("While running set property method for " + beanName + "." + property
                     + "with value '" + value + "'", e);
-            throw new FlatwormConversionException("Setting field " + beanName + "." + property);
+            throw new FlatwormParserException("Setting field " + beanName + "." + property);
         }
     }
 }

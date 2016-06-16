@@ -16,12 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConversionException;
-import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
-import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 import com.blackbear.flatworm.test.domain.Film;
 
 import junit.framework.TestCase;
@@ -69,10 +64,7 @@ public class EncodingTestCase extends TestCase {
         return parser.loadConfigurationFile(is);
     }
 
-    protected Object getNextBean() throws FlatwormInvalidRecordException,
-            FlatwormInputLineLengthException, FlatwormConversionException,
-            FlatwormUnsetFieldValueException, FlatwormCreatorException,
-            FlatwormParserException, IOException {
+    protected Object getNextBean() throws FlatwormParserException, IOException {
         MatchedRecord results = ff.nextRecord(reader);
         return results.getBean(getBeanName());
     }

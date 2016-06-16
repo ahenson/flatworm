@@ -17,13 +17,17 @@
 package com.blackbear.flatworm.errors;
 
 /**
- * The exception thrown when an attempt is made to read past the end of an input
- * line.
+ * The exception thrown parsing the configuration components of the File Format and unexpected conditions are found
+ * that prevent the configuration from being correctly interpreted.
  */
 
-public class FlatwormInputLineLengthException extends FlatwormException {
+public class FlatwormConfigurationException extends FlatwormException {
 
-    public FlatwormInputLineLengthException(String s) {
+    public FlatwormConfigurationException(String s) {
         super(s);
+    }
+
+    public FlatwormConfigurationException(String s, Exception e) {
+        super(s, e);
     }
 }

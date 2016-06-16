@@ -59,8 +59,7 @@ public class FileParser {
      *
      * @param config full path to the FlatWorm XML configuration file
      * @param file   full path to input file
-     * @throws FlatwormParserException - wraps FlatwormConfigurationValueException and FlatwormUnsetFieldValueException (to reduce number of
-     *                                 exceptions clients have to be aware of)
+     * @throws FlatwormParserException should any issues occur while parse the data.
      */
     public FileParser(String config, String file) throws FlatwormParserException {
         this.file = file;
