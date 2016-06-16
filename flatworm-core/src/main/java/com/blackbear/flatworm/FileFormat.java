@@ -130,7 +130,7 @@ public class FileFormat {
             if (firstLine == null)
                 return null;
             Record rd;
-            rd = this.findMatchingRecord(firstLine);
+            rd = findMatchingRecord(firstLine);
             if (rd == null)
                 throw new FlatwormInvalidRecordException("Unmatched line in input file");
 

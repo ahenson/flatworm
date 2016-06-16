@@ -76,6 +76,7 @@ public class ComplexFileTest {
             results = ff.getNextRecord(bufIn);
             assertEquals("videotape", results.getRecordName());
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Caught an exception of type " + e.getClass().getSimpleName());
         }
     }

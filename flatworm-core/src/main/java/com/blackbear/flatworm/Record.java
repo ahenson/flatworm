@@ -69,7 +69,7 @@ class Record {
      * @return boolean does this line match according to the defined criteria?
      */
     public boolean matchesLine(String line, FileFormat ff) {
-        boolean matchesLine = false;
+        boolean matchesLine = true;
         switch (identTypeFlag) {
 
             // Recognition by value in a certain field
@@ -77,15 +77,21 @@ class Record {
             // TODO: No - this won't - need some other way of identifying the record - thinking a line handler that maintains state.
             case 'F':
                 if (line.length() < fieldIdentStart + fieldIdentLength) {
+                    matchesLine = false;
                     break;
                 } else {
+                    matchesLine = false;
                     for (String matchingStrings : fieldIdentMatchStrings) {
                         if (line.regionMatches(fieldIdentStart, matchingStrings, 0, fieldIdentLength)) {
                             matchesLine = true;
                             break;
                         }
                     }
+                    if(matchesLine) {
+                        break;
+                    }
                 }
+                matchesLine = false;
                 break;
 
             // Recognition by length of line
