@@ -17,6 +17,7 @@
 package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.FileParser;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class ReadDelimitEmployee {
 //        }
         catch (IOException ex) {
             System.out.println("IOException: Something bad happend while accesing the flatfile: " + ex.getMessage());
-        } catch (FlatwormParserException ex) {
+        } catch (FlatwormConfigurationException ex) {
             System.out.println("FlatwormParserException: Something happened that the parser did not like: "
                     + ex.getMessage());
         }

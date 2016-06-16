@@ -14,13 +14,19 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.segment;
+package com.blackbear.flatworm.converters;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+/**
+ * Bean class used to store the values from the Conversion-Option XML tag
+ */
 @Data
-public class Phone {
-    private String type;
-    private String publishInd;
-    private String number;
+@EqualsAndHashCode
+@AllArgsConstructor
+public class ConversionOption {
+    private String name;
+    private String value;
 }

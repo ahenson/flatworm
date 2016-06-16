@@ -14,19 +14,25 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.converters;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.util.Map;
 
 /**
- * Bean class used to store the values from the Conversion-Option XML tag
+ * Provide a contract that aligns with how the {@link CoreConverters} manages its built in Converters.
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
  */
-@Data
-@EqualsAndHashCode
-@AllArgsConstructor
-public class ConversionOption {
-    private String name;
-    private String value;
+@FunctionalInterface
+public interface ToTypeConverterFunction {
+
+    /**
+     * Convert the given {@code value} into another format. ({@code Object} is used here to make this as generic
+     * as possible while still allowing for caching.
+     * @param value The {@code value} to convert.
+     * @param options Any {@link ConversionOption}s that were configured to go along with the converter.
+     * @return The {@code value} value converted.
+     */
+    Object convert(String value, Map<String, ConversionOption> options) throws Exception;
 }

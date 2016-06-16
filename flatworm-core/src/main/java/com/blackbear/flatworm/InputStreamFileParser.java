@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.BufferedReader;
@@ -27,15 +28,15 @@ public class InputStreamFileParser extends FileParser {
 
     private final InputStream is;
 
-    public InputStreamFileParser(String config, InputStream is) throws FlatwormParserException {
-        super(config, null);
+    public InputStreamFileParser(String configContent, InputStream is) throws FlatwormParserException {
+        this.configContent = configContent;
         this.is = is;
     }
 
     @Override
-    public void open() throws IOException {
+    public void open() throws FlatwormConfigurationException, IOException {
+        loadConfiguration();
         String encoding = fileFormat.getEncoding();
         bufIn = new BufferedReader(new InputStreamReader(is, encoding));
     }
-
 }

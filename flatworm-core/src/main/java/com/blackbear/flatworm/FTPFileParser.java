@@ -16,9 +16,11 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,19 +31,23 @@ public class FTPFileParser extends FileParser {
 
     private final URL url;
 
-    public FTPFileParser(String config, URL url) throws FlatwormParserException {
-        super(config, null);
+    public FTPFileParser(String configContent, URL url) {
         this.url = url;
+        this.configContent = configContent;
+    }
+
+    public FTPFileParser(File configFile, URL url) {
+        this.url = url;
+        this.configFile = configFile;
     }
 
     @Override
-    public void open() throws IOException {
+    public void open() throws FlatwormConfigurationException, IOException {
+        loadConfiguration();
+
         URLConnection con = url.openConnection();
         InputStream in = con.getInputStream();
         String encoding = fileFormat.getEncoding();
         bufIn = new BufferedReader(new InputStreamReader(in, encoding));
-
-        in.close();
     }
-
 }

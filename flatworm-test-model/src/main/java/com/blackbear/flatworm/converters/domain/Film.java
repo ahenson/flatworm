@@ -14,16 +14,20 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain;
+package com.blackbear.flatworm.converters.domain;
+
+import java.util.Date;
 
 import lombok.Data;
 
 /**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
  */
 @Data
-public class Videotape {
-    private String sku;
+public class Film {
+    private Date releaseDate;
 
-    private double price;
+    private String title;
+
+    private String studio;
 }

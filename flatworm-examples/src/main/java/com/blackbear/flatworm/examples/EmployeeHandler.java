@@ -24,7 +24,7 @@ package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.MatchedRecord;
 
-import com.blackbear.flatworm.test.domain.Employee;
+import com.blackbear.flatworm.converters.domain.Employee;
 
 /**
  * @author e50633

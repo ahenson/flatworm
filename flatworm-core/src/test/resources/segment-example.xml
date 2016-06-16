@@ -19,9 +19,9 @@
     <converter name="char"
                class="com.blackbear.flatworm.converters.CoreConverters"
                method="convertChar" return-type="java.lang.String"/>
-    <converter name="decimal"
+    <converter name="double"
                class="com.blackbear.flatworm.converters.CoreConverters"
-               method="convertDecimal" return-type="java.lang.Double"/>
+               method="convertDouble" return-type="java.lang.Double"/>
     <converter name="int"
                class="com.blackbear.flatworm.converters.CoreConverters"
                method="convertInteger" return-type="java.lang.Integer"/>
@@ -35,11 +35,11 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="account" class="com.blackbear.flatworm.test.domain.segment.Account"/>
-            <bean name="consumer" class="com.blackbear.flatworm.test.domain.segment.Consumer"/>
-            <bean name="id" class="com.blackbear.flatworm.test.domain.segment.Identity"/>
-            <bean name="phone" class="com.blackbear.flatworm.test.domain.segment.Phone"/>
-            <bean name="address" class="com.blackbear.flatworm.test.domain.segment.Address"/>
+            <bean name="account" class="com.blackbear.flatworm.converters.domain.segment.Account"/>
+            <bean name="consumer" class="com.blackbear.flatworm.converters.domain.segment.Consumer"/>
+            <bean name="id" class="com.blackbear.flatworm.converters.domain.segment.Identity"/>
+            <bean name="phone" class="com.blackbear.flatworm.converters.domain.segment.Phone"/>
+            <bean name="address" class="com.blackbear.flatworm.converters.domain.segment.Address"/>
             <line delimit="|">
                 <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
                 <record-element beanref="account.reportingDate" length="0" type="date">

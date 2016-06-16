@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.config.SegmentElement;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 

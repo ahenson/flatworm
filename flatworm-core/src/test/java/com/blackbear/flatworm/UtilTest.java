@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.converters.ConversionOption;
+
 import org.junit.Test;
 
 import java.util.HashMap;

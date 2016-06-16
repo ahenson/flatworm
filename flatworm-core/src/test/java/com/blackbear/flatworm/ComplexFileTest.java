@@ -22,11 +22,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
-import com.blackbear.flatworm.test.domain.Book;
-import com.blackbear.flatworm.test.domain.Dvd;
-import com.blackbear.flatworm.test.domain.Film;
-import com.blackbear.flatworm.test.domain.Header;
-import com.blackbear.flatworm.test.domain.Videotape;
+import com.blackbear.flatworm.converters.domain.Book;
+import com.blackbear.flatworm.converters.domain.Dvd;
+import com.blackbear.flatworm.converters.domain.Film;
+import com.blackbear.flatworm.converters.domain.Header;
+import com.blackbear.flatworm.converters.domain.Videotape;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

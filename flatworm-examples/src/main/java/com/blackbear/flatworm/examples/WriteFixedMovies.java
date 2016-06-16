@@ -17,15 +17,13 @@
 package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.FileCreator;
-import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
-import java.io.IOException;
 import java.util.Date;
 
-import com.blackbear.flatworm.test.domain.Book;
-import com.blackbear.flatworm.test.domain.Dvd;
-import com.blackbear.flatworm.test.domain.Film;
-import com.blackbear.flatworm.test.domain.Videotape;
+import com.blackbear.flatworm.converters.domain.Book;
+import com.blackbear.flatworm.converters.domain.Dvd;
+import com.blackbear.flatworm.converters.domain.Film;
+import com.blackbear.flatworm.converters.domain.Videotape;
 
 public class WriteFixedMovies {
 

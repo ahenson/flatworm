@@ -14,13 +14,27 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.segment;
+/*
+ * Created on Apr 5, 2005
+ * 
+ * To change the template for this generated file go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
+ * Comments
+ */
+package com.blackbear.flatworm.converters.domain;
 
 import lombok.Data;
 
+/**
+ * @author e50633
+ */
 @Data
-public class Student {
-    private String firstName;
-    private String lastName;
-    private int grade;
+public class Inventory {
+
+    private String sku;
+
+    private double price;
+
+    private int quantity;
+
+    private String description;
 }

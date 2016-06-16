@@ -14,30 +14,18 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.converters.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
- * Bean class used to represent information about a Converter. That is, a method
- * from CoreConverters or one you implement.
+ * Model class that mimics what a header record might look like in a flat file.
+ *
+ * @author Alan Henson
+ * @since 4.0.0
  */
 @Data
-@Builder
-@EqualsAndHashCode
-@AllArgsConstructor
-class Converter {
-    private String converterClass;
-
-    private String name;
-
-    private String returnType;
-
-    private String method;
-
-    public Converter() {
-    }
+public class Header {
+    private String source;
+    private Double version;
 }

@@ -22,6 +22,8 @@ import com.google.common.collect.ListMultimap;
 
 import com.blackbear.flatworm.callbacks.ExceptionCallback;
 import com.blackbear.flatworm.callbacks.RecordCallback;
+import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.lang.StringUtils;
@@ -50,13 +52,16 @@ public class FileParser implements Closeable {
 
     private List<ExceptionCallback> exceptionCallbacks = new ArrayList<>();
 
-    private File configFile;
-    private File dataInputFile;
+    protected File configFile;
+    protected File dataInputFile;
 
-    private String dataInputContent;
-    private String configContent;
+    protected String dataInputContent;
+    protected String configContent;
     protected FileFormat fileFormat;
     protected BufferedReader bufIn;
+
+    protected FileParser() {
+    }
 
     /**
      * Constructor for FileParser.
@@ -157,23 +162,15 @@ public class FileParser implements Closeable {
      * the config content will be parsed and either the data file or the data content will be parsed depending upon which constructor was
      * used.
      *
-     * @throws FlatwormParserException should parsing the config have issues due to syntactical reasons.
-     * @throws IOException             should the {@link InputStream} fail to properly open.
+     * @throws FlatwormConfigurationException should parsing the config file have any issues.
+     * @throws IOException                    should the {@link InputStream} fail to properly open.
      */
-    public void open() throws FlatwormParserException, IOException {
+    public void open() throws FlatwormConfigurationException, IOException {
         Preconditions.checkState((configFile != null || dataInputFile != null)
-                        || !StringUtils.isBlank(configContent) | !StringUtils.isBlank(dataInputContent),
+                        || (!StringUtils.isBlank(configContent) || !StringUtils.isBlank(dataInputContent)),
                 "Either the config file or config content must be provided and either the input file or input content must be provided.");
-        try {
-            ConfigurationReader parser = new ConfigurationReader();
-            if (configFile != null) {
-                fileFormat = parser.loadConfigurationFile(configFile);
-            } else {
-                fileFormat = parser.loadConfigurationFile(new ByteArrayInputStream(configContent.getBytes(StandardCharsets.UTF_8)));
-            }
-        } catch (Exception ex) {
-            throw new FlatwormParserException(ex.getMessage(), ex);
-        }
+
+        loadConfiguration();
 
         InputStream in;
         String encoding;
@@ -185,6 +182,23 @@ public class FileParser implements Closeable {
             in = new ByteArrayInputStream(dataInputContent.getBytes(StandardCharsets.UTF_8));
         }
         bufIn = new BufferedReader(new InputStreamReader(in, encoding));
+    }
+
+    /**
+     * Load the configuration file content.
+     * @throws FlatwormConfigurationException should parsing the content cause any issues.
+     */
+    protected void loadConfiguration() throws FlatwormConfigurationException {
+        try {
+            ConfigurationReader parser = new ConfigurationReader();
+            if (configFile != null) {
+                fileFormat = parser.loadConfigurationFile(configFile);
+            } else {
+                fileFormat = parser.loadConfigurationFile(new ByteArrayInputStream(configContent.getBytes(StandardCharsets.UTF_8)));
+            }
+        } catch (Exception ex) {
+            throw new FlatwormConfigurationException(ex.getMessage(), ex);
+        }
     }
 
     /**

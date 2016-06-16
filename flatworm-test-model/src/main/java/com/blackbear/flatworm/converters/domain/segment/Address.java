@@ -14,18 +14,17 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain;
+package com.blackbear.flatworm.converters.domain.segment;
 
 import lombok.Data;
 
-/**
- * Model class that mimics what a header record might look like in a flat file.
- *
- * @author Alan Henson
- * @since 4.0.0
- */
 @Data
-public class Header {
-    private String source;
-    private Double version;
+public class Address {
+    private String type;
+    private String number;
+    private String street;
+    private String streetType;
+    private String city;
+    private String state;
+    private String zip;
 }

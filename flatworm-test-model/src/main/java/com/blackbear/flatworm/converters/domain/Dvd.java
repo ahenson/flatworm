@@ -14,17 +14,23 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.segment;
+package com.blackbear.flatworm.converters.domain;
 
 import lombok.Data;
 
+/**
+ * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ */
 @Data
-public class Address {
-    private String type;
-    private String number;
-    private String street;
-    private String streetType;
-    private String city;
-    private String state;
-    private String zip;
+public class Dvd {
+    private String sku;
+
+    private String dualLayer;
+
+    private double price;
+
+    public String toString() {
+        return super.toString() + "[" + sku + ", " + price + ", " + dualLayer + "]";
+    }
+
 }

@@ -16,6 +16,15 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.config.Bean;
+import com.blackbear.flatworm.config.Converter;
+import com.blackbear.flatworm.config.Line;
+import com.blackbear.flatworm.config.LineElement;
+import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.RecordDefinition;
+import com.blackbear.flatworm.config.RecordElement;
+import com.blackbear.flatworm.config.SegmentElement;
+import com.blackbear.flatworm.converters.ConversionOption;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 

@@ -14,12 +14,24 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.config;
 
 import com.google.common.base.Strings;
 
+import com.blackbear.flatworm.BeanMappingStrategy;
+import com.blackbear.flatworm.CardinalityMode;
+import com.blackbear.flatworm.ParseUtils;
+import com.blackbear.flatworm.PropertyUtilsMappingStrategy;
+import com.blackbear.flatworm.Util;
+import com.blackbear.flatworm.converters.ConversionHelper;
+import com.blackbear.flatworm.converters.ConverterFunctionCache;
+import com.blackbear.flatworm.converters.ToTypeConverterFunction;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
  * Bean class used to store the values from the Line XML tag
  */
 @Slf4j
-class Line {
+public class Line {
     private List<LineElement> elements = new ArrayList<>();
     private String delimit;
     private char chrQuote = '\0';
@@ -167,15 +179,21 @@ class Line {
      * @throws FlatwormParserException should any issues occur while parsing the data.
      */
     private void mapField(String fieldChars, RecordElement re) throws FlatwormParserException {
-        Object value = convHelper.convert(re.getType(), fieldChars, re.getConversionOptions(),
-                re.getBeanRef());
-
         String beanRef = re.getBeanRef();
         int posOfFirstDot = beanRef.indexOf('.');
         String beanName = beanRef.substring(0, posOfFirstDot);
         String property = beanRef.substring(posOfFirstDot + 1);
-
         Object bean = beans.get(beanName);
+
+        Object value = fieldChars;
+        if(!StringUtils.isBlank(re.getType())) {
+            // Using the configuration based approach.
+            value = convHelper.convert(re.getType(), fieldChars, re.getConversionOptions(), re.getBeanRef());
+        }
+        else {
+            // Use the reflection approach.
+            value = convHelper.convert(bean, beanName, property, fieldChars, re.getConversionOptions());
+        }
 
         mappingStrategy.mapBean(bean, beanName, property, value, re.getConversionOptions());
     }

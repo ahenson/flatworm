@@ -14,29 +14,13 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain;
-
-import java.util.Date;
+package com.blackbear.flatworm.converters.domain.segment;
 
 import lombok.Data;
 
-/**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
- */
 @Data
-public class Book {
-    private Date releaseDate;
-
-    private String title;
-
-    private String author;
-
-    private double price;
-
-    private String sku;
-
-    public String toString() {
-        return super.toString() + "[" + releaseDate + ", " + title + ", " + author + "," + getSku()
-                + "," + getPrice() + "]";
-    }
+public class Phone {
+    private String type;
+    private String publishInd;
+    private String number;
 }

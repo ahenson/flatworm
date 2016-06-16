@@ -27,7 +27,7 @@
                method="convertDecimal" return-type="java.lang.Integer"/>
     <record name="inventory">
         <record-definition>
-            <bean name="inventory" class="com.blackbear.flatworm.test.domain.Inventory"/>
+            <bean name="inventory" class="com.blackbear.flatworm.converters.domain.Inventory"/>
             <line delimit="~">
                 <record-element length="30" beanref="inventory.sku"
                                 type="char">

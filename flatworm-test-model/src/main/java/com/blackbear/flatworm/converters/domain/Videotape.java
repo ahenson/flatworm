@@ -14,32 +14,16 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.segment;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+package com.blackbear.flatworm.converters.domain;
 
 import lombok.Data;
-import lombok.Singular;
 
+/**
+ * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ */
 @Data
-public class Consumer {
-    private Integer consumerNumber;
-    private String lastName;
-    private String firstName;
-    private String middleName;
-    private String gender;
+public class Videotape {
+    private String sku;
 
-    private List<Identity> id = new ArrayList<>();
-
-    private List<Phone> phone = new ArrayList<>();
-
-    public void addId(Identity identity) {
-        id.add(identity);
-    }
-
-    public void addPhone(Phone phone) {
-        this.phone.add(phone);
-    }
+    private double price;
 }

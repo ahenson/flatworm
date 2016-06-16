@@ -14,20 +14,30 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain;
+package com.blackbear.flatworm.config;
 
-import java.util.Date;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
+ * Bean class used to represent information about a Converter. That is, a method
+ * from CoreConverters or one you implement.
  */
 @Data
-public class Film {
-    private Date releaseDate;
+@Builder
+@EqualsAndHashCode
+@AllArgsConstructor
+public class Converter {
+    private String converterClass;
 
-    private String title;
+    private String name;
 
-    private String studio;
+    private String returnType;
+
+    private String method;
+
+    public Converter() {
+    }
 }

@@ -16,7 +16,9 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConfigurationException;
+import com.blackbear.flatworm.config.Converter;
+import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.converters.ConversionHelper;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.BufferedReader;
@@ -125,15 +127,10 @@ public class FileFormat {
 
     /**
      * When called with a {@code BufferedReader}, reads sufficient lines to parse a record, and returns the beans created.
-     * @param in The stream to read from
-     * @return The created beans in a MatchedRecord object
-     * @throws FlatwormParserException TODO This needs to be simplified.
-     * @throws FlatwormParserException TODO This needs to be simplified.
-     * @throws FlatwormParserException TODO This needs to be simplified.
-     * @throws FlatwormParserException TODO This needs to be simplified.
-     * @throws FlatwormConfigurationException TODO This needs to be simplified.
-     * @throws FlatwormParserException TODO This needs to be simplified.
-     * @throws IOException TODO This needs to be simplified.
+     * @param in The stream to read from.
+     * @return The created beans in a MatchedRecord object.
+     * @throws FlatwormParserException should an issue occur while parsing the data content.
+     * @throws IOException Should an I/O issue occur.
      */
     public MatchedRecord nextRecord(BufferedReader in) throws FlatwormParserException, IOException {
 
@@ -157,6 +154,13 @@ public class FileFormat {
         return matchedRecord;
     }
 
+    /**
+     * Manually provide the next data to be parsed.
+     * @param line The line of data that should be parsed - this could be multiple lines if the {@code line.separator) is used
+     *             to separate the lines within the {@code line} parameter.
+     * @return The {@link MatchedRecord} for the given data if the data could be parsed.
+     * @throws FlatwormParserException should an issue occur while parsing the data content.
+     */
     public MatchedRecord nextRecord(String line) throws FlatwormParserException {
         MatchedRecord matchedRecord;
         try {
@@ -168,6 +172,13 @@ public class FileFormat {
         return matchedRecord;
     }
 
+    /**
+     * Manually provide the next data to be parsed.
+     * @param lines The lines of data that should be parsed - this wll be appended together with the correct system-based
+     *              {@code line.separator).
+     * @return The {@link MatchedRecord} for the given data if the data could be parsed.
+     * @throws FlatwormParserException should an issue occur while parsing the data content.
+     */
     public MatchedRecord nextRecord(List<String> lines) throws FlatwormParserException {
         MatchedRecord matchedRecord;
         try {

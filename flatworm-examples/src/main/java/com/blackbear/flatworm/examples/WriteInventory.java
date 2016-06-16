@@ -65,10 +65,8 @@ public class WriteInventory {
 //        }
         catch (IOException ex) {
             System.out.println("Something bad happened while opening,reading,closing the input file: " + ex.getMessage());
-        } catch (FlatwormParserException ex) {
-            System.out.println("Something happened that the parser did not like: " + ex.getMessage());
         } catch (FlatwormConfigurationException ex) {
-            System.out.println("Something happened that the creator did not like: " + ex.getMessage());
+            System.out.println("Something happened that the parser did not like: " + ex.getMessage());
         }
     }
 }

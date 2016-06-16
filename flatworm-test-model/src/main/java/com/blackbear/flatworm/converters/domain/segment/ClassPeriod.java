@@ -14,37 +14,24 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.converters.domain.segment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.Data;
 
-/**
- * Bean class used to store the values from the Record-Definition XML tag
- */
 @Data
-class RecordDefinition {
-    private Map<String, Bean> beansUsed;
-    private List<Line> lines;
+public class ClassPeriod {
+    private String subject;
+    private int period;
+    private String teacher;
+    private int gradeLevel;
+    private String room;
 
-    public RecordDefinition() {
-        this.beansUsed = new HashMap<>();
-        this.lines = new ArrayList<>();
-    }
+    private List<Student> students = new ArrayList<>();
 
-    public void addBeanUsed(Bean bean) {
-        this.beansUsed.put(bean.getBeanName(), bean);
-    }
-
-    public void addLine(Line line) {
-        lines.add(line);
-    }
-
-    public String toString() {
-        return super.toString() + "[bean = " + beansUsed + ", lines=" + lines + "]";
+    public void addStudent(Student student) {
+        students.add(student);
     }
 }

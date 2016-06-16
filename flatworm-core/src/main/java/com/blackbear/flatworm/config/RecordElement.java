@@ -14,7 +14,9 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.config;
+
+import com.blackbear.flatworm.converters.ConversionOption;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +27,7 @@ import lombok.Setter;
 /**
  * Bean class used to store the values from the Record-Element XML tag
  */
-
-class RecordElement implements LineElement {
+public class RecordElement implements LineElement {
 
     @Getter
     @Setter

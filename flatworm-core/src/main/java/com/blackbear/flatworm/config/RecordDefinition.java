@@ -14,21 +14,37 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.config;
 
-import com.blackbear.flatworm.converters.ConversionOption;
-import com.blackbear.flatworm.errors.FlatwormParserException;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import lombok.Data;
+
 /**
- * Provides the ability to specify how the raw data parsed from the input file
- * is to be mapped into the beans.
- *
- * @author Dave Derry
- *
+ * Bean class used to store the values from the Record-Definition XML tag
  */
-public interface BeanMappingStrategy {
-    void mapBean(Object bean, String beanName, String property, Object value,
-                 Map<String, ConversionOption> conv) throws FlatwormParserException;
+@Data
+public class RecordDefinition {
+    private Map<String, Bean> beansUsed;
+    private List<Line> lines;
+
+    public RecordDefinition() {
+        this.beansUsed = new HashMap<>();
+        this.lines = new ArrayList<>();
+    }
+
+    public void addBeanUsed(Bean bean) {
+        this.beansUsed.put(bean.getBeanName(), bean);
+    }
+
+    public void addLine(Line line) {
+        lines.add(line);
+    }
+
+    public String toString() {
+        return super.toString() + "[bean = " + beansUsed + ", lines=" + lines + "]";
+    }
 }

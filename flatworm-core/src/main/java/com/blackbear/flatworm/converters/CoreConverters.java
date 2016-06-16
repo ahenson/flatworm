@@ -16,7 +16,6 @@
 
 package com.blackbear.flatworm.converters;
 
-import com.blackbear.flatworm.ConversionOption;
 import com.blackbear.flatworm.Util;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -32,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * {@code CoreConverters} contains methods to convert the most commonly encountered text types to native Java types. It can be used as the
  * {@code class} parameter in a Flatworm {@code converter} tag, with one of the public methods listed below as the {@code method} parameter.
- *  All converters (included the ones listed here and any supplied by the user) should expect to accept and handle the following {@code
+ * All converters (included the ones listed here and any supplied by the user) should expect to accept and handle the following {@code
  * conversion-option}s:  <dl> <dt>{@code justify}</dt> <dd>Defines the justification rule used to strip/add pad characters to this field.
  * Used in conjunction with the {@code pad-character} option. Valid values are: <ul> <li>{@code left} to strip the right hand side of the
  * field of pad chars</li> <li>{@code right} to strip the left hand side of the field of pad chars</li> <li>{@code both} to strip both end
@@ -40,6 +39,8 @@ import lombok.extern.slf4j.Slf4j;
  * the character to be used in conjunction with the {@code justify} option when removing or adding pad characters from a field. The default
  * value is the space character.</dd> <dt>{@code default-value}</dt> <dd>Defines the default value to be used if the field is empty after
  * being stripped of pad characters.</dd> </dl>
+ *
+ * NOTE: This class must remain threadsafe.
  *
  * @author James M. Turner
  * @version $Id: CoreConverters.java,v 1.8 2009/12/07 00:50:53 dderry Exp $
@@ -81,7 +82,6 @@ public class CoreConverters {
      * @return The converted date
      * @throws FlatwormParserException if the date fails to parse correctly.
      */
-
     public Date convertDate(String str, Map<String, ConversionOption> options)
             throws FlatwormParserException {
         try {
@@ -131,11 +131,9 @@ public class CoreConverters {
      * @param options The conversion-option values for the field
      * @return The converted double value
      * @throws FlatwormParserException If the source number fails to parse as a double or the decimal places option fails to parse as an
-     *                                     integer value.
+     *                                 integer value.
      */
-
-    public Double convertDecimal(String str, Map<String, ConversionOption> options)
-            throws FlatwormParserException {
+    public Double convertDouble(String str, Map<String, ConversionOption> options) throws FlatwormParserException {
         try {
             int decimalPlaces = 0;
             ConversionOption conv = options.get("decimal-places");
@@ -163,7 +161,19 @@ public class CoreConverters {
         }
     }
 
-    public String convertDecimal(Object obj, Map<String, ConversionOption> options) {
+    /**
+     * Convert a {@link Double} to a {@link String} taking into account the options provided.
+     *
+     * In addition to the standard conversion options, doubles also support the following:  <dl> <dt>{@code decimal-implied}</dt> <dd>If set
+     * to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places} is
+     * required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point, if
+     * {@code decimal-implied} is set.</dd> </dl>
+     *
+     * @param obj     The {@code obj} to convert.
+     * @param options The {@code ConversionOption} provided.
+     * @return the {@code obj} converted to a {@link String}.
+     */
+    public String convertDouble(Object obj, Map<String, ConversionOption> options) {
         Double d = (Double) obj;
         if (d == null) {
             return null;
@@ -195,6 +205,92 @@ public class CoreConverters {
     }
 
     /**
+     * Conversion function for {@code Float}, returns the source string with padding removed if requested, converted into a float.
+     *
+     *
+     * In addition to the standard conversion options, floats also support the following:  <dl> <dt>{@code decimal-implied}</dt> <dd>If set
+     * to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places} is
+     * required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point, if
+     * {@code decimal-implied} is set.</dd> </dl>
+     *
+     * @param str     The source string
+     * @param options The conversion-option values for the field
+     * @return The converted float value
+     * @throws FlatwormParserException If the source number fails to parse as a float or the decimal places option fails to parse as an
+     *                                 integer value.
+     */
+    public Float convertFloat(String str, Map<String, ConversionOption> options) throws FlatwormParserException {
+        try {
+            int decimalPlaces = 0;
+            ConversionOption conv = options.get("decimal-places");
+
+            String decimalPlacesOption = null;
+            if (null != conv)
+                decimalPlacesOption = conv.getValue();
+
+            boolean decimalImplied = "true".equals(Util.getValue(options, "decimal-implied"));
+
+            if (decimalPlacesOption != null)
+                decimalPlaces = Integer.parseInt(decimalPlacesOption);
+
+            if (str.length() == 0)
+                return 0.0F;
+
+            if (decimalImplied)
+                return Float.parseFloat(str) / (float) Math.pow(10F, decimalPlaces);
+            else
+                return Float.parseFloat(str);
+
+        } catch (NumberFormatException ex) {
+            log.error("Failed to parse float value", ex);
+            throw new FlatwormParserException(str);
+        }
+    }
+
+    /**
+     * Convert a {@link Float} to a {@link String} taking into account the options provided.
+     *
+     * In addition to the standard conversion options, floats also support the following:  <dl> <dt>{@code decimal-implied}</dt> <dd>If set
+     * to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places} is
+     * required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point, if
+     * {@code decimal-implied} is set.</dd> </dl>
+     *
+     * @param obj     The {@code obj} to convert.
+     * @param options The {@code ConversionOption} provided.
+     * @return the {@code obj} converted to a {@link String}.
+     */
+    public String convertFloat(Object obj, Map<String, ConversionOption> options) {
+        Float f = (Float) obj;
+        if (f == null) {
+            return null;
+        }
+
+        int decimalPlaces = 0;
+        ConversionOption conv = options.get("decimal-places");
+
+        String decimalPlacesOption = null;
+        if (null != conv)
+            decimalPlacesOption = conv.getValue();
+
+        boolean decimalImplied = "true".equals(Util.getValue(options, "decimal-implied"));
+
+        if (decimalPlacesOption != null)
+            decimalPlaces = Integer.parseInt(decimalPlacesOption);
+
+        DecimalFormat format = new DecimalFormat();
+        format.setDecimalSeparatorAlwaysShown(!decimalImplied);
+        format.setGroupingUsed(false);
+        if (decimalImplied) {
+            format.setMaximumFractionDigits(0);
+            f = f * (float) Math.pow(10D, decimalPlaces);
+        } else {
+            format.setMinimumFractionDigits(decimalPlaces);
+            format.setMaximumFractionDigits(decimalPlaces);
+        }
+        return format.format(f);
+    }
+
+    /**
      * Conversion function for {@code Integer}, returns the source string with padding removed if requested, converted into a integer.
      *
      * @param str     The source string
@@ -202,7 +298,6 @@ public class CoreConverters {
      * @return The converted integer value
      * @throws FlatwormParserException If the source number fails to parse as an integer value.
      */
-
     public Integer convertInteger(String str, Map<String, ConversionOption> options)
             throws FlatwormParserException {
         try {
@@ -217,6 +312,13 @@ public class CoreConverters {
         }
     }
 
+    /**
+     * Conver an {@link Integer} to a {@link String}.
+     *
+     * @param obj     The {@code obj} to convert.
+     * @param options The {@code ConversionOption} provided.
+     * @return the {@code obj} converted to a {@link String}.
+     */
     public String convertInteger(Object obj, Map<String, ConversionOption> options) {
         if (obj == null) {
             return null;
@@ -233,7 +335,6 @@ public class CoreConverters {
      * @return The converted long value
      * @throws FlatwormParserException If the source number fails to parse as an long value.
      */
-
     public Long convertLong(String str, Map<String, ConversionOption> options)
             throws FlatwormParserException {
         try {
@@ -248,6 +349,13 @@ public class CoreConverters {
         }
     }
 
+    /**
+     * Conver an {@link Long} to a {@link String}.
+     *
+     * @param obj     The {@code obj} to convert.
+     * @param options The {@code ConversionOption} provided.
+     * @return the {@code obj} converted to a {@link String}.
+     */
     public String convertLong(Object obj, Map<String, ConversionOption> options) {
         if (obj == null) {
             return null;
@@ -258,18 +366,19 @@ public class CoreConverters {
 
     /**
      * Conversion function for {@code BigDecimal}, returns the source string with padding removed if requested, converted into a big
-     * decimal. In addition to the standard conversion options, big decimals also support the following:  <dl> <dt>{@code
-     * decimal-implied}</dt> <dd>If set to {@code true}, the decimal point is positionally implied rather than explicitly included. If set,
-     * {@code decimal-places} is required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the
-     * right of the decimal point, if {@code decimal-implied} is set.</dd> </dl>
+     * decimal.
+     *
+     * In addition to the standard conversion options, big decimals also support the following:  <dl> <dt>{@code decimal-implied}</dt>
+     * <dd>If set to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places}
+     * is required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point,
+     * if {@code decimal-implied} is set.</dd> </dl>
      *
      * @param str     The source string.
      * @param options The conversion-option values for the field.
      * @return The converted big decimal value.
-     * @throws FlatwormParserException If the source number fails to parse as a big decimal or the decimal places option fails to parse
-     *                                     as an integer value.
+     * @throws FlatwormParserException If the source number fails to parse as a big decimal or the decimal places option fails to parse as
+     *                                 an integer value.
      */
-
     public BigDecimal convertBigDecimal(String str, Map<String, ConversionOption> options)
             throws FlatwormParserException {
         try {
@@ -293,6 +402,18 @@ public class CoreConverters {
         }
     }
 
+    /**
+     * Conver an {@link BigDecimal} to a {@link String}.
+     *
+     * In addition to the standard conversion options, big decimals also support the following:  <dl> <dt>{@code decimal-implied}</dt>
+     * <dd>If set to {@code true}, the decimal point is positionally implied rather than explicitly included. If set, {@code decimal-places}
+     * is required.</dd> <dt>{@code decimal-places}</dt> <dd>The number of digits in the string which are to the right of the decimal point,
+     * if {@code decimal-implied} is set.</dd> </dl>
+     *
+     * @param obj     The {@code obj} to convert.
+     * @param options The {@code ConversionOption} provided.
+     * @return the {@code obj} converted to a {@link String}.
+     */
     public String convertBigDecimal(Object obj, Map<String, ConversionOption> options) {
         if (obj == null) {
             return null;
@@ -300,7 +421,7 @@ public class CoreConverters {
         BigDecimal bd = (BigDecimal) obj;
 
         int decimalPlaces = 0;
-        String decimalPlacesOption = (String) Util.getValue(options, "decimal-places");
+        String decimalPlacesOption = Util.getValue(options, "decimal-places");
         boolean decimalImplied = "true".equals(Util.getValue(options, "decimal-implied"));
 
         if (decimalPlacesOption != null)

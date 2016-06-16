@@ -14,21 +14,8 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.converters.domain.segment;
 
-import com.blackbear.flatworm.converters.ConversionOption;
-import com.blackbear.flatworm.errors.FlatwormParserException;
+public class Identity {
 
-import java.util.Map;
-
-/**
- * Provides the ability to specify how the raw data parsed from the input file
- * is to be mapped into the beans.
- *
- * @author Dave Derry
- *
- */
-public interface BeanMappingStrategy {
-    void mapBean(Object bean, String beanName, String property, Object value,
-                 Map<String, ConversionOption> conv) throws FlatwormParserException;
 }

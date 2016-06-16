@@ -14,7 +14,9 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.config;
+
+import com.blackbear.flatworm.CardinalityMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +25,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-class SegmentElement implements LineElement {
+public class SegmentElement implements LineElement {
     private int fieldIdentStart = 0;
     private int fieldIdentLength = 0;
     private List<String> fieldIdentMatchStrings = new ArrayList<>();

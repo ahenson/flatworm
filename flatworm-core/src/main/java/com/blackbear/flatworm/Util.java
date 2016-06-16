@@ -18,6 +18,8 @@ package com.blackbear.flatworm;
 
 import com.google.common.primitives.Ints;
 
+import com.blackbear.flatworm.converters.ConversionOption;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;

@@ -16,6 +16,11 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.config.Bean;
+import com.blackbear.flatworm.config.Line;
+import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.RecordDefinition;
+
 import org.junit.Test;
 
 import java.util.List;

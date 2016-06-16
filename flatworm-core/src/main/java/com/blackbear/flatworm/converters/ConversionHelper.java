@@ -14,11 +14,15 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.converters;
 
+import com.blackbear.flatworm.Util;
+import com.blackbear.flatworm.config.Converter;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
-import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.beanutils.PropertyUtils;
+
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +40,7 @@ public class ConversionHelper {
     private Map<String, Converter> converters;
 
     private Map<Converter, Method> converterMethodCache;
-
     private Map<Converter, Method> converterToStringMethodCache;
-
     private Map<String, Object> converterObjectCache;
 
     public ConversionHelper() {
@@ -49,15 +51,17 @@ public class ConversionHelper {
     }
 
     /**
-     * @param type       The name of the converter from the xml configuration file
-     * @param fieldChars The value of the field as read from the input file
-     * @param options    Map of ConversionOptions (if any) for this field
-     * @param beanRef    "class.property", used for more descriptive exception messages, should something go wrong
-     * @return Java type corresponding to the field type, post conversion
-     * @throws FlatwormParserException - if problems are encountered during the conversion process (wraps other exceptions)
+     * Attempt to convert the given {@code fieldChars} to an instance of a {@link Object}.
+     *
+     * @param type       The name of the converter from the xml configuration file.
+     * @param fieldChars The value of the field as read from the input file.
+     * @param options    Map of ConversionOptions (if any) for this field.
+     * @param beanRef    "class.property", used for more descriptive exception messages, should something go wrong.
+     * @return The {@link Object} constructed from the {@code fieldChars} value.
+     * @throws FlatwormParserException should parsing the value to a {@link Object} fail for any reason.
      */
-    public Object convert(String type, String fieldChars, Map<String, ConversionOption> options,
-                          String beanRef) throws FlatwormParserException {
+    public Object convert(String type, String fieldChars, Map<String, ConversionOption> options, String beanRef)
+            throws FlatwormParserException {
 
         Object value;
 
@@ -77,8 +81,41 @@ public class ConversionHelper {
         return value;
     }
 
-    public String convert(String type, Object obj, Map<String, ConversionOption> options,
-                          String beanRef) throws FlatwormParserException {
+    /**
+     * Use an alternate method that attempts to use reflection to figure out which conversion routine to use.
+     *
+     * @param bean         The {@link Object} that contains the property.
+     * @param beanName     The name of the bean as configured.
+     * @param propertyName The name of the property that is to be set.
+     * @param fieldChars   The value.
+     * @param options      The {@link ConversionOption}s.
+     * @return The {@link Object} constructed from the {@code fieldChars} value.
+     * @throws FlatwormParserException should parsing the value to a {@link Object} fail for any reason.
+     */
+    public Object convert(Object bean, String beanName, String propertyName, String fieldChars, Map<String, ConversionOption> options)
+            throws FlatwormParserException {
+        Object value = null;
+        try {
+            PropertyDescriptor propDescriptor = PropertyUtils.getPropertyDescriptor(bean, propertyName);
+            value = ConverterFunctionCache.convertFromString(propDescriptor.getPropertyType(), fieldChars, options);
+        } catch (Exception e) {
+            throw new FlatwormParserException(String.format("Failed to convert and set value %s on bean %s [%s] for property %s.",
+                    fieldChars, beanName, bean.getClass().getName(), propertyName));
+        }
+        return value;
+    }
+
+    /**
+     * Convert a given {@link Object} to a String.
+     *
+     * @param type    The converter type specified.
+     * @param obj     The {@link Object} to convert to a String.
+     * @param options The {@link ConversionOption}s.
+     * @param beanRef The reference to the bean that has the property.
+     * @return The {@link String} value of the {@link Object}.
+     * @throws FlatwormParserException should converting the {@link Object} fail for any reason.
+     */
+    public String convert(String type, Object obj, Map<String, ConversionOption> options, String beanRef) throws FlatwormParserException {
         String result;
         try {
             Object converter = getConverterObject(type);
@@ -86,9 +123,25 @@ public class ConversionHelper {
             Object[] args = {obj, options};
             result = (String) method.invoke(converter, args);
         } catch (Exception e) {
-            log.error("While running toString convert method for " + beanRef, e);
-            throw new FlatwormParserException("Converting field " + beanRef
-                    + " to string for value '" + obj + "'");
+            throw new FlatwormParserException("Converting field " + beanRef + " to string for value '" + obj + "'", e);
+        }
+        return result;
+    }
+
+    /**
+     * Convert a given {@link Object} to a String.
+     * @param obj     The {@link Object} to convert to a String.
+     * @param options The {@link ConversionOption}s.
+     * @param beanRef The reference to the bean that has the property.
+     * @return The {@link String} value of the {@link Object}.
+     * @throws FlatwormParserException should converting the {@link Object} fail for any reason.
+     */
+    public String convert(Object obj, Map<String, ConversionOption> options, String beanRef) throws FlatwormParserException {
+        String result;
+        try {
+            result = ConverterFunctionCache.convertToString(obj, options);
+        } catch (Exception e) {
+            throw new FlatwormParserException("Converting field " + beanRef + " to string for value '" + obj + "'", e);
         }
         return result;
     }
@@ -128,7 +181,7 @@ public class ConversionHelper {
     }
 
     /**
-     * Facilitates the storage of multiple converters used by the <code>convert</code> method during processing
+     * Facilitates the storage of multiple converters used by the {@code convert} method during processing.
      *
      * @param converter The converter to be added
      */
@@ -151,12 +204,14 @@ public class ConversionHelper {
     }
 
     /**
-     * @param type The name of the converter. Used for lookup
-     * @return Java reflection Object used to represent the conversion method
+     * Retrieve the method to use in performing the conversion based upon the {@code converterName}.
+     *
+     * @param converterName The name of the converter. Used for lookup.
+     * @return Java reflection Object used to represent the conversion method.
      */
-    private Method getConverterMethod(String type) throws FlatwormParserException {
+    private Method getConverterMethod(String converterName) throws FlatwormParserException {
         try {
-            Converter c = converters.get(type);
+            Converter c = converters.get(converterName);
             if (converterMethodCache.get(c) != null)
                 return converterMethodCache.get(c);
             Method meth;
@@ -174,37 +229,43 @@ public class ConversionHelper {
         }
     }
 
-    private Method getToStringConverterMethod(String type) throws FlatwormParserException {
-        Converter c = converters.get(type);
+    /**
+     * Get the method that is reponsible for transorming an {@link Object} to a {@link String}.
+     *
+     * @param converterName The name of the converter.
+     * @return The {@link Method} that can turn an {@link Object} into a {@link String}. The expectation is that this functionality is more
+     * advanced than {@code toString()};
+     * @throws FlatwormParserException should attempting to retrieving the {@link Method} fail for any reason.
+     */
+    private Method getToStringConverterMethod(String converterName) throws FlatwormParserException {
+        Converter c = converters.get(converterName);
         if (converterToStringMethodCache.get(c) != null)
             return converterToStringMethodCache.get(c);
         try {
-            Method meth;
             Class<?> cl = Class.forName(c.getConverterClass());
             Class args[] = {Object.class, Map.class};
-            meth = cl.getMethod(c.getMethod(), args);
+            Method meth = cl.getMethod(c.getMethod(), args);
             converterToStringMethodCache.put(c, meth);
             return meth;
-        } catch (NoSuchMethodException e) {
-            log.error("Finding method", e);
-            throw new FlatwormParserException("Couldn't Find Method 'String " + c.getMethod()
-                    + "(Object, HashMap)'");
-        } catch (ClassNotFoundException e) {
-            log.error("Finding class", e);
-            throw new FlatwormParserException("Couldn't Find Class");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new FlatwormParserException(e.getMessage(), e);
         }
     }
 
     /**
-     * @param type The name of the converter. Used for lookup
-     * @return An instance of the conversion class
-     * @throws FlatwormParserException if there is no Converter registered with the specified name.
+     * Fetch the {@link Converter} object read from the config data.
+     *
+     * @param converterName The name of the converter. Used for lookup.
+     * @return An instance of the conversion class.
+     * @throws FlatwormParserException if there is no Converter registered with the specified name or the {@link Method} failed be
+     *                                 retrieved.
      */
-    private Object getConverterObject(String type) throws FlatwormParserException {
+    private Object getConverterObject(String converterName) throws FlatwormParserException {
         try {
-            Converter c = converters.get(type);
+            Converter c = converters.get(converterName);
             if (c == null) {
-                throw new FlatwormParserException("type '" + type + "' not registered");
+                throw new FlatwormParserException("converterName '" + converterName + "' not registered");
             }
             if (converterObjectCache.get(c.getConverterClass()) != null)
                 return converterObjectCache.get(c.getConverterClass());
@@ -215,22 +276,9 @@ public class ConversionHelper {
             o = cl.getConstructor(args).newInstance(objArgs);
             converterObjectCache.put(c.getConverterClass(), o);
             return o;
-        } catch (NoSuchMethodException e) {
-            log.error("Finding method", e);
-            throw new FlatwormParserException("Couldn't Find Method");
-        } catch (IllegalAccessException e) {
-            log.error("No access to class", e);
-            throw new FlatwormParserException("Couldn't access class");
-        } catch (InvocationTargetException e) {
-            log.error("Invoking method", e);
-            throw new FlatwormParserException("Couldn't invoke method");
-        } catch (InstantiationException e) {
-            log.error("Instantiating", e);
-            throw new FlatwormParserException("Couldn't instantiate converter");
-        } catch (ClassNotFoundException e) {
-            log.error("Finding class", e);
-            throw new FlatwormParserException("Couldn't Find Class");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new FlatwormParserException(e.getMessage(), e);
         }
     }
-
 }

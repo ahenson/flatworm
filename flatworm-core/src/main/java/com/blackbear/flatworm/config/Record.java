@@ -14,8 +14,10 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.config;
 
+import com.blackbear.flatworm.converters.ConversionHelper;
+import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.logging.log4j.util.Strings;
@@ -42,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 @ToString
-class Record {
+public class Record {
 
     public static final String FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME = "matchesLine";
 

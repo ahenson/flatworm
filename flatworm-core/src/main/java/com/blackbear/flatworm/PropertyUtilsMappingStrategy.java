@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.converters.ConversionOption;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.beanutils.PropertyUtils;

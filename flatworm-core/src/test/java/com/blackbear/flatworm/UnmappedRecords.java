@@ -16,10 +16,10 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.test.domain.Dvd;
-import com.blackbear.flatworm.test.domain.Film;
-import com.blackbear.flatworm.test.domain.Header;
-import com.blackbear.flatworm.test.domain.Videotape;
+import com.blackbear.flatworm.converters.domain.Dvd;
+import com.blackbear.flatworm.converters.domain.Film;
+import com.blackbear.flatworm.converters.domain.Header;
+import com.blackbear.flatworm.converters.domain.Videotape;
 
 import org.junit.Test;
 

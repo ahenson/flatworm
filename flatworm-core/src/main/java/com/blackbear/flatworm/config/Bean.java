@@ -14,34 +14,17 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain.segment;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+package com.blackbear.flatworm.config;
 
 import lombok.Data;
-import lombok.Singular;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
-public class Account {
-    private Date reportingDate;
-    private String accountCode;
-    private Integer accountType;
-    private String accountNumber;
-    private String serviceType;
-    private String companyId;
-
-    private List<Consumer> consumers = new ArrayList<>();
-
-    private List<Address> addresses = new ArrayList<>();
-
-    public void addConsumer(Consumer consumer) {
-        consumers.add(consumer);
-    }
-
-    public void addAddress(Address address) {
-        addresses.add(address);
-    }
+@ToString
+@EqualsAndHashCode
+public class Bean {
+    private String beanName;
+    private String beanClass;
+    private Class beanObjectClass;
 }

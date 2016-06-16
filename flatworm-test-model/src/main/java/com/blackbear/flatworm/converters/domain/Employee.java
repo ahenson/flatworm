@@ -14,12 +14,33 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.converters.domain;
 
-/*
- * A interface used for elements that can be parts of a Line element. Since a SegmentElement can also
- * be made up of the same components, they server the same purpose there
+import lombok.Data;
+
+/**
+ * Created by IntelliJ IDEA. User: james Date: Sep 18, 2003 Time: 2:56:46 AM To change this template use Options | File Templates.
  */
-interface LineElement {
-    String getBeanRef();
+@Data
+public class Employee {
+    private String firstName;
+
+    private String lastName;
+
+    private String ssn;
+
+    private double salary;
+
+    private String gender;
+
+    private String misc;
+
+    public String toString() {
+        return super.toString() + "[" + this.lastName + ", " + this.firstName + ", " + this.ssn + ", "
+                + this.gender + ", " + this.salary + ", " + this.misc + "]";
+    }
+
+    public boolean validate() {
+        return true;
+    }
 }

@@ -14,23 +14,24 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.test.domain;
+package com.blackbear.flatworm.converters;
 
-import lombok.Data;
+import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ * Provide a contract that aligns with how the {@link CoreConverters} manages its built in Converters.
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
  */
-@Data
-public class Dvd {
-    private String sku;
+@FunctionalInterface
+public interface FromTypeConverterFunction {
 
-    private String dualLayer;
-
-    private double price;
-
-    public String toString() {
-        return super.toString() + "[" + sku + ", " + price + ", " + dualLayer + "]";
-    }
-
+    /**
+     * Convert the given {@code value} into a ({@code String}.
+     * @param value The {@code value} to convert to a {@link String}.
+     * @param options Any {@link ConversionOption}s that were configured to go along with the converter.
+     * @return The {@code value} value converted to a {@link String}.
+     */
+    String convert(Object value, Map<String, ConversionOption> options) throws Exception;
 }

@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.blackbear.flatworm.test.domain.segment.ClassPeriod;
+import com.blackbear.flatworm.converters.domain.segment.ClassPeriod;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

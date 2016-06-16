@@ -17,7 +17,7 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.test.domain.Film;
+import com.blackbear.flatworm.converters.domain.Film;
 
 import junit.framework.TestCase;
 
