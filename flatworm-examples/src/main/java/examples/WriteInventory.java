@@ -34,7 +34,7 @@ public class WriteInventory {
         try {
             FileParser parser = new FileParser(xmlConfigFileIn, inputFile);
             FileCreator writer = new FileCreator(xmlConfigFileOut, outputFile);
-            writer.setRecordSeperator("\n");
+            writer.setRecordSeparator("\n");
 
             writer.open();
             parser.open();

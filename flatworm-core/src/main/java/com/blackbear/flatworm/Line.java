@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm;
 
+import com.google.common.base.Strings;
+
 import com.blackbear.flatworm.errors.FlatwormConversionException;
 import com.blackbear.flatworm.errors.FlatwormCreatorException;
 import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
@@ -114,15 +116,14 @@ class Line {
         // JBL - check for delimited status
         if (isDelimited()) {
             // Don't parse empty lines
-            if (inputLine != null && !inputLine.isEmpty()) {
+            if (!Strings.isNullOrEmpty(inputLine)) {
                 parseInputDelimited(inputLine);
                 return;
             }
         }
 
         int charPos = 0;
-        for (int i = 0; i < elements.size(); i++) {
-            LineElement le = elements.get(i);
+        for (LineElement le : elements) {
             if (le instanceof RecordElement) {
                 RecordElement re = (RecordElement) le;
                 int start = charPos;

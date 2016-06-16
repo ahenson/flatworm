@@ -36,7 +36,7 @@ public class WriteFixedMovies {
 
         try {
             FileCreator creator = new FileCreator(xmlConfigFile, outputFile);
-            creator.setRecordSeperator("\n");
+            creator.setRecordSeparator("\n");
             creator.open();
 
             // -----------------------------------------------

@@ -16,8 +16,6 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,22 +28,31 @@ import lombok.Setter;
 
 class RecordElement implements LineElement {
 
+    @Getter
+    @Setter
     private Integer fieldEnd;
 
+    @Getter
+    @Setter
     private Integer fieldStart;
 
+    @Getter
+    @Setter
     private Integer fieldLength;
 
     private Integer spacerLength;
 
     private char fieldType;
 
+    @Setter
     private String beanRef;
 
     @Getter
     @Setter
     private String type;
 
+    @Getter
+    @Setter
     private Map<String, ConversionOption> conversionOptions;
 
     public RecordElement() {
@@ -71,51 +78,6 @@ class RecordElement implements LineElement {
         return fieldLength != null;
     }
 
-    public int getFieldStart() throws FlatwormUnsetFieldValueException {
-        if (fieldStart == null)
-            throw new FlatwormUnsetFieldValueException("fieldStart is unset");
-        else
-            return fieldStart;
-    }
-
-    public void setFieldStart(int fieldStart) {
-        this.fieldStart = fieldStart;
-    }
-
-    public int getFieldEnd() throws FlatwormUnsetFieldValueException {
-        if (fieldEnd == null)
-            throw new FlatwormUnsetFieldValueException("fieldEnd is unset");
-        else
-            return fieldEnd;
-    }
-
-    public void setFieldEnd(int fieldEnd) {
-        this.fieldEnd = fieldEnd;
-    }
-
-    public int getFieldLength() throws FlatwormUnsetFieldValueException {
-        if (fieldLength == null)
-            if (!(isFieldStartSet() && isFieldEndSet()))
-                throw new FlatwormUnsetFieldValueException("length is unset");
-            else
-                // Derive length from start and end position
-                return fieldEnd - fieldStart;
-        else
-            return fieldLength;
-    }
-
-    public void setFieldLength(int fieldLength) {
-        this.fieldLength = fieldLength;
-    }
-
-    public Map<String, ConversionOption> getConversionOptions() {
-        return conversionOptions;
-    }
-
-    public void setConversionOptions(Map<String, ConversionOption> conversionOptions) {
-        this.conversionOptions = conversionOptions;
-    }
-
     public void addConversionOption(String name, ConversionOption option) {
         conversionOptions.put(name, option);
     }
@@ -123,9 +85,5 @@ class RecordElement implements LineElement {
     @Override
     public String getBeanRef() {
         return beanRef;
-    }
-
-    public void setBeanRef(String beanRef) {
-        this.beanRef = beanRef;
     }
 }

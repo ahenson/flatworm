@@ -16,13 +16,9 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.errors.FlatwormConfigurationValueException;
 import com.blackbear.flatworm.errors.FlatwormCreatorException;
-import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -37,37 +33,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Used to create a flatfile. This class wraps the functionality that used to be
- * in the main() of the examples. This way, the client knows less about the
- * internal workings of FlatWorm.
- */
-public class FileCreator {
-    private static Log log = LogFactory.getLog(FileCreator.class);
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Used to create a flatfile. This class wraps the functionality that used to be in the main() of the examples. This way, the client knows
+ * less about the internal workings of FlatWorm.
+ */
+@Slf4j
+public class FileCreator {
     private String file;
 
     private FileFormat ff;
 
     private BufferedWriter bufOut;
 
-    private Map<String, Object> beans = new HashMap<String, Object>();
+    private Map<String, Object> beans = new HashMap<>();
 
-    private String recordSeperator = null;
+    private String recordSeparator = null;
 
     private OutputStream outputStream;
 
     /**
      * Constructor for FileCreator<br>
      *
-     * @param config
-     *          Full path to the FlatWorm XML configuration file
-     * @param file
-     *          Full path to output file
-     * @throws FlatwormCreatorException
-     *           - wraps FlatwormConfigurationValueException &
-     *           FlatwormUnsetFieldValueException (to reduce number of exceptions
-     *           clients have to be aware of)
+     * @param config Full path to the FlatWorm XML configuration file
+     * @param file   Full path to output file
+     * @throws FlatwormCreatorException - wraps FlatwormConfigurationValueException & FlatwormUnsetFieldValueException (to reduce number of
+     *                                  exceptions clients have to be aware of)
      */
     public FileCreator(String config, String file) throws FlatwormCreatorException {
         this.file = file;
@@ -97,10 +89,8 @@ public class FileCreator {
         ConfigurationReader parser = new ConfigurationReader();
         try {
             ff = parser.loadConfigurationFile(configStream);
-        } catch (FlatwormConfigurationValueException ex) {
-            throw new FlatwormCreatorException(ex.getMessage());
-        } catch (FlatwormUnsetFieldValueException ex) {
-            throw new FlatwormCreatorException(ex.getMessage());
+        } catch (Exception ex) {
+            throw new FlatwormCreatorException(ex.getMessage(), ex);
         }
     }
 
@@ -114,19 +104,13 @@ public class FileCreator {
             } else {
                 ff = parser.loadConfigurationFile(config);
             }
-        } catch (FlatwormConfigurationValueException ex) {
-            throw new FlatwormCreatorException(ex.getMessage());
-        } catch (FlatwormUnsetFieldValueException ex) {
-            throw new FlatwormCreatorException(ex.getMessage());
+        } catch (Exception ex) {
+            throw new FlatwormCreatorException(ex.getMessage(), ex);
         }
     }
 
     /**
      * Open the newfile for writing<br>
-     *
-     * @throws UnsupportedEncodingException
-     * @throws IOException
-     *           - if there is some sort of filesystem related problem
      */
     public void open() throws FlatwormCreatorException, UnsupportedEncodingException {
         // Setup buffered writer
@@ -136,60 +120,45 @@ public class FileCreator {
             }
             bufOut = new BufferedWriter(new OutputStreamWriter(outputStream, ff.getEncoding()));
         } catch (FileNotFoundException ex) {
-            throw new FlatwormCreatorException(ex.getMessage());
+            throw new FlatwormCreatorException(ex.getMessage(), ex);
         }
-
     }
 
     /**
-     * This is a convenience method that lets the writer know about your bean
-     * without having to pass a HashMap to write()<br>
+     * This is a convenience method that lets the writer know about your bean without having to pass a HashMap to write()<br>
      *
-     * @param name
-     *          The name of bean as defined in your flatworm XML file
-     * @param bean
-     *          The bean object
+     * @param name The name of bean as defined in your flatworm XML file
+     * @param bean The bean object
      */
     public void setBean(String name, Object bean) {
         beans.put(name, bean);
     }
 
     /**
-     * Flatworm does not assume you want a newline between records, call this
-     * method to set your record delimiter.<br>
+     * Flatworm does not assume you want a newline between records, call this method to set your record delimiter.<br>
      *
-     * @param recordSeperator
-     *          The String you want to use to separate your records. Could be "\n"
+     * @param recordSeparator The String you want to use to separate your records. Could be "\n"
      */
-    public void setRecordSeperator(String recordSeperator) {
-        this.recordSeperator = recordSeperator;
+    public void setRecordSeparator(String recordSeparator) {
+        this.recordSeparator = recordSeparator;
     }
 
     /**
-     * Close the output file, since we are using buffered IO, this is very
-     * important.<br>
+     * Close the output file, since we are using buffered IO, this is very important.<br>
      *
-     * @throws IOException
-     *           - If the file system chooses not to close your file for some
-     *           unknown reason
+     * @throws IOException - If the file system chooses not to close your file for some unknown reason
      */
     public void close() throws IOException {
         bufOut.close();
     }
 
     /**
-     * Write information to the output file. Make sure you have called the
-     * setBean() method with the needed beans before calling this method.<br>
+     * Write information to the output file. Make sure you have called the setBean() method with the needed beans before calling this
+     * method.<br>
      *
-     * @param recordName
-     *          The name specified in your flatworm configuration file for this
-     *          record
-     * @throws IOException
-     *           - If the file system has a problem with you writing information
-     *           to the recently opened file.
-     * @throws FlatwormCreationException
-     *           - wraps varius Exceptions so client doesn't have to handle too
-     *           many
+     * @param recordName The name specified in your flatworm configuration file for this record
+     * @throws IOException              - If the file system has a problem with you writing information to the recently opened file.
+     * @throws FlatwormCreatorException - wraps various Exceptions so client doesn't have to handle too many
      */
     public void write(String recordName) throws IOException, FlatwormCreatorException {
         Record record = ff.getRecord(recordName);
@@ -199,9 +168,7 @@ public class FileCreator {
 
         // Iterate over lines
         boolean first = true;
-        for (Iterator<Line> itLines = lines.iterator(); itLines.hasNext(); ) {
-            Line line = itLines.next();
-
+        for (Line line : lines) {
             String delimit = line.getDelimiter();
             if (null == delimit)
                 delimit = "";
@@ -213,8 +180,7 @@ public class FileCreator {
             // Dave Derry 11/2009
             List<String> recIdents = record.getFieldIdentMatchStrings();
             if (first) {
-                for (Iterator<String> itRecIdents = recIdents.iterator(); itRecIdents.hasNext(); ) {
-                    String id = itRecIdents.next();
+                for (String id : recIdents) {
                     bufOut.write(id + delimit);
                 }
             }
@@ -225,27 +191,24 @@ public class FileCreator {
                 LineElement lineElement = itRecElements.next();
                 if (lineElement instanceof RecordElement) {
                     RecordElement recElement = (RecordElement) lineElement;
-                    Map<String, ConversionOption> convOptions = recElement.getConversionOptions();
-                    int length = 0;
-                    String beanRef = "";
-                    String type = "";
-                    try {
-                        beanRef = recElement.getBeanRef();
-                        type = recElement.getType();
-                        length = recElement.getFieldLength();
-                    } catch (FlatwormUnsetFieldValueException ex) {
+                    String beanRef = recElement.getBeanRef();
+                    String type = recElement.getType();
+
+                    if (recElement.getFieldLength() == null) {
                         throw new FlatwormCreatorException(
-                                "Could not deduce field length (please provide more data in your xml file for : "
-                                        + beanRef + " " + ex.getMessage());
+                                String.format("Could not deduce field length (please provide more data in your xml file for : %s)",
+                                        beanRef));
                     }
+
+                    Map<String, ConversionOption> convOptions = recElement.getConversionOptions();
 
                     String val = "";
                     ConversionHelper convHelper = ff.getConversionHelper();
                     try {
                         if (beanRef != null) {
                             // Extract property name
-                            Object bean = null;
-                            String property = "";
+                            Object bean;
+                            String property;
                             try {
                                 int posOfFirstDot = beanRef.indexOf('.');
                                 bean = beans.get(beanRef.substring(0, posOfFirstDot));
@@ -279,8 +242,8 @@ public class FileCreator {
                 }
             } // end for all record elements
 
-            if (null != recordSeperator)
-                bufOut.write(recordSeperator);
+            if (null != recordSeparator)
+                bufOut.write(recordSeparator);
 
             first = false;
         } // end for all lines
