@@ -22,9 +22,6 @@ import com.blackbear.flatworm.errors.FlatwormInputLineLengthException;
 import com.blackbear.flatworm.errors.FlatwormInvalidRecordException;
 import com.blackbear.flatworm.errors.FlatwormUnsetFieldValueException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,27 +30,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
 /**
- * The <code>FileFormat</code> is the point of entry into the Flatworm parser.
- * It is generated from the XML Flatworm description, and can then be used to
- * read a line or lines from a file, determine if there is a matching record
- * definition for the line(s), and return a <code>HashMap</code> with the beans
- * created by parsing the input.
+ * The <code>FileFormat</code> is the point of entry into the Flatworm parser. It is generated from the XML Flatworm description, and can
+ * then be used to read a line or lines from a file, determine if there is a matching record definition for the line(s), and return a
+ * <code>HashMap</code> with the beans created by parsing the input.
  */
-
+@Slf4j
 public class FileFormat {
-    private static Log log = LogFactory.getLog(FileFormat.class);
-
     private Map<String, Record> records;
     private List<Record> recordOrder;
-    private ConversionHelper convHelper = null;
+    private ConversionHelper convHelper;
+
     // JBL - Used when parsing fails, gives access to bad line
     private String lastLine = "";
+
+    @Getter
+    @Setter
     private String encoding;
 
     public FileFormat() {
-        records = new HashMap<String, Record>();
-        recordOrder = new ArrayList<Record>();
+        records = new HashMap<>();
+        recordOrder = new ArrayList<>();
+        lastLine = "";
 
         // JBL
         convHelper = new ConversionHelper();
@@ -83,48 +85,39 @@ public class FileFormat {
     }
 
     private Record findMatchingRecord(String firstLine) {
-        for (int i = 0; i < recordOrder.size(); i++) {
-            Record record = recordOrder.get(i);
+        Record result = null;
+        for (Record record : recordOrder) {
             if (record.matchesLine(firstLine, this)) {
-                return record;
+                result = record;
+                break;
             }
         }
-        return null;
+        return result;
     }
 
     /**
-     * Facilitates the storage of multiple converters. However, actual storage is
-     * delegated to the ConversionHelper class.
+     * Facilitates the storage of multiple converters. However, actual storage is delegated to the ConversionHelper class.
      *
-     * @param converter
-     *          The Converter to store
+     * @param converter The Converter to store
      */
     public void addConverter(Converter converter) {
         convHelper.addConverter(converter);
     }
 
     /**
-     * FileFormat is the keeper of ConversionHelper, but does not actually use it.
-     * This allows access
+     * FileFormat is the keeper of ConversionHelper, but does not actually use it. This allows access.
      *
      * @return ConversionHelper
      */
-    public ConversionHelper getConvertionHelper() {
+    public ConversionHelper getConversionHelper() {
         return convHelper;
     }
 
     /**
-     * When called with a <code>BufferedReader</code>, reads sufficient lines to
-     * parse a record, and returns the beans created.
+     * When called with a {@code BufferedReader}, reads sufficient lines to parse a record, and returns the beans created.
      *
-     * @param in
-     *          The stream to read from
+     * @param in The stream to read from
      * @return The created beans in a MatchedRecord object
-     * @throws FlatwormInvalidRecordException
-     * @throws FlatwormInputLineLengthException
-     * @throws FlatwormConversionException
-     * @throws FlatwormUnsetFieldValueException
-     * @throws FlatwormCreatorException
      */
     public MatchedRecord getNextRecord(BufferedReader in) throws FlatwormInvalidRecordException,
             FlatwormInputLineLengthException, FlatwormConversionException,
@@ -147,13 +140,4 @@ public class FileFormat {
             return null;
         }
     }
-
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-
 }

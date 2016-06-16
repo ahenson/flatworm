@@ -16,10 +16,17 @@
 
 package com.blackbear.flatworm;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * Bean class used to represent information about a Converter. That is, a method
  * from CoreConverters or one you implement.
  */
+@Data
+@EqualsAndHashCode
+@AllArgsConstructor
 class Converter {
     private String converterClass;
 
@@ -31,37 +38,4 @@ class Converter {
 
     public Converter() {
     }
-
-    public String getConverterClass() {
-        return converterClass;
-    }
-
-    public void setConverterClass(String converterClass) {
-        this.converterClass = converterClass;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getReturnType() {
-        return returnType;
-    }
-
-    public void setReturnType(String returnType) {
-        this.returnType = returnType;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
 }

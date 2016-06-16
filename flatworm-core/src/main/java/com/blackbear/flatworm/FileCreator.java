@@ -240,7 +240,7 @@ public class FileCreator {
                     }
 
                     String val = "";
-                    ConversionHelper convHelper = ff.getConvertionHelper();
+                    ConversionHelper convHelper = ff.getConversionHelper();
                     try {
                         if (beanRef != null) {
                             // Extract property name

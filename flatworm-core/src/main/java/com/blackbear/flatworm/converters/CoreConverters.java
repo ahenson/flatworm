@@ -20,15 +20,14 @@ import com.blackbear.flatworm.ConversionOption;
 import com.blackbear.flatworm.Util;
 import com.blackbear.flatworm.errors.FlatwormConversionException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <code>CoreConverters</code> contains methods to convert the most commonly
@@ -63,9 +62,8 @@ import java.util.Map;
  * @author James M. Turner
  * @version $Id: CoreConverters.java,v 1.8 2009/12/07 00:50:53 dderry Exp $
  */
-
+@Slf4j
 public class CoreConverters {
-    private static Log log = LogFactory.getLog(CoreConverters.class);
 
     /**
      * Conversion function for <code>String</code>, returns the source string with
@@ -121,7 +119,7 @@ public class CoreConverters {
     public Date convertDate(String str, Map<String, ConversionOption> options)
             throws FlatwormConversionException {
         try {
-            String format = (String) Util.getValue(options, "format");
+            String format = Util.getValue(options, "format");
 
             SimpleDateFormat sdf;
             if (str.length() == 0)
@@ -131,7 +129,7 @@ public class CoreConverters {
             sdf = new SimpleDateFormat(format);
             return sdf.parse(str);
         } catch (ParseException ex) {
-            log.error(ex);
+            log.error("Failed to parse date", ex);
             throw new FlatwormConversionException(str);
         }
     }
@@ -147,7 +145,7 @@ public class CoreConverters {
      */
     public String convertDate(Object obj, Map<String, ConversionOption> options) {
         Date date = (Date) obj;
-        String format = (String) Util.getValue(options, "format");
+        String format = Util.getValue(options, "format");
         if (obj == null)
             return null;
         if (format == null)
@@ -187,7 +185,7 @@ public class CoreConverters {
             throws FlatwormConversionException {
         try {
             int decimalPlaces = 0;
-            ConversionOption conv = (ConversionOption) options.get("decimal-places");
+            ConversionOption conv = options.get("decimal-places");
 
             String decimalPlacesOption = null;
             if (null != conv)
@@ -199,15 +197,15 @@ public class CoreConverters {
                 decimalPlaces = Integer.parseInt(decimalPlacesOption);
 
             if (str.length() == 0)
-                return new Double(0.0D);
+                return 0.0D;
 
             if (decimalImplied)
-                return new Double(Double.parseDouble(str) / Math.pow(10D, decimalPlaces));
+                return Double.parseDouble(str) / Math.pow(10D, decimalPlaces);
             else
                 return Double.valueOf(str);
 
         } catch (NumberFormatException ex) {
-            log.error(ex);
+            log.error("Failed to parse double value", ex);
             throw new FlatwormConversionException(str);
         }
     }
@@ -219,7 +217,7 @@ public class CoreConverters {
         }
 
         int decimalPlaces = 0;
-        ConversionOption conv = (ConversionOption) options.get("decimal-places");
+        ConversionOption conv = options.get("decimal-places");
 
         String decimalPlacesOption = null;
         if (null != conv)
@@ -235,7 +233,7 @@ public class CoreConverters {
         format.setGroupingUsed(false);
         if (decimalImplied) {
             format.setMaximumFractionDigits(0);
-            d = new Double(d.doubleValue() * Math.pow(10D, decimalPlaces));
+            d = d * Math.pow(10D, decimalPlaces);
         } else {
             format.setMinimumFractionDigits(decimalPlaces);
             format.setMaximumFractionDigits(decimalPlaces);
@@ -260,12 +258,12 @@ public class CoreConverters {
             throws FlatwormConversionException {
         try {
             if (str.length() == 0) {
-                return new Integer(0);
+                return 0;
             } else {
                 return Integer.valueOf(str);
             }
         } catch (NumberFormatException ex) {
-            log.error(ex);
+            log.error("Failed to parse Integer", ex);
             throw new FlatwormConversionException(str);
         }
     }
@@ -275,7 +273,7 @@ public class CoreConverters {
             return null;
         }
         Integer i = (Integer) obj;
-        return Integer.toString(i.intValue());
+        return Integer.toString(i);
     }
 
     /**
@@ -295,12 +293,12 @@ public class CoreConverters {
             throws FlatwormConversionException {
         try {
             if (str.length() == 0) {
-                return new Long(0L);
+                return 0L;
             } else {
                 return Long.valueOf(str);
             }
         } catch (NumberFormatException ex) {
-            log.error(ex);
+            log.error("Failed to parse Long", ex);
             throw new FlatwormConversionException(str);
         }
     }
@@ -310,7 +308,7 @@ public class CoreConverters {
             return null;
         }
         Long l = (Long) obj;
-        return Long.toString(l.longValue());
+        return Long.toString(l);
     }
 
     /**
@@ -358,7 +356,7 @@ public class CoreConverters {
             else
                 return new BigDecimal(Double.parseDouble(str));
         } catch (NumberFormatException ex) {
-            log.error(ex);
+            log.error("Failed to convert BigDecimal", ex);
             throw new FlatwormConversionException(str);
         }
     }
