@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm;
 
+import com.google.common.primitives.Ints;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -249,5 +251,18 @@ public final class Util {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Try to parse using Google's {@code Int.tryParse} method, but make it {@code null} safe.
+     * @param value The value to attempt to parse.
+     * @return The value as an {@link Integer} if properly formatted as an {@link Integer} or {@code null}.
+     */
+    public static Integer tryParseInt(String value) {
+        Integer result = null;
+        if(value != null) {
+            result = Ints.tryParse(value);
+        }
+        return result;
     }
 }
