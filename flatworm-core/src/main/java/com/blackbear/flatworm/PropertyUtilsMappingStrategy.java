@@ -46,15 +46,7 @@ public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
                     value = currentValue.toString() + value;
             }
             PropertyUtils.setProperty(bean, property, value);
-        } catch (IllegalAccessException e) {
-            log.error("While running set property method for " + beanName + "." + property
-                    + "with value '" + value + "'", e);
-            throw new FlatwormConversionException("Setting field " + beanName + "." + property);
-        } catch (InvocationTargetException e) {
-            log.error("While running set property method for " + beanName + "." + property
-                    + "with value '" + value + "'", e);
-            throw new FlatwormConversionException("Setting field " + beanName + "." + property);
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             log.error("While running set property method for " + beanName + "." + property
                     + "with value '" + value + "'", e);
             throw new FlatwormConversionException("Setting field " + beanName + "." + property);
