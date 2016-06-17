@@ -18,7 +18,7 @@ To add a dependency on Guava using Maven, use the following:
 </dependency>
 ```
 
-The actively developed release is [flatworm 4.0.0-SNAPSHOT]().
+The actively developed release is [flatworm 4.0.0-SNAPSHOT](). Starting with 4.0.0, it will not be backwards compatible with prior releases.
 
 Background
 ----------
@@ -42,7 +42,9 @@ Work Completed
 * Cleaned up some comments
 * Removed com.blackbear.flatworm.Callback - use ExceptionCallback or RecordCallback instead (moved to new callbacks package).
 * Added ability to use a JavaScript snippet to see if a line should be processed by a given Record
-* 
+* Added ability to specify ignore-field on a record-element to explicitly ignore it.
+* Changed the record-element "type" attribute to "converter-name" as that's what it's really linked to.
+* Changed the minlength/maxlength attributes for the length-ident element to min-length/max-length for consistency.
 
 TODOs
 -------
@@ -56,4 +58,6 @@ TODOs
 * Add the ability to specify a type in addition-to or instead-of a converter
 * Introduce constants where string literals are used
 * Complete checklist for deploying production jar to Maven Central repository
-* Add default converters based upon reflection 
+* Add default converters based upon reflection
+* Add more broad support for the script-ident so that CDATA isn't required 
+* Add support for other script types and engines.

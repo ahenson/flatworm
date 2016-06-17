@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.converters.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOption;
 
 import org.junit.Test;
 

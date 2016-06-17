@@ -14,17 +14,15 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain.segment;
+package com.blackbear.flatworm.config.impl;
 
-import lombok.Data;
+import com.blackbear.flatworm.config.LineTokenIdentity;
 
-@Data
-public class Address {
-    private String type;
-    private String number;
-    private String street;
-    private String streetType;
-    private String city;
-    private String state;
-    private String zip;
+/**
+ * Abstract implementation of {@link LineTokenIdentity} and an extension to the linke {@code AbstractIdentity} instance
+ * to provide helper methods and default implementations of some methods.
+ *
+ * @author Alan Henson
+ */
+public abstract class AbstractLineTokenIdentity extends AbstractIdentity implements LineTokenIdentity {
 }

@@ -25,10 +25,12 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import com.blackbear.flatworm.converters.domain.segment.Account;
-import com.blackbear.flatworm.converters.domain.segment.Address;
-import com.blackbear.flatworm.converters.domain.segment.Consumer;
-import com.blackbear.flatworm.converters.domain.segment.Phone;
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.test.domain.segment.Account;
+import com.blackbear.flatworm.test.domain.segment.Address;
+import com.blackbear.flatworm.test.domain.segment.Consumer;
+import com.blackbear.flatworm.test.domain.segment.Phone;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -36,7 +38,7 @@ import static org.junit.Assert.fail;
 public class SegmentFileTest {
     @Test
     public void testFileRead() {
-        ConfigurationReader parser = new ConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReader();
         BufferedReader bufIn = null;
         try {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("segment-example.xml"));
@@ -52,6 +54,7 @@ public class SegmentFileTest {
             account = (Account) results.getBean("account");
             assertComplexAccount(account);
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Caught an exception of type " + e.getClass().getSimpleName() + ": " + e.getMessage());
         } finally {
             if (bufIn != null) {

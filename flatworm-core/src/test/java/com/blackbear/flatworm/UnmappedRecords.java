@@ -16,10 +16,12 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.converters.domain.Dvd;
-import com.blackbear.flatworm.converters.domain.Film;
-import com.blackbear.flatworm.converters.domain.Header;
-import com.blackbear.flatworm.converters.domain.Videotape;
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.test.domain.Dvd;
+import com.blackbear.flatworm.test.domain.Film;
+import com.blackbear.flatworm.test.domain.Header;
+import com.blackbear.flatworm.test.domain.Videotape;
 
 import org.junit.Test;
 
@@ -36,7 +38,7 @@ public class UnmappedRecords {
     @Test
     public void testFileRead() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-        ConfigurationReader parser = new ConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReader();
         try {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("unmapped-records.xml"));
             InputStream in = getClass().getClassLoader().getResourceAsStream("unmapped_records.txt");

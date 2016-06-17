@@ -75,7 +75,7 @@ public class ParseUtils {
             method.invoke(target, toAdd);
         } catch (Exception e) {
             throw new FlatwormParserException(String.format(
-                    "Unable to invoke add method %s on bean %s with object of type %s", methodName,
+                    "Unable to invoke add method %s on bean %s with object of converterName %s", methodName,
                     target.getClass().getSimpleName(), toAdd.getClass().getSimpleName()), e);
         }
     }
@@ -101,7 +101,7 @@ public class ParseUtils {
             if (propertyDescriptor != null) {
                 Object collectionInstance = PropertyUtils.getProperty(target, collectionPropertyName);
                 if (collectionInstance != null) {
-                    // Once compiled, generics lose their type reference and it defaults to a simple java.lang.Object.class
+                    // Once compiled, generics lose their converterName reference and it defaults to a simple java.lang.Object.class
                     // so that's the method parameter we'll search by.
                     Method addMethod = propertyDescriptor.getPropertyType().getMethod("add", Object.class);
                     if (addMethod != null) {
@@ -123,7 +123,7 @@ public class ParseUtils {
             }
         } catch (Exception e) {
             throw new FlatwormParserException(String.format(
-                    "Unable to invoke the add method on the collection for property %s in bean %s with object of type %s",
+                    "Unable to invoke the add method on the collection for property %s in bean %s with object of converterName %s",
                     collectionPropertyName, target.getClass().getName(), toAdd.getClass().getName()),
                     e);
         }

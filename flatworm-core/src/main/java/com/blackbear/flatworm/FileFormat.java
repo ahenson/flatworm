@@ -25,7 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +41,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class FileFormat {
+
+    @Getter
+    private ConversionHelper convHelper;
+
     private Map<String, Record> records;
     private List<Record> recordOrder;
-    private ConversionHelper convHelper;
 
     @Getter
     private int lineNumber;
@@ -70,8 +73,8 @@ public class FileFormat {
         convHelper = new ConversionHelper();
     }
 
-    public Map<String, Record> getRecords() {
-        return Collections.unmodifiableMap(records);
+    public Collection<Record> getRecords() {
+        return records.values();
     }
 
     public void addRecord(Record r) {
@@ -86,7 +89,7 @@ public class FileFormat {
     private Record findMatchingRecord(String firstLine) throws FlatwormParserException {
         Record result = null;
         for (Record record : recordOrder) {
-            if (record.matchesLine(firstLine, this)) {
+            if (record.matchesLine(this, firstLine)) {
                 result = record;
                 break;
             }
@@ -102,7 +105,7 @@ public class FileFormat {
     public boolean hasDefaultRecord() {
         return records.values()
                 .stream()
-                .filter(record -> record.getIdentTypeFlag() == '\0')
+                .filter(record -> record.getRecordIdentity() == null)
                 .findAny()
                 .isPresent();
     }
@@ -139,10 +142,10 @@ public class FileFormat {
         lineNumber++;
 
         if (currentParsedLine != null) {
-            Record rd = findMatchingRecord(currentParsedLine);
-            if (rd != null) {
-                Map<String, Object> beans = rd.parseRecord(currentParsedLine, in, convHelper);
-                matchedRecord = new MatchedRecord(rd.getName(), beans);
+            Record record = findMatchingRecord(currentParsedLine);
+            if (record != null) {
+                Map<String, Object> beans = record.parseRecord(currentParsedLine, in, convHelper);
+                matchedRecord = new MatchedRecord(record.getName(), beans);
             }
             else if (!ignoreUnmappedRecords) {
                 throw new FlatwormParserException(String.format(
@@ -156,7 +159,7 @@ public class FileFormat {
 
     /**
      * Manually provide the next data to be parsed.
-     * @param line The line of data that should be parsed - this could be multiple lines if the {@code line.separator) is used
+     * @param line The line of data that should be parsed - this could be multiple lines if the {@code line.separator} is used
      *             to separate the lines within the {@code line} parameter.
      * @return The {@link MatchedRecord} for the given data if the data could be parsed.
      * @throws FlatwormParserException should an issue occur while parsing the data content.
@@ -175,7 +178,7 @@ public class FileFormat {
     /**
      * Manually provide the next data to be parsed.
      * @param lines The lines of data that should be parsed - this wll be appended together with the correct system-based
-     *              {@code line.separator).
+     *              {@code line.separator}.
      * @return The {@link MatchedRecord} for the given data if the data could be parsed.
      * @throws FlatwormParserException should an issue occur while parsing the data content.
      */

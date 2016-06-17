@@ -17,25 +17,31 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.config.Bean;
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.impl.LengthIdentity;
 import com.blackbear.flatworm.config.Line;
 import com.blackbear.flatworm.config.Record;
 import com.blackbear.flatworm.config.RecordDefinition;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class ConfigurationReaderTest {
     private FileFormat format;
 
     public void loadFileFormat(String configFile) {
-        ConfigurationReader reader = new ConfigurationReader();
+        ConfigurationReader reader = new DefaultConfigurationReader();
         try {
             format = reader.loadConfigurationFile(configFile);
         } catch (Exception e) {
@@ -63,15 +69,28 @@ public class ConfigurationReaderTest {
     }
 
     private void assertDvdRecord(Record dvd) {
-        assertEquals('L', dvd.getIdentTypeFlag());
-        assertEquals(85, dvd.getLengthIdentMin());
-        assertEquals(85, dvd.getLengthIdentMax());
+        assertNotNull(dvd.getRecordIdentity());
+        assertTrue(dvd.getRecordIdentity() instanceof LengthIdentity);
+
+        LengthIdentity identity = LengthIdentity.class.cast(dvd.getRecordIdentity());
+
+        assertNotNull(identity.getMinLength());
+        assertNotNull(identity.getMaxLength());
+        assertEquals(85, identity.getMinLength().intValue());
+        assertEquals(85, identity.getMaxLength().intValue());
         RecordDefinition def = dvd.getRecordDefinition();
         assertNotNull(def);
-        Map<String, Bean> beans = def.getBeansUsed();
+        Collection<Bean> beans = def.getBeans();
         assertEquals(2, beans.size());
-        assertNotNull(beans.get("dvd"));
-        assertNotNull(beans.get("film"));
+
+        beans.forEach(Assert::assertNotNull);
+        assertTrue(beans.stream()
+                .filter(bean -> "dvd".endsWith(bean.getBeanName()))
+                .findAny().isPresent());
+        assertTrue(beans.stream()
+                .filter(bean -> "film".endsWith(bean.getBeanName()))
+                .findAny().isPresent());
+
         List<Line> lines = def.getLines();
         assertEquals(1, lines.size());
         Line line = lines.get(0);

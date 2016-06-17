@@ -18,7 +18,8 @@ package com.blackbear.flatworm;
 
 import com.google.common.primitives.Ints;
 
-import com.blackbear.flatworm.converters.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.LineToken;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -48,26 +49,31 @@ public final class Util {
      * @param str      The string you want to split
      * @param chrSplit character you want to split the string on
      * @param chrQuote character you want to be considered to be your quoting character
-     * @return String array containing results of splitting the supplied String
+     * @return List of {@link LineToken} instances representing what was parsed from the line base upon the delimiter.
      */
-    public static String[] split(String str, char chrSplit, char chrQuote) {
-        List<String> tokens = new ArrayList<>();
+    public static List<LineToken> split(String str, char chrSplit, char chrQuote) {
+        List<LineToken> tokens = new ArrayList<>();
         StringBuilder str1 = new StringBuilder();
         boolean inQuote = false;
 
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == chrSplit && !inQuote) {
-                tokens.add(str1.toString());
+        int colIdx = 0;
+        int tokenLength = 0;
+        for (; colIdx < str.length(); colIdx++) {
+            if (str.charAt(colIdx) == chrSplit && !inQuote) {
+                tokens.add(new LineToken(str1.toString(), tokenLength, colIdx));
                 str1 = new StringBuilder();
-            } else if (str.charAt(i) == chrQuote) {
+                tokenLength = 0;
+            } else if (str.charAt(colIdx) == chrQuote) {
+                tokenLength++;
                 inQuote = (!inQuote);
             } else {
-                str1.append(str.charAt(i));
+                tokenLength++;
+                str1.append(str.charAt(colIdx));
             }
         }
 
-        tokens.add(str1.toString());
-        return tokens.toArray(new String[tokens.size()]);
+        tokens.add(new LineToken(str1.toString(), tokenLength, colIdx));
+        return tokens;
     }
 
     /**
@@ -104,7 +110,8 @@ public final class Util {
      * <br> <br> Specified in flatworm XML file like: <code>&lt;conversion-option name="justify" value="right"/&gt;</code>
      *
      * @param str     field to be justified
-     * @param value   specifies the type of justification. Can be ('left'|'right'|'both') - default value is 'both' if not specified
+     * @param value   specifies the converterName of justification. Can be ('left'|'right'|'both') - default value is 'both' if not
+     *                specified
      * @param options collection of ConversionOptions to gather further justification options
      * @param length  used in file creation to ensure string is padded to the proper length
      * @return padded string
@@ -191,7 +198,7 @@ public final class Util {
      * <br> <br> Specified in flatworm XML file like: <code>&lt;conversion-option name="strip-chars" value="non-numeric"/&gt;</code>
      *
      * @param str     field to be stripped
-     * @param value   type of characters to be stripped. Can be ('non-numeric'|'non-alpha'|'non-alphanumeric')
+     * @param value   converterName of characters to be stripped. Can be ('non-numeric'|'non-alpha'|'non-alphanumeric')
      * @param options collection of ConversionOptions, for future enhancement
      * @return the string stripped of the specified character types
      */
@@ -257,13 +264,29 @@ public final class Util {
 
     /**
      * Try to parse using Google's {@code Int.tryParse} method, but make it {@code null} safe.
+     *
      * @param value The value to attempt to parse.
      * @return The value as an {@link Integer} if properly formatted as an {@link Integer} or {@code null}.
      */
     public static Integer tryParseInt(String value) {
         Integer result = null;
-        if(value != null) {
+        if (value != null) {
             result = Ints.tryParse(value);
+        }
+        return result;
+    }
+
+    /**
+     * Try parse the {@code value} using {@code java.lang.Boolean::parseBoolean}, but only if {@code value} isn't blank or {@code null}.
+     *
+     * @param value The value to parse (should be {@code true} or {@code false}.
+     * @return the {@link Boolean} result if {@code value} is valid accordingly to {@code java.lang.Boolean::parseBoolean} or {@code null}
+     * if {@code value} is {@code null} or blank.
+     */
+    public static Boolean tryParseBoolean(String value) {
+        Boolean result = null;
+        if (!StringUtils.isBlank(value)) {
+            result = Boolean.parseBoolean(value);
         }
         return result;
     }

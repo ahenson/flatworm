@@ -16,13 +16,15 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.ConversionOption;
 import com.blackbear.flatworm.config.Line;
 import com.blackbear.flatworm.config.LineElement;
 import com.blackbear.flatworm.config.Record;
 import com.blackbear.flatworm.config.RecordDefinition;
 import com.blackbear.flatworm.config.RecordElement;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
 import com.blackbear.flatworm.converters.ConversionHelper;
-import com.blackbear.flatworm.converters.ConversionOption;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -92,7 +94,7 @@ public class FileCreator {
     }
 
     private void loadConfigurationFile(InputStream configStream) throws FlatwormConfigurationException {
-        ConfigurationReader parser = new ConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReader();
         try {
             ff = parser.loadConfigurationFile(configStream);
         } catch (Exception ex) {
@@ -103,7 +105,7 @@ public class FileCreator {
     private void loadConfigurationFile(String config) throws FlatwormConfigurationException {
         // Load configuration xml file
         try {
-            ConfigurationReader parser = new ConfigurationReader();
+            ConfigurationReader parser = new DefaultConfigurationReader();
             InputStream configStream = this.getClass().getClassLoader().getResourceAsStream(config);
             if (configStream != null) {
                 ff = parser.loadConfigurationFile(configStream);
@@ -178,15 +180,14 @@ public class FileCreator {
             if (null == delimit)
                 delimit = "";
 
-            // record-ident contain what is considered hard-coded data
+            // record-ident contains what is considered hard-coded data
             // for the output line, these can be used to uniquely identify
             // lines for parsers. We need to write them out.
             // For multiline records they should only be written for the first line -
             // Dave Derry 11/2009
-            List<String> recIdents = record.getFieldIdentMatchStrings();
             if (first) {
-                for (String id : recIdents) {
-                    bufOut.write(id + delimit);
+                if(record.getRecordIdentity() != null) {
+                    record.getRecordIdentity().write(bufOut, record, line);
                 }
             }
 
@@ -197,7 +198,7 @@ public class FileCreator {
                 if (lineElement instanceof RecordElement) {
                     RecordElement recElement = (RecordElement) lineElement;
                     String beanRef = recElement.getBeanRef();
-                    String type = recElement.getType();
+                    String type = recElement.getConverterName();
 
                     if (recElement.getFieldLength() == null) {
                         throw new FlatwormConfigurationException(

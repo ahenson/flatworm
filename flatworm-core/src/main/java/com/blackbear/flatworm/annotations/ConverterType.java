@@ -14,13 +14,29 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain.segment;
+package com.blackbear.flatworm.annotations;
 
-import lombok.Data;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Data
-public class Phone {
-    private String type;
-    private String publishInd;
-    private String number;
+/**
+ * Class description goes here.
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
+ */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@interface ConverterType {
+    String name();
+
+    String classname();
+
+    String methodName();
+
+    String returnType();
 }

@@ -14,29 +14,21 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain;
-
-import java.util.Date;
-
-import lombok.Data;
+package com.blackbear.flatworm.config;
 
 /**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
+ * Contract that extends the {@link Identity} interface to indicate that the identity method is specific to line tokens (i.e. fields
+ * found within the line of data being parsed vs. characteristics of the entire line itself)..
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
  */
-@Data
-public class Book {
-    private Date releaseDate;
+public interface LineTokenIdentity extends Identity {
 
-    private String title;
-
-    private String author;
-
-    private double price;
-
-    private String sku;
-
-    public String toString() {
-        return super.toString() + "[" + releaseDate + ", " + title + ", " + author + "," + getSku()
-                + "," + getPrice() + "]";
-    }
+    /**
+     * Given a {@link LineToken} determine if it matches the {@link LineTokenIdentity} configuration.
+     * @param lineToken The {@link LineToken} instance to evaluate.
+     * @return {@code true} if it matches and {@code false} if not.
+     */
+    boolean matchesIdentity(LineToken lineToken);
 }

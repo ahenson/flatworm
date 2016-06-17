@@ -14,7 +14,7 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain;
+package com.blackbear.flatworm.test.domain;
 
 import lombok.Data;
 

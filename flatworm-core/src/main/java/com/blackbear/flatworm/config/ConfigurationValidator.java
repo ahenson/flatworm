@@ -1,0 +1,324 @@
+/*
+ * Flatworm - A Java Flat File Importer/Exporter Copyright (C) 2004 James M. Turner.
+ * Extended by James Lawrence 2005
+ * Extended by Josh Brackett in 2011 and 2012
+ * Extended by Alan Henson in 2016
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+ * and limitations under the License.
+ */
+
+package com.blackbear.flatworm.config;
+
+import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.config.impl.FieldIdentity;
+import com.blackbear.flatworm.config.impl.LengthIdentity;
+import com.blackbear.flatworm.config.impl.ScriptIdentity;
+
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Encapsulates most of the validation logic that is run against a flatworm's configuration for parsing a data file.
+ *
+ * @author Alan Henson
+ */
+public class ConfigurationValidator {
+
+    /**
+     * Valdate the configuration captured in the {@link FileFormat} instance.
+     * @param fileFormat The {@link FileFormat} instance to check.
+     * @return An empty {@link List} if no errors or found else all errors found will be in the return with
+     * each specific error being its own entry in the {@link List}.
+     */
+    public static List<String> validateFileFormat(FileFormat fileFormat) {
+        List<String> errors = new ArrayList<>();
+
+        fileFormat.getConversionHelper().getConverters()
+                .forEach(converter -> validateConverter(converter, errors));
+
+        fileFormat.getRecords().forEach(record -> validateRecord(record, errors));
+
+        return errors;
+    }
+
+    /**
+     * Validate that the {@code record} tag and its children were properly populated.
+     *
+     * @param record The {@link Record} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateRecord(Record record, List<String> errors) {
+        if (StringUtils.isBlank(record.getName())) {
+            errors.add("Must specify a name for the record.");
+        }
+
+        validateIdentity(record.getRecordIdentity(), errors);
+        validateRecordDefinition(record.getRecordDefinition(), errors);
+    }
+
+    /**
+     * Validate that the {@code converter} tag was properly populated.
+     *
+     * @param converter The {@link Converter} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateConverter(Converter converter, List<String> errors) {
+        Class<?> clazz = null;
+        if(StringUtils.isBlank(converter.getName())) {
+            errors.add("Must specify the name of the Converter." +
+                    "This is used to identify which converter to use in the record-element configuration.");
+        }
+
+        if(StringUtils.isBlank(converter.getConverterClass())) {
+            errors.add("Must specify the class of the Converter." +
+                    "This is used to identify which converter to use in the record-element configuration.");
+        }
+        else {
+            try {
+                clazz = Class.forName(converter.getConverterClass());
+            } catch(Exception e) {
+                errors.add(String.format("Failed to locate Converter class: %s for Converter:%s." +
+                        "Please double check the fully qualified name for accuracy",
+                        converter.getName(), converter.getConverterClass()));
+            }
+        }
+
+        if(StringUtils.isBlank(converter.getReturnType())) {
+            errors.add(String.format("Must specify the return-type for Converter %s.", converter.getName()));
+        }
+        else {
+            try {
+                Class.forName(converter.getReturnType());
+            }
+            catch(Exception e) {
+                errors.add(String.format("Failed to find return-type %s for Converter %s.",
+                        converter.getReturnType(), converter.getName()));
+            }
+        }
+
+        if(StringUtils.isBlank(converter.getMethod())) {
+            errors.add(String.format("Must specify the method for Converter %s.", converter.getName()));
+        }
+        else if(clazz != null) {
+            try {
+                clazz.getMethod(converter.getMethod(), Object.class, Map.class);
+            }
+            catch(Exception e) {
+                errors.add(String.format("Failed to find method %s on Converter %s.",
+                        converter.getMethod(), converter.getConverterClass()));
+            }
+        }
+    }
+
+    /**
+     * If a known {@link Identity} has been used, attempt to validate it.
+     *
+     * @param identity The {@link Identity} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateIdentity(Identity identity, List<String> errors) {
+        if(identity instanceof LengthIdentity) {
+            validateLengthIdentity(LengthIdentity.class.cast(identity), errors);
+        }
+        else if(identity instanceof FieldIdentity) {
+            validateFieldIdentity(FieldIdentity.class.cast(identity), errors);
+
+        }
+        else if(identity instanceof ScriptIdentity) {
+            validateScriptIdentity(ScriptIdentity.class.cast(identity), errors);
+        }
+    }
+
+    /**
+     * Validate that the {@code length-ident} tag was properly populated.
+     *
+     * @param lengthIdentity The {@link LengthIdentity} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateLengthIdentity(LengthIdentity lengthIdentity, List<String> errors) {
+        if (lengthIdentity.getMinLength() == null) {
+            errors.add("Must specify the min-length attribute when using length-ident. " +
+                    "This specifies that a line of data must be of a minimum length for it to be parsed by this Record.");
+        }
+        if (lengthIdentity.getMaxLength() == null) {
+            errors.add("Must specify the max-length attribute when using length-ident. " +
+                    "This specifies that a line of data must not be more than a given length for it to be parsed by this Record.");
+        }
+    }
+
+    /**
+     * Validate that the {@code field-ident} tag was properly populated.
+     *
+     * @param fieldIdentity The {@link FieldIdentity} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateFieldIdentity(FieldIdentity fieldIdentity, List<String> errors) {
+        if (fieldIdentity.getStartPosition() == null) {
+            errors.add("Must specify the field-start attribute when using field-ident. " +
+                    "This indicates where the field identify value starts for the record.");
+        }
+        if (fieldIdentity.getFieldLength() == null) {
+            errors.add("Must specify the field-length attribute when using field-ident. " +
+                    "This indicates the length of field identity for the record.");
+        }
+        if (fieldIdentity.getMatchingStrings().isEmpty()) {
+            errors.add("Must specify at least one match-string element when using field-ident. " +
+                    "These are used to determine if a line of data should be parsed by this Record.");
+        }
+    }
+
+    /**
+     * Validate that the {@code script-ident} tag was properly populated.
+     *
+     * @param scriptIdentity The {@link ScriptIdentity} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateScriptIdentity(ScriptIdentity scriptIdentity, List<String> errors) {
+        if (StringUtils.isBlank(scriptIdentity.getScript())) {
+            errors.add("The script-ident node must include the script to be executed.");
+        }
+    }
+
+    /**
+     * Validate that the {@code record-definition} tag was properly populated.
+     *
+     * @param recordDefinition The {@link RecordDefinition} instance containing the values to validate.
+     * @param errors           A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateRecordDefinition(RecordDefinition recordDefinition, List<String> errors) {
+        if (recordDefinition.getBeans().isEmpty()) {
+            errors.add("Must specify at least 1 bean element for a record-definition. " +
+                    "This indicates what Java object will be populated with the values parsed.");
+        }
+        else {
+            recordDefinition.getBeans().forEach(bean -> validateBean(bean, errors));
+        }
+
+        if (recordDefinition.getLines().isEmpty()) {
+            errors.add("Must specify at least 1 line element for a record-definition. " +
+                    "This indicates how the line of data is to be parsed.");
+        }
+        else {
+            recordDefinition.getLines().forEach(line -> validateLine(line, errors));
+        }
+    }
+
+    /**
+     * Validate that the {@code bean} tag was properly populated.
+     *
+     * @param bean   The {@link Bean} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateBean(Bean bean, List<String> errors) {
+        if (StringUtils.isBlank(bean.getBeanName())) {
+            errors.add("Must specify the name for a bean element. " +
+                    "This is how the bean will be referenced within the record-element configuration.");
+        }
+
+        if (StringUtils.isBlank(bean.getBeanClass())) {
+            errors.add("Must specify the class for a bean element. " +
+                    "This indicates the fully qualified name of the Java class that will be instantiated and populated when data " +
+                    "is parsed.");
+        }
+    }
+
+    /**
+     * Validate that the {@code line} tag was properly populated.
+     *
+     * @param line   The {@link Line} instance containing the values to validate.
+     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateLine(Line line, List<String> errors) {
+        line.getElements()
+                .stream()
+                .filter(lineElement -> lineElement instanceof RecordElement)
+                .map(RecordElement.class::cast)
+                .forEach(recordElement -> validateRecordElement(line, recordElement, errors));
+
+        line.getElements()
+                .stream()
+                .filter(lineElement -> lineElement instanceof SegmentElement)
+                .map(SegmentElement.class::cast)
+                .forEach(segmentElement -> validateSegmentElement(segmentElement, errors));
+    }
+
+    /**
+     * Validate that the {@code segment-element} configuration contains all of the required components.
+     *
+     * @param segment The segment instance to validate.
+     * @param errors  A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateSegmentElement(SegmentElement segment, List<String> errors) {
+        if (StringUtils.isBlank(segment.getParentBeanRef())) {
+            errors.add("Must specify the parent-beanref attribute for segment-elements.");
+        }
+        if (StringUtils.isBlank(segment.getBeanRef())) {
+            errors.add("Must specify the beanref attribute for segment-elements.");
+        }
+        if (StringUtils.isBlank(segment.getCollectionPropertyName()) && StringUtils.isBlank(segment.getAddMethod())) {
+            errors.add("Must specify either the collection-property-name attribute or add-method attribute for segment-elements.");
+        }
+        if(segment.getCardinalityMode() == null) {
+            errors.add("Must specify the cardinality mode to indicate if the collection size should be controlled.");
+        }
+        if(segment.getFieldIdentity() != null) {
+            validateFieldIdentity(segment.getFieldIdentity(), errors);
+        }
+        else {
+            errors.add("Must specify the field-ident configuration to use so that the lines can be correctly subdivided during parsing.");
+        }
+    }
+
+    /**
+     * Validate that the {@code record-element} configuration contains all of the required components.
+     *
+     * @param parentLine The parent {@link Line} instance - used for checking to see if a delimiter is present.
+     * @param recordElement The {@link RecordElement} instance to validate.
+     * @param errors  A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateRecordElement(Line parentLine, RecordElement recordElement, List<String> errors) {
+        if (recordElement.getIgnoreField() == null || !recordElement.getIgnoreField()) {
+            if(StringUtils.isBlank(recordElement.getBeanRef())) {
+                errors.add("Must specify a beanref attribute for a record-element.");
+            }
+
+            if(StringUtils.isBlank(parentLine.getDelimiter())) {
+                if(recordElement.getFieldEnd() == null && recordElement.getFieldLength() == null) {
+                    errors.add("Must set either the 'end' or 'length' properties for a record-element.");
+                }
+                if(recordElement.getFieldEnd() != null && recordElement.getFieldLength() != null) {
+                    errors.add("Can't specify both the 'end' or 'length' properties for a record-element.");
+                }
+            }
+
+            for(ConversionOption option : recordElement.getConversionOptions().values()) {
+                validateConversionOption(option, errors);
+            }
+        }
+    }
+
+    /**
+     * Validate that the {@code conversion-option} configuration contains all of the required components.
+     *
+     * @param conversionOption The {@link ConversionOption} instance to validate.
+     * @param errors  A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateConversionOption(ConversionOption conversionOption, List<String> errors) {
+        if(StringUtils.isBlank(conversionOption.getName())) {
+            errors.add("Must specify the name attribute for a conversion-option element.");
+        }
+        if(StringUtils.isBlank(conversionOption.getValue())) {
+            errors.add("Must specify the value attribute for a conversion-option element.");
+        }
+    }    
+}

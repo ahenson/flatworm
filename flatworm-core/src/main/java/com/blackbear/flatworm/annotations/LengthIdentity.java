@@ -14,30 +14,26 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain.segment;
+package com.blackbear.flatworm.annotations;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import lombok.Data;
+/**
+ * Class description goes here.
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
+ */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@interface LengthIdentity {
 
-@Data
-public class Consumer {
-    private Integer consumerNumber;
-    private String lastName;
-    private String firstName;
-    private String middleName;
-    private String gender;
-
-    private List<Identity> id = new ArrayList<>();
-
-    private List<Phone> phone = new ArrayList<>();
-
-    public void addId(Identity identity) {
-        id.add(identity);
-    }
-
-    public void addPhone(Phone phone) {
-        this.phone.add(phone);
-    }
+    int minLength();
+    int maxLength();
+    boolean apply();
 }

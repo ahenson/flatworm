@@ -17,6 +17,7 @@
 package com.blackbear.flatworm.converters;
 
 import com.blackbear.flatworm.Util;
+import com.blackbear.flatworm.config.ConversionOption;
 import com.blackbear.flatworm.config.Converter;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -24,6 +25,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * The {@code ConversionHelper} was created to separate formatting responsibility into a separate class. This class also makes writing your
- * own converter more of a reality by separating type conversion from string formatting. String formatting has moved to a separate class
+ * own converter more of a reality by separating converterName conversion from string formatting. String formatting has moved to a separate class
  * called Util.
  */
 @Slf4j
@@ -53,21 +55,21 @@ public class ConversionHelper {
     /**
      * Attempt to convert the given {@code fieldChars} to an instance of a {@link Object}.
      *
-     * @param type       The name of the converter from the xml configuration file.
+     * @param converterName       The name of the converter from the xml configuration file.
      * @param fieldChars The value of the field as read from the input file.
      * @param options    Map of ConversionOptions (if any) for this field.
      * @param beanRef    "class.property", used for more descriptive exception messages, should something go wrong.
      * @return The {@link Object} constructed from the {@code fieldChars} value.
      * @throws FlatwormParserException should parsing the value to a {@link Object} fail for any reason.
      */
-    public Object convert(String type, String fieldChars, Map<String, ConversionOption> options, String beanRef)
+    public Object convert(String converterName, String fieldChars, Map<String, ConversionOption> options, String beanRef)
             throws FlatwormParserException {
 
         Object value;
 
         try {
-            Object object = getConverterObject(type);
-            Method method = getConverterMethod(type);
+            Object object = getConverterObject(converterName);
+            Method method = getConverterMethod(converterName);
 
             fieldChars = transformString(fieldChars, options, 0);
 
@@ -94,7 +96,7 @@ public class ConversionHelper {
      */
     public Object convert(Object bean, String beanName, String propertyName, String fieldChars, Map<String, ConversionOption> options)
             throws FlatwormParserException {
-        Object value = null;
+        Object value;
         try {
             PropertyDescriptor propDescriptor = PropertyUtils.getPropertyDescriptor(bean, propertyName);
             value = ConverterFunctionCache.convertFromString(propDescriptor.getPropertyType(), fieldChars, options);
@@ -108,7 +110,7 @@ public class ConversionHelper {
     /**
      * Convert a given {@link Object} to a String.
      *
-     * @param type    The converter type specified.
+     * @param type    The converter converterName specified.
      * @param obj     The {@link Object} to convert to a String.
      * @param options The {@link ConversionOption}s.
      * @param beanRef The reference to the bean that has the property.
@@ -189,18 +191,21 @@ public class ConversionHelper {
         converters.put(converter.getName(), converter);
     }
 
-    public Converter getConverter(String name) {
-        Converter result = null;
-        Converter convert = converters.get(name);
-        if (convert != null) {
-            result = new Converter();
-            result.setConverterClass(convert.getConverterClass());
-            result.setMethod(convert.getMethod());
-            result.setName(convert.getName());
-            result.setReturnType(convert.getReturnType());
-        }
+    /**
+     * Return all of the currently registered {@link Converter} instances.
+     * @return the currently registered {@link Converter} instances.
+     */
+    public Collection<Converter> getConverters() {
+        return converters.values();
+    }
 
-        return result;
+    /**
+     * Get the {@link Converter} by name.
+     * @param name The name.
+     * @return The {@link Converter} instance if found by the {@code name} and {@code null} if not.
+     */
+    public Converter getConverter(String name) {
+        return converters.get(name);
     }
 
     /**

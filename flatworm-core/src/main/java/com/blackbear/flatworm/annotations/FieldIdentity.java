@@ -14,19 +14,26 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters;
+package com.blackbear.flatworm.annotations;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Bean class used to store the values from the Conversion-Option XML tag
+ * Class description goes here.
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
  */
-@Data
-@EqualsAndHashCode
-@AllArgsConstructor
-public class ConversionOption {
-    private String name;
-    private String value;
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@interface FieldIdentity {
+    int fieldStartPosition();
+    int fieldLength();
+    boolean apply();
+    StringMatchIdentity[] stringMatchIdentities();
 }

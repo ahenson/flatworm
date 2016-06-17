@@ -14,13 +14,29 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain.segment;
+package com.blackbear.flatworm.annotations;
 
-import lombok.Data;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@Data
-public class Student {
-    private String firstName;
-    private String lastName;
-    private int grade;
+/**
+ * Class description goes here.
+ *
+ * @author Alan Henson
+ * @since 2016.1.0.0
+ */
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@interface AdditionalLine {
+    Class<?> recordClass();
+
+    int lineNumber() default 2;
+
+    String delimiter() default "";
+
+    char quoteCharacter() default '\0';
 }

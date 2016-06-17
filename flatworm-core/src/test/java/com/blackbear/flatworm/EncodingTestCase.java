@@ -16,8 +16,10 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
 import com.blackbear.flatworm.errors.FlatwormParserException;
-import com.blackbear.flatworm.converters.domain.Film;
+import com.blackbear.flatworm.test.domain.Film;
 
 import junit.framework.TestCase;
 
@@ -39,11 +41,11 @@ public class EncodingTestCase extends TestCase {
             + "    <converter name=\"char\" class=\"com.blackbear.flatworm.converters.CoreConverters\" method=\"convertChar\"\r\n"
             + "        return-type=\"java.lang.String\" />\r\n" + "    <record name=\"dvd\">\r\n"
             + "       <record-ident>\r\n"
-            + "           <length-ident minlength=\"0\" maxlength=\"9999\" />\r\n"
+            + "           <length-ident min-length=\"0\" max-length=\"9999\" />\r\n"
             + "       </record-ident>\r\n" + "       <record-definition>\r\n"
             + "           <bean name=\"film\" class=\"com.blackbear.flatworm.test.domain.Film\" />\r\n" + "           <line>\r\n"
             + "               <record-element length=\"30\" beanref=\"film.title\"\r\n"
-            + "                   type=\"char\">\r\n"
+            + "                   converter-name=\"char\">\r\n"
             + "                   <conversion-option name=\"justify\" value=\"left\" />\r\n"
             + "               </record-element>\r\n" + "           </line>\r\n"
             + "       </record-definition>\r\n" + "   </record>\r\n" + "</file-format>";
@@ -53,7 +55,7 @@ public class EncodingTestCase extends TestCase {
     }
 
     protected void setContent(byte[] content) throws Exception {
-        ConfigurationReader parser = new ConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReader();
         ff = getFileFormat(parser);
         reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content),
                 ff.getEncoding()));

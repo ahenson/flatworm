@@ -17,7 +17,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-converterName">
     <title>A Field Guide To Flatworm</title>
 </head>
 <body>
@@ -52,8 +52,8 @@ be instantiated for each logical record.
 There are a few powerful features in Flatworm worth mentioning.&nbsp;
 For one thing, a record may consist of one or more physical lines in the
 file.&nbsp; A record may contain more than one bean once decoded.&nbsp;
-A flat file may contain more than one type of record, and Flatworm can
-use line length and substring matching to determine which type of record
+A flat file may contain more than one converterName of record, and Flatworm can
+use line length and substring matching to determine which converterName of record
 a line begins.
 <br>
 <br>
@@ -173,7 +173,7 @@ To do this, we start by writing the Flatworm XML descriptor for the
 file:
 <br>
 <br>
-<pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;<br>&lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;<br>&lt;file-format&gt;<br>    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/&gt;<br>    &lt;converter name="decimal" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDecimal" return-type="java.lang.Double"/&gt;<br>    &lt;record name="newhire"&gt;<br>        &lt;record-ident&gt;<br>            &lt;field-ident field-start="0" field-length="2"&gt;<br>                &lt;match-string&gt;NH&lt;/match-string&gt;<br>            &lt;/field-ident&gt;<br>        &lt;/record-ident&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="employee" class="Employee"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element length="2"/&gt;<br>                &lt;record-element length="15" beanref="employee.firstName" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="15" beanref="employee.lastName" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="1" beanref="employee.gender" type="char"/&gt;<br>                &lt;record-element length="11" beanref="employee.ssn" type="char"&gt;<br>                    &lt;conversion-option name="strip-chars" value="non-numeric"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="10" beanref="employee.salary" type="decimal"&gt;<br>                    &lt;conversion-option name="decimal-places" value="2"/&gt;<br>                    &lt;conversion-option name="decimal-implied" value="true"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>&lt;/file-format&gt;<br></pre>
+<pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;<br>&lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;<br>&lt;file-format&gt;<br>    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-converterName="java.lang.String"/&gt;<br>    &lt;converter name="decimal" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDecimal" return-converterName="java.lang.Double"/&gt;<br>    &lt;record name="newhire"&gt;<br>        &lt;record-ident&gt;<br>            &lt;field-ident field-start="0" field-length="2"&gt;<br>                &lt;match-string&gt;NH&lt;/match-string&gt;<br>            &lt;/field-ident&gt;<br>        &lt;/record-ident&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="employee" class="Employee"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element length="2"/&gt;<br>                &lt;record-element length="15" beanref="employee.firstName" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="15" beanref="employee.lastName" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="1" beanref="employee.gender" converterName="char"/&gt;<br>                &lt;record-element length="11" beanref="employee.ssn" converterName="char"&gt;<br>                    &lt;conversion-option name="strip-chars" value="non-numeric"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="10" beanref="employee.salary" converterName="decimal"&gt;<br>                    &lt;conversion-option name="decimal-places" value="2"/&gt;<br>                    &lt;conversion-option name="decimal-implied" value="true"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>&lt;/file-format&gt;<br></pre>
 The file-format tag is required, and specifies the beginning of the
 actual description.&nbsp; The first thing that we must do is to register
 converters for the datatypes used in the file.&nbsp; There are a number
@@ -208,7 +208,7 @@ which matches on the characters NH (new hire) at locations 0-2 on the
 line.&nbsp; If no record-ident is defined, all records will match.
 <br>
 <br>
-Once we're sure that we are dealing with the correct record type, we can
+Once we're sure that we are dealing with the correct record converterName, we can
 define the record.&nbsp; We start by defining the beans that will be
 returned.&nbsp; Each bean has a name which is used to reference it
 inside the definition, and a class (fully qualified) with which to
@@ -236,7 +236,7 @@ in terms of:
     </li>
 </ul>
 Each record element also defines the beanref (according to the standard
-used in the Apache Commons BeanUtil package), and the type (which should
+used in the Apache Commons BeanUtil package), and the converterName (which should
 match one of the types defined at the top of the file)&nbsp; Record
 elements also may have conversion-options, which are specific to the
 converter specified.&nbsp; For example, in the above example, the
@@ -250,7 +250,7 @@ Now we're ready to fire it all up.&nbsp; Here's a simple Java class that
 parses the input file and prints out the beans produced:
 <br>
 <br>
-<pre>import java.io.*;<br>import java.util.HashMap;<br><br>import com.blackbear.flatworm.ConfigurationReader;<br>import com.blackbear.flatworm.FileFormat;<br>import com.blackbear.flatworm.MatchedRecord;<br>import com.blackbear.flatworm.errors.*;<br><br>public class SimpleFlatwormExample {<br>    public static void main(String[] args) {<br>         ConfigurationReader parser = new ConfigurationReader();<br>         try {<br>             FileFormat ff = parser.loadConfigurationFile(args[0]);<br>             InputStream in = new FileInputStream(args[1]);<br>             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));<br>             MatchedRecord results;<br>             while ((results = ff.getNextRecord(bufIn)) != null) {<br>                 if (results.getRecordName().equals("newhire")) {<br>                    System.out.println(results.getBean("employee"));<br>                 }<br>             }<br><br>         } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {<br>             flatwormUnsetFieldValueError.printStackTrace();  <br>         } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {<br>             flatwormConfigurationValueError.printStackTrace();<br>         } catch (FileNotFoundException e) {<br>             e.printStackTrace();<br>         } catch (FlatwormInvalidRecordException e) {<br>             e.printStackTrace(); <br>         } catch (FlatwormInputLineLengthException e) {<br>             e.printStackTrace(); <br>         } catch (FlatwormConversionException e) {<br>             e.printStackTrace(); <br>         }<br>     }<br><br>}<br></pre>
+<pre>import java.io.*;<br>import java.util.HashMap;<br><br>import com.blackbear.flatworm.config.ConfigurationReader;<br>import com.blackbear.flatworm.FileFormat;<br>import com.blackbear.flatworm.MatchedRecord;<br>import com.blackbear.flatworm.errors.*;<br><br>public class SimpleFlatwormExample {<br>    public static void main(String[] args) {<br>         ConfigurationReader parser = new ConfigurationReader();<br>         try {<br>             FileFormat ff = parser.loadConfigurationFile(args[0]);<br>             InputStream in = new FileInputStream(args[1]);<br>             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));<br>             MatchedRecord results;<br>             while ((results = ff.getNextRecord(bufIn)) != null) {<br>                 if (results.getRecordName().equals("newhire")) {<br>                    System.out.println(results.getBean("employee"));<br>                 }<br>             }<br><br>         } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {<br>             flatwormUnsetFieldValueError.printStackTrace();  <br>         } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {<br>             flatwormConfigurationValueError.printStackTrace();<br>         } catch (FileNotFoundException e) {<br>             e.printStackTrace();<br>         } catch (FlatwormInvalidRecordException e) {<br>             e.printStackTrace(); <br>         } catch (FlatwormInputLineLengthException e) {<br>             e.printStackTrace(); <br>         } catch (FlatwormConversionException e) {<br>             e.printStackTrace(); <br>         }<br>     }<br><br>}<br></pre>
 The location of the configuration file is passed in as the first
 argument to the method, and the file to be parsed as the second.&nbsp; A
 ConfigurationReader object is created, and the loadConfigurationFile
@@ -259,7 +259,7 @@ FileFormat is returned.&nbsp; After opening the input file and morphing
 it into a BufferedReader,&nbsp; the BufferedReader is passed in to the
 getNextRecord method of the FileFormat.&nbsp; getNextRecord either
 returns null if the input file has been exhusted, or a MatchedRecord
-object.&nbsp; The getRecordName method lets us know which type of record
+object.&nbsp; The getRecordName method lets us know which converterName of record
 is being returned (remembering again that a file can have several types
 of records), and we can access specific beans with the getBean method.
 <br>
@@ -270,14 +270,14 @@ When we run this test program, the results are as expected:
 <pre>C:/j2sdk1.4.2_04\bin\java SimpleFlatwormExample simple-example.xml import1.txt<br>Employee@120a47e[TURNER, JAMES, 123456789, M, 42243.45]<br>Employee@f73c1[JONES, JOHN, 987654321, M, 1043567.45]<br>Process terminated with exit code 0<br></pre>
 <h3>Defining Your Own Converters</h3>
 If you want to define a novel new converter to use in your application,
-it's quite simple.&nbsp; For each type to be converted, a converter has to
+it's quite simple.&nbsp; For each converterName to be converted, a converter has to
 offer two methods:
 <ol>
-    <li>A method to convert a string read from the file to the target type (parsing). The signature
-        of such a method looks like this (being <tt>T</tt> the type to be parsed):
+    <li>A method to convert a string read from the file to the target converterName (parsing). The signature
+        of such a method looks like this (being <tt>T</tt> the converterName to be parsed):
         <pre>public T convertT(String str, HashMap options) throws FlatwormConversionException;</pre>
-    <li>A method to convert a value of the target type into a string representation (generation). The
-        signature of such a method looks like this (being <tt>T</tt> the type to be written):
+    <li>A method to convert a value of the target converterName into a string representation (generation). The
+        signature of such a method looks like this (being <tt>T</tt> the converterName to be written):
         <pre>public String convertT(Object obj, HashMap options)</pre>
 </ol>
 To become a bit more specific, let's look at the definition
@@ -367,7 +367,7 @@ of the CoreConverter's method for writing a Decimal:
     }
 </pre>
 The generating converter methods have a similar restriction as the parsing methods, just
-the first parameter must be of type <tt>Object</tt>. It is not the actual attribute type, so
+the first parameter must be of converterName <tt>Object</tt>. It is not the actual attribute converterName, so
 Flatworm remains compatible with Java version below 5.0.
 
 <h3>Record Matching</h3>
@@ -599,18 +599,18 @@ As it turns out, this is a piece of cake for Flatworm:
 <pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
 &lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;
 &lt;file-format&gt;
-    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/&gt;
-    &lt;converter name="decimal" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDecimal" return-type="java.lang.Double"/&gt;
-    &lt;converter name="date" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDate" return-type="java.util.Date"/&gt;
+    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-converterName="java.lang.String"/&gt;
+    &lt;converter name="decimal" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDecimal" return-converterName="java.lang.Double"/&gt;
+    &lt;converter name="date" class="com.blackbear.flatworm.converters.CoreConverters" method="convertDate" return-converterName="java.util.Date"/&gt;
     &lt;record name="dvd"&gt;
         &lt;record-ident&gt;
-            &lt;length-ident minlength="85" maxlength="85"/&gt;
+            &lt;length-ident min-length="85" max-length="85"/&gt;
         &lt;/record-ident&gt;
         &lt;record-definition&gt;
             &lt;bean name="dvd" class="Dvd"/&gt;
             &lt;bean name="film" class="Film"/&gt;
             &lt;line&gt;
-                &lt;record-element length="30" beanref="film.title" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="30" beanref="film.studio" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="8" beanref="film.releaseDate" type="date"&gt;<br>                    &lt;conversion-option name="format" value="yyyyMMdd"/&gt;<br>                    &lt;conversion-option name="default-value" value="19990101"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="9" beanref="dvd.sku" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="7" beanref="dvd.price" type="decimal"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="1" beanref="dvd.dualLayer" type="char"/&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>    &lt;record name="videotape"&gt;<br>        &lt;record-ident&gt;<br>            &lt;field-ident field-start="0" field-length="1"&gt;<br>                &lt;match-string&gt;V&lt;/match-string&gt;<br>            &lt;/field-ident&gt;<br>        &lt;/record-ident&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="video" class="Videotape"/&gt;<br>            &lt;bean name="film" class="Film"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element start="1" end="10"  beanref="video.sku" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="10" end="16" beanref="video.price" type="decimal"&gt;<br>                    &lt;conversion-option name="decimal-implied" value="true"/&gt;<br>                    &lt;conversion-option name="decimal-places" value="2"/&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>            &lt;line&gt;<br>                &lt;record-element start="0" end="30" beanref="film.title" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="30" end="60" beanref="film.studio" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="60" end="70" beanref="film.releaseDate" type="date"&gt;<br>                    &lt;conversion-option name="default-value" value="1980-01-01"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>    &lt;record name="book"&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="book" class="Book"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element length="9"  beanref="book.sku" type="char"/&gt;<br>                &lt;record-element length="30" beanref="book.title" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="30" beanref="book.author" type="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="7" beanref="book.price" type="decimal"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="10" beanref="book.releaseDate" type="date"&gt;<br>                    &lt;conversion-option name="default-value" value="1970-01-01"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>&lt;/file-format&gt;<br><br>
+                &lt;record-element length="30" beanref="film.title" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="30" beanref="film.studio" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="8" beanref="film.releaseDate" converterName="date"&gt;<br>                    &lt;conversion-option name="format" value="yyyyMMdd"/&gt;<br>                    &lt;conversion-option name="default-value" value="19990101"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="9" beanref="dvd.sku" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="7" beanref="dvd.price" converterName="decimal"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="1" beanref="dvd.dualLayer" converterName="char"/&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>    &lt;record name="videotape"&gt;<br>        &lt;record-ident&gt;<br>            &lt;field-ident field-start="0" field-length="1"&gt;<br>                &lt;match-string&gt;V&lt;/match-string&gt;<br>            &lt;/field-ident&gt;<br>        &lt;/record-ident&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="video" class="Videotape"/&gt;<br>            &lt;bean name="film" class="Film"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element start="1" end="10"  beanref="video.sku" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="10" end="16" beanref="video.price" converterName="decimal"&gt;<br>                    &lt;conversion-option name="decimal-implied" value="true"/&gt;<br>                    &lt;conversion-option name="decimal-places" value="2"/&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                    &lt;conversion-option name="pad-character" value="0"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>            &lt;line&gt;<br>                &lt;record-element start="0" end="30" beanref="film.title" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="30" end="60" beanref="film.studio" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element start="60" end="70" beanref="film.releaseDate" converterName="date"&gt;<br>                    &lt;conversion-option name="default-value" value="1980-01-01"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>    &lt;record name="book"&gt;<br>        &lt;record-definition&gt;<br>            &lt;bean name="book" class="Book"/&gt;<br>            &lt;line&gt;<br>                &lt;record-element length="9"  beanref="book.sku" converterName="char"/&gt;<br>                &lt;record-element length="30" beanref="book.title" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="30" beanref="book.author" converterName="char"&gt;<br>                    &lt;conversion-option name="justify" value="left"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="7" beanref="book.price" converterName="decimal"&gt;<br>                    &lt;conversion-option name="justify" value="right"/&gt;<br>                &lt;/record-element&gt;<br>                &lt;record-element length="10" beanref="book.releaseDate" converterName="date"&gt;<br>                    &lt;conversion-option name="default-value" value="1970-01-01"/&gt;<br>                &lt;/record-element&gt;<br>            &lt;/line&gt;<br>        &lt;/record-definition&gt;<br>    &lt;/record&gt;<br>&lt;/file-format&gt;<br><br>
 </pre>
 Without rehashing old ground, you can see that in this example, we have
 three different scenarios for matching records.&nbsp; Dvds are matched
@@ -629,7 +629,7 @@ file:
 And the following test program:
 <br>
 <span style="font-family: monospace;"></span>
-<pre>import java.io.*;<br>import java.util.HashMap;<br><br>import com.blackbear.flatworm.ConfigurationReader;<br>import com.blackbear.flatworm.FileFormat;<br>import com.blackbear.flatworm.MatchedRecord;<br>import com.blackbear.flatworm.errors.*;<br><br>public class ComplexFlatwormExample {<br>    public static void main(String[] args) {<br>         ConfigurationReader parser = new ConfigurationReader();<br>         try {<br>             FileFormat ff = parser.loadConfigurationFile(args[0]);<br>             InputStream in = new FileInputStream(args[1]);<br>             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));<br><br>             MatchedRecord results;<br>             while ((results = ff.getNextRecord(bufIn)) != null) {<br>                 if (results.getRecordName().equals("dvd")) {<br>                    System.out.println(results.getBean("dvd"));<br>                     System.out.println(results.getBean("film"));<br>                 }<br>                 if (results.getRecordName().equals("videotape")) {<br>                    System.out.println(results.getBean("video"));<br>                     System.out.println(results.getBean("film"));<br>                 }<br>                 if (results.getRecordName().equals("book")) {<br>                    System.out.println(results.getBean("book"));<br>                 }<br>                 System.out.println("");<br>             }<br><br>         } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {<br>             flatwormUnsetFieldValueError.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {<br>             flatwormConfigurationValueError.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FileNotFoundException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormInvalidRecordException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormInputLineLengthException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormConversionException e) {<br>             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.<br>         }<br>     }<br><br><br><br>}<br></pre>
+<pre>import java.io.*;<br>import java.util.HashMap;<br><br>import com.blackbear.flatworm.config.ConfigurationReader;<br>import com.blackbear.flatworm.FileFormat;<br>import com.blackbear.flatworm.MatchedRecord;<br>import com.blackbear.flatworm.errors.*;<br><br>public class ComplexFlatwormExample {<br>    public static void main(String[] args) {<br>         ConfigurationReader parser = new ConfigurationReader();<br>         try {<br>             FileFormat ff = parser.loadConfigurationFile(args[0]);<br>             InputStream in = new FileInputStream(args[1]);<br>             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));<br><br>             MatchedRecord results;<br>             while ((results = ff.getNextRecord(bufIn)) != null) {<br>                 if (results.getRecordName().equals("dvd")) {<br>                    System.out.println(results.getBean("dvd"));<br>                     System.out.println(results.getBean("film"));<br>                 }<br>                 if (results.getRecordName().equals("videotape")) {<br>                    System.out.println(results.getBean("video"));<br>                     System.out.println(results.getBean("film"));<br>                 }<br>                 if (results.getRecordName().equals("book")) {<br>                    System.out.println(results.getBean("book"));<br>                 }<br>                 System.out.println("");<br>             }<br><br>         } catch (FlatwormUnsetFieldValueException flatwormUnsetFieldValueError) {<br>             flatwormUnsetFieldValueError.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormConfigurationValueException flatwormConfigurationValueError) {<br>             flatwormConfigurationValueError.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FileNotFoundException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormInvalidRecordException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormInputLineLengthException e) {<br>             e.printStackTrace();  //To change body of catch statement use Options | File Templates.<br>         } catch (FlatwormConversionException e) {<br>             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.<br>         }<br>     }<br><br><br><br>}<br></pre>
 The following output is produced:
 <br>
 <pre>Dvd@3901c6[55512121, 49.95, Y]<br>Film@a37368[Thu Jan 15 00:00:00 EST 2004, DIAL J FOR JAVA, RUN ANYWHERE STUDIO]<br><br>Book@ae506e[Mon Nov 10 00:00:00 EST 2003, HE KNOWS WHEN YOU"RE CODING, JAVALANG OBJECT,546234476,13.95]<br><br>Videotape@ba6c83[2346542, 23.55]<br>Film@12a1e44[Wed Mar 12 00:00:00 EST 2003, WHEN A STRANGER IMPLEMENTS, NULL POINTER PRODUCTIONS]<br><br>Book@29428e[Sun Dec 19 00:00:00 EST 2004, THE GC ALWAYS RINGS TWICE, JAVAUTIL HASHMAP,546543476,23.43]<br><br>Videotape@161f10f[2435542, 19.55]<br>Film@1193779[Tue Jan 01 00:00:00 EST 1980, DATA AND DATATYPES, PRETENTIOUS FILMS LTD]<br></pre>
@@ -653,10 +653,10 @@ example shows the respective part of the XML descriptor:
         &lt;/record-ident&gt;
         &lt;record-definition&gt;
             &lt;line <b>delimit=";"</b>&gt;
-                &lt;record-element length="0" type="char"&gt;
+                &lt;record-element length="0" converterName="char"&gt;
                     &lt;conversion-option name="default-value" value="field1" /&gt;
                 &lt;/record-element&gt;
-                &lt;record-element length="0" type="char"&gt;
+                &lt;record-element length="0" converterName="char"&gt;
                     &lt;conversion-option name="default-value" value="field2" /&gt;
                 &lt;/record-element&gt;
             &lt;/line&gt;
@@ -696,8 +696,8 @@ The simple class example could be described with the following configuration:<br
 <pre>&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
 &lt;!DOCTYPE file-format SYSTEM "http://www.blackbear.com/dtds/flatworm-data-description_1_0.dtd"&gt;
 &lt;file-format&gt;
-    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-type="java.lang.String"/&gt;
-    &lt;converter name="int" class="com.blackbear.flatworm.converters.CoreConverters" method="convertInteger" return-type="java.lang.Integer"/&gt;
+    &lt;converter name="char" class="com.blackbear.flatworm.converters.CoreConverters" method="convertChar" return-converterName="java.lang.String"/&gt;
+    &lt;converter name="int" class="com.blackbear.flatworm.converters.CoreConverters" method="convertInteger" return-converterName="java.lang.Integer"/&gt;
     &lt;record name="class"&gt;
         &lt;record-ident&gt;
             &lt;field-ident field-start="0" field-length="2"&gt;
@@ -708,19 +708,19 @@ The simple class example could be described with the following configuration:<br
             &lt;bean name="class" class="ClassPeriod"/&gt;
             &lt;bean name="student" class="Student"/&gt;
             &lt;line delimit="|"&gt;
-                &lt;record-element length="0" type="char"/&gt;
-                &lt;record-element length="0" beanref="class.subject" type="char"/&gt;
-                &lt;record-element length="0" beanref="class.period" type="int"/&gt;
-                &lt;record-element length="0" beanref="class.teacher" type="char"/&gt;
-                &lt;record-element length="0" beanref="class.gradeLevel" type="int"/&gt;
+                &lt;record-element length="0" converterName="char"/&gt;
+                &lt;record-element length="0" beanref="class.subject" converterName="char"/&gt;
+                &lt;record-element length="0" beanref="class.period" converterName="int"/&gt;
+                &lt;record-element length="0" beanref="class.teacher" converterName="char"/&gt;
+                &lt;record-element length="0" beanref="class.gradeLevel" converterName="int"/&gt;
                 &lt;segment-element parent-beanref="class" addMethod="addStudent" beanref="student" minCount="1" maxCount="30"&gt;
                     &lt;field-ident field-start="0" field-length="1"&gt;
                         &lt;match-string&gt;S&lt;/match-string&gt;
                     &lt;/field-ident&gt;
                     &lt;record-element length="0"/&gt;
-                    &lt;record-element length="0" beanref="student.firstName" type="char"/&gt;
-                    &lt;record-element length="0" beanref="student.lastName" type="char"/&gt;
-                    &lt;record-element length="0" beanref="student.grade" type="int"/&gt;
+                    &lt;record-element length="0" beanref="student.firstName" converterName="char"/&gt;
+                    &lt;record-element length="0" beanref="student.lastName" converterName="char"/&gt;
+                    &lt;record-element length="0" beanref="student.grade" converterName="int"/&gt;
                 &lt;/segment-element&gt;
             &lt;/line&gt;
         &lt;/record-definition&gt;
@@ -734,7 +734,7 @@ a &lt;record-ident&gt; element. The identifier must be the first field in the se
 the Java class it can just be consumed. There must be a beanref attribute because Flatworm will construct an instance of the specified bean
 for
 each segment that it encounters. It then invokes the addMethod on the parent-beanref, which must have a Collection property for that
-type. There is an additional attribute that is not shown here; cardinality-mode. This attribute defines how to handle segments that don't
+converterName. There is an additional attribute that is not shown here; cardinality-mode. This attribute defines how to handle segments that don't
 adhere to the specified cardinality; that is when there are fewer than the minCount, or more than the maxCount. The default mode is
 LOOSE, which means that an error is logged for any violations, but no other action is taken. For cardinality mode RESTRICTED,
 in addition to logging an error, no more than the maxCount instances will be added to the parent collection. If the cardinality mode
@@ -810,7 +810,7 @@ public class ClassPeriod
     </tr>
     <tr>
         <td style="vertical-align: top;">beanref</td>
-        <td style="vertical-align: top;">The name of the bean to hold the fields for this segment type</td>
+        <td style="vertical-align: top;">The name of the bean to hold the fields for this segment converterName</td>
         <td style="vertical-align: top;">no - if the name is specified<br/>yes - if no name is specified</td>
         <td style="vertical-align: top;">The name of the segment if specified (there must be a bean with the same name declared)</td>
     </tr>
@@ -830,7 +830,7 @@ ComplexFlatwormExample) have required that you load the configuration file. Then
 FileFormat that you got back from parsing the configuration file) to retrieve the records from the data file. This works very well, and
 provides you with a good bit of control over the process. But if you would prefer something a little bit simpler you can use the FileParser
 (since version 1.2). To use the FileParser, you instantiate an instance with the name of the configuration file, and the data file. For each
-record type that you have defined you call the setBeanHandler(String, Object, String) method, passing the name of the record type, the
+record converterName that you have defined you call the setBeanHandler(String, Object, String) method, passing the name of the record converterName, the
 object
 to be invoked on the callback, and the callback method to be invoked. You also set an exception handler by calling the
 setExceptionHandler(Object,
@@ -838,7 +838,7 @@ String) method, passing the object to be invoked on the callback and the callbac
 call
 the open() method (which can throw FileNotFoundException or UnsupportedEncodingException). The file is read by calling the read() method,
 and
-when it is finished call the close() method. As each record is read, the callback for that record type will be invoked, passing the
+when it is finished call the close() method. As each record is read, the callback for that record converterName will be invoked, passing the
 MatchedRecord
 that was generated. From the matched record you can extract the beans that were created for that record. Lets see what the
 SimpleFlatwormExample
@@ -888,7 +888,7 @@ public class SimpleFlatwormExample
 <br/>
 With version 2.0 a new object based callback mechanism has been introduced. Passing a class that implements RecordCallback to the
 FileParser's
-addRecordCallback(String, RecordCallback) method for each record type to be processed avoids the reflective method invocation of the
+addRecordCallback(String, RecordCallback) method for each record converterName to be processed avoids the reflective method invocation of the
 previous
 callback mechanism. The previous mechanism is still supported, but will likely be removed in a future version. To set an exception callback
 with
@@ -897,7 +897,7 @@ either
 callback mechanism only one exception callback is supported, and if none is set and an exception occurs, a RuntimeException will now be
 thrown.
 If you are not interested in processing any record types that are included in the configuration you don't need to add a callback for that
-type.
+converterName.
 
 <br/>
 <br/>

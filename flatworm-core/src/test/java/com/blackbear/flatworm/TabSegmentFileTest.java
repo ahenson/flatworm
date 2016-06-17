@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.blackbear.flatworm.converters.domain.segment.ClassPeriod;
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.test.domain.segment.ClassPeriod;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -31,7 +33,7 @@ import static org.junit.Assert.fail;
 public class TabSegmentFileTest {
     @Test
     public void testFileRead() {
-        ConfigurationReader parser = new ConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReader();
         BufferedReader bufIn = null;
         try {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("segment-class-tabs.xml"));

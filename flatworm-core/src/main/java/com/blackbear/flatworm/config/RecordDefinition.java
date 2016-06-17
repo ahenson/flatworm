@@ -17,34 +17,57 @@
 package com.blackbear.flatworm.config;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Bean class used to store the values from the Record-Definition XML tag
  */
-@Data
 public class RecordDefinition {
-    private Map<String, Bean> beansUsed;
+    @Setter
+    private Map<String, Bean> beans;
+
+    @Getter
+    @Setter
     private List<Line> lines;
 
+    @Getter
+    @Setter
+    private Record parentRecord;
+
     public RecordDefinition() {
-        this.beansUsed = new HashMap<>();
+        this.beans = new HashMap<>();
         this.lines = new ArrayList<>();
     }
 
-    public void addBeanUsed(Bean bean) {
-        this.beansUsed.put(bean.getBeanName(), bean);
+    public void addBean(Bean bean) {
+        bean.setParentRecordDefinition(this);
+        this.beans.put(bean.getBeanName(), bean);
+    }
+
+    public Collection<Bean> getBeans() {
+        return beans.values();
+    }
+
+    public Map<String, Bean> getBeanMap() {
+        return Collections.unmodifiableMap(beans);
     }
 
     public void addLine(Line line) {
+        line.setParentRecordDefinition(this);
         lines.add(line);
     }
 
+    @Override
     public String toString() {
-        return super.toString() + "[bean = " + beansUsed + ", lines=" + lines + "]";
+        return "RecordDefinition{" +
+                "parentRecord=" + parentRecord +
+                '}';
     }
 }

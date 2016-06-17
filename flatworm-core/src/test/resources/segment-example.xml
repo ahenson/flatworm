@@ -27,7 +27,7 @@
                method="convertInteger" return-type="java.lang.Integer"/>
     <converter name="date"
                class="com.blackbear.flatworm.converters.CoreConverters"
-               method="convertDate" return-type="java.lang.Date"/>
+               method="convertDate" return-type="java.util.Date"/>
     <record name="account">
         <record-ident>
             <field-ident field-start="0" field-length="2">
@@ -35,63 +35,58 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="account" class="com.blackbear.flatworm.converters.domain.segment.Account"/>
-            <bean name="consumer" class="com.blackbear.flatworm.converters.domain.segment.Consumer"/>
-            <bean name="id" class="com.blackbear.flatworm.converters.domain.segment.Identity"/>
-            <bean name="phone" class="com.blackbear.flatworm.converters.domain.segment.Phone"/>
-            <bean name="address" class="com.blackbear.flatworm.converters.domain.segment.Address"/>
+            <bean name="account" class="com.blackbear.flatworm.test.domain.segment.Account"/>
+            <bean name="consumer" class="com.blackbear.flatworm.test.domain.segment.Consumer"/>
+            <bean name="id" class="com.blackbear.flatworm.test.domain.segment.Identity"/>
+            <bean name="phone" class="com.blackbear.flatworm.test.domain.segment.Phone"/>
+            <bean name="address" class="com.blackbear.flatworm.test.domain.segment.Address"/>
             <line delimit="|">
-                <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
-                <record-element beanref="account.reportingDate" length="0" type="date">
+                <record-element beanref="account.reportingDate" converter-name="date">
                     <conversion-option name="format" value="yyyyMMdd"/>
                 </record-element>
-                <record-element beanref="account.accountCode" length="0" type="char"/>
-                <record-element beanref="account.accountType" length="0" type="int"/>
-                <record-element beanref="account.accountNumber" length="0" type="char"/>
-                <record-element beanref="account.serviceType" length="0" type="char"/>
-                <record-element beanref="account.companyId" length="0" type="char"/>
+                <record-element beanref="account.accountCode" converter-name="char"/>
+                <record-element beanref="account.accountType" converter-name="int"/>
+                <record-element beanref="account.accountNumber" converter-name="char"/>
+                <record-element beanref="account.serviceType" converter-name="char"/>
+                <record-element beanref="account.companyId" converter-name="char"/>
                 <segment-element beanref="consumer" minCount="0" maxCount="5" parent-beanref="account" add-method="addConsumer"
                                  cardinality-mode="restrict">
                     <field-ident field-start="0" field-length="2">
                         <match-string>ID</match-string>
                     </field-ident>
-                    <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
-                    <record-element beanref="consumer.consumerNumber" length="0" type="int"/>
-                    <record-element beanref="consumer.lastName" length="0" type="char"/>
-                    <record-element beanref="consumer.firstName" length="0" type="char"/>
-                    <record-element beanref="consumer.middleName" length="0" type="char"/>
-                    <record-element beanref="consumer.gender" length="0" type="char"/>
+                    <record-element beanref="consumer.consumerNumber" converter-name="int"/>
+                    <record-element beanref="consumer.lastName" converter-name="char"/>
+                    <record-element beanref="consumer.firstName" converter-name="char"/>
+                    <record-element beanref="consumer.middleName" converter-name="char"/>
+                    <record-element beanref="consumer.gender" converter-name="char"/>
                     <segment-element minCount="0" maxCount="6" parent-beanref="consumer" add-method="addId" beanref="id">
                         <field-ident field-start="0" field-length="2">
                             <match-string>II</match-string>
                         </field-ident>
-                        <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
-                        <record-element beanref="id.type" length="0" type="char"/>
-                        <record-element beanref="id.state" length="0" type="char"/>
-                        <record-element beanref="id.value" length="0" type="char"/>
+                        <record-element beanref="id.type" converter-name="char"/>
+                        <record-element beanref="id.state" converter-name="char"/>
+                        <record-element beanref="id.value" converter-name="char"/>
                     </segment-element>
                     <segment-element minCount="0" maxCount="7" parent-beanref="consumer" add-method="addPhone" beanref="phone">
                         <field-ident field-start="0" field-length="2">
                             <match-string>PH</match-string>
                         </field-ident>
-                        <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
-                        <record-element beanref="phone.type" length="0" type="char"/>
-                        <record-element beanref="phone.publishInd" length="0" type="char"/>
-                        <record-element beanref="phone.number" length="0" type="char"/>
+                        <record-element beanref="phone.type" converter-name="char"/>
+                        <record-element beanref="phone.publishInd" converter-name="char"/>
+                        <record-element beanref="phone.number" converter-name="char"/>
                     </segment-element>
                 </segment-element>
                 <segment-element minCount="0" maxCount="4" parent-beanref="account" add-method="addAddress" beanref="address">
                     <field-ident field-start="0" field-length="2">
                         <match-string>AD</match-string>
                     </field-ident>
-                    <record-element length="0"/>   <!--  Need to allow for the type identifier! -->
-                    <record-element beanref="address.type" length="0" type="char"/>
-                    <record-element beanref="address.number" length="0" type="char"/>
-                    <record-element beanref="address.street" length="0" type="char"/>
-                    <record-element beanref="address.streetType" length="0" type="char"/>
-                    <record-element beanref="address.city" length="0" type="char"/>
-                    <record-element beanref="address.state" length="0" type="char"/>
-                    <record-element beanref="address.zip" length="0" type="char"/>
+                    <record-element beanref="address.type" converter-name="char"/>
+                    <record-element beanref="address.number" converter-name="char"/>
+                    <record-element beanref="address.street" converter-name="char"/>
+                    <record-element beanref="address.streetType" converter-name="char"/>
+                    <record-element beanref="address.city" converter-name="char"/>
+                    <record-element beanref="address.state" converter-name="char"/>
+                    <record-element beanref="address.zip" converter-name="char"/>
                 </segment-element>
             </line>
         </record-definition>

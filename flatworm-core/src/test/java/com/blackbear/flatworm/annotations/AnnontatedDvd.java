@@ -14,18 +14,36 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain;
+package com.blackbear.flatworm.annotations;
 
 import lombok.Data;
 
 /**
- * Model class that mimics what a header record might look like in a flat file.
+ * Class description goes here.
  *
  * @author Alan Henson
- * @since 4.0.0
+ * @since 2016.1.0.0
  */
 @Data
-public class Header {
-    private String source;
-    private Double version;
+@Record(fieldIdentity =
+    @FieldIdentity(
+        fieldStartPosition = 0,
+        fieldLength = 3,
+        apply = true,
+        stringMatchIdentities = { @
+                StringMatchIdentity(matchString = "DVD", ignoreCase = true) }))
+public class AnnontatedDvd {
+
+    @RecordElement(order = 1, length = 30)
+    private String sku;
+
+    @RecordElement(order = 2, length = 30)
+    private String dualLayer;
+
+    @RecordElement(order = 2, length = 30)
+    private double price;
+
+    public String toString() {
+        return super.toString() + "[" + sku + ", " + price + ", " + dualLayer + "]";
+    }
 }

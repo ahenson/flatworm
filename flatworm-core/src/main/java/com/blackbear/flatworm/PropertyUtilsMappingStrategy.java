@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.converters.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOption;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -47,7 +47,7 @@ public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
             PropertyUtils.setProperty(bean, property, value);
         } catch (Exception e) {
             log.error("While running set property method for " + beanName + "." + property
-                    + "with value '" + value + "'", e);
+                    + " with value '" + value + "'", e);
             throw new FlatwormParserException("Setting field " + beanName + "." + property);
         }
     }

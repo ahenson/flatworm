@@ -16,6 +16,9 @@
 
 package com.blackbear.flatworm.converters;
 
+import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.Record;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +29,7 @@ import java.util.Optional;
 /**
  * Goes above and beyond the {@link ConversionHelper} by providing a singleton like experience where multiple converter methods can be
  * registered based upon which property types they support. This is meant to be a generic approach so if you need a specific {@code
- * Converter} then please add it to the configuration file and reference it from your given {@link com.blackbear.flatworm.config.Record}
+ * Converter} then please add it to the configuration file and reference it from your given {@link Record}
  * configurations.
  *
  * @author Alan Henson
@@ -133,10 +136,10 @@ public class ConverterFunctionCache {
 
     /**
      * Attempt to find a converter from a {@link String} to a {@link Object} instance based
-     * upon the {@code clazz} type. This will look for an exact match by class name and it will
+     * upon the {@code clazz} converterName. This will look for an exact match by class name and it will
      * then look for anything that {@code clazz} inherits from to see if that converter would work.
      * The best way to avoid having the wrong converter chosen is to have specific converters
-     * for subtypes when the converter for the parent type won't work.
+     * for subtypes when the converter for the parent converterName won't work.
      * @param clazz The {@link Class} to find the converter for.
      * @return The {@link ToTypeConverterFunction} function if found by the {@code clazz} or {@code null}.
      */
@@ -153,10 +156,10 @@ public class ConverterFunctionCache {
 
     /**
      * Attempt to find a converter from an instance of an {@link Object} to a {@link String} based
-     * upon the {@code clazz} type. This will look for an exact match by class name and it will
+     * upon the {@code clazz} converterName. This will look for an exact match by class name and it will
      * then look for anything that {@code clazz} inherits from to see if that converter would work.
      * The best way to avoid having the wrong converter chosen is to have specific converters
-     * for subtypes when the converter for the parent type won't work.
+     * for subtypes when the converter for the parent converterName won't work.
      * @param clazz The {@link Class} to find the converter for.
      * @return The {@link FromTypeConverterFunction} function if found by the {@code clazz} or {@code null}.
      */

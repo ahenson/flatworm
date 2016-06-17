@@ -27,19 +27,19 @@
                method="convertDecimal" return-type="java.lang.Integer"/>
     <record name="inventory">
         <record-definition>
-            <bean name="inventory" class="com.blackbear.flatworm.converters.domain.Inventory"/>
+            <bean name="inventory" class="com.blackbear.flatworm.test.domain.Inventory"/>
             <line delimit="~">
                 <record-element length="30" beanref="inventory.sku"
-                                type="char">
+                                converter-name="char">
                 </record-element>
                 <record-element length="30" beanref="inventory.price"
-                                type="decimal">
+                                converter-name="decimal">
                 </record-element>
                 <record-element length="30" beanref="inventory.quantity"
-                                type="integer">
+                                converter-name="integer">
                 </record-element>
                 <record-element length="60"
-                                beanref="inventory.description" type="char">
+                                beanref="inventory.description" converter-name="char">
                 </record-element>
             </line>
         </record-definition>

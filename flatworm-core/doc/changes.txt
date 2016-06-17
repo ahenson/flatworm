@@ -22,7 +22,7 @@ Changes in Version 2.0
 
   For example; a record could be for an account. Accounts may include up to X consumers, and Y phone numbers.
   With a typical flat file format, accounts that contain fewer than X consumers and/or Y phone numbers would
-  include a lot of blank space, or empty delimiters. With segment support, each segment type must be identified
+  include a lot of blank space, or empty delimiters. With segment support, each segment converterName must be identified
   by an indicator field (must be the first field in the segment). The record would contain fields for only the 
   consumers and phone numbers actually present in the account.
   For an idea of how to use this feature see the SegmentedFileWriterTest or the SegmentFileTest in the test module.
@@ -65,7 +65,7 @@ Changes in Version 1.2
       public String convertT(Object obj, HashMap options)
 
   (The 'T' in 'convertT' should be replaced with a sensible description
-  of the type, e.g. 'convertChar', 'convertGender' and so forth.)      
+  of the converterName, e.g. 'convertChar', 'convertGender' and so forth.)
 
 - Multiple padding characters
 

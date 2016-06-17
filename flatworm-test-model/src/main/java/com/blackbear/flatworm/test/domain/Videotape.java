@@ -14,24 +14,16 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain.segment;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.blackbear.flatworm.test.domain;
 
 import lombok.Data;
 
+/**
+ * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:16 AM To change this template use File | Settings | File Templates.
+ */
 @Data
-public class ClassPeriod {
-    private String subject;
-    private int period;
-    private String teacher;
-    private int gradeLevel;
-    private String room;
+public class Videotape {
+    private String sku;
 
-    private List<Student> students = new ArrayList<>();
-
-    public void addStudent(Student student) {
-        students.add(student);
-    }
+    private double price;
 }

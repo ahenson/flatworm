@@ -27,4 +27,5 @@ public class Bean {
     private String beanName;
     private String beanClass;
     private Class beanObjectClass;
+    private RecordDefinition parentRecordDefinition;
 }

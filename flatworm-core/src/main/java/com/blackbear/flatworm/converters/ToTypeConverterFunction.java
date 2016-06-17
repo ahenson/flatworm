@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm.converters;
 
+import com.blackbear.flatworm.config.ConversionOption;
+
 import java.util.Map;
 
 /**
@@ -33,6 +35,7 @@ public interface ToTypeConverterFunction {
      * @param value The {@code value} to convert.
      * @param options Any {@link ConversionOption}s that were configured to go along with the converter.
      * @return The {@code value} value converted.
+     * @throws Exception should anything unexpected occur.
      */
     Object convert(String value, Map<String, ConversionOption> options) throws Exception;
 }

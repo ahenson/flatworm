@@ -14,27 +14,17 @@
  * and limitations under the License.
  */
 
-/*
- * Created on Apr 5, 2005
- * 
- * To change the template for this generated file go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
- * Comments
- */
-package com.blackbear.flatworm.converters.domain;
+package com.blackbear.flatworm.test.domain.segment;
 
 import lombok.Data;
 
-/**
- * @author e50633
- */
 @Data
-public class Inventory {
-
-    private String sku;
-
-    private double price;
-
-    private int quantity;
-
-    private String description;
+public class Address {
+    private String type;
+    private String number;
+    private String street;
+    private String streetType;
+    private String city;
+    private String state;
+    private String zip;
 }

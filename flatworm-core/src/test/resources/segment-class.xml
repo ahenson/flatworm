@@ -25,24 +25,24 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="class" class="com.blackbear.flatworm.converters.domain.segment.ClassPeriod"/>
-            <bean name="student" class="com.blackbear.flatworm.converters.domain.segment.Student"/>
+            <bean name="class" class="com.blackbear.flatworm.test.domain.segment.ClassPeriod"/>
+            <bean name="student" class="com.blackbear.flatworm.test.domain.segment.Student"/>
             <line delimit="|">
-                <record-element length="0" type="char"/>
-                <record-element length="0" beanref="class.subject" type="char"/>
-                <record-element length="0" beanref="class.period" type="int"/>
-                <record-element length="0" beanref="class.teacher" type="char"/>
-                <record-element length="0" beanref="class.gradeLevel" type="int"/>
+                <record-element length="0" converter-name="char"/>
+                <record-element length="0" beanref="class.subject" converter-name="char"/>
+                <record-element length="0" beanref="class.period" converter-name="int"/>
+                <record-element length="0" beanref="class.teacher" converter-name="char"/>
+                <record-element length="0" beanref="class.gradeLevel" converter-name="int"/>
                 <segment-element collection-property-name="students" beanref="student" parent-beanref="class" minCount="1" maxCount="30">
                     <field-ident field-start="0" field-length="1">
                         <match-string>S</match-string>
                     </field-ident>
                     <record-element length="0"/>
-                    <record-element length="0" beanref="student.firstName" type="char"/>
-                    <record-element length="0" beanref="student.lastName" type="char"/>
-                    <record-element length="0" beanref="student.grade" type="int"/>
+                    <record-element length="0" beanref="student.firstName" converter-name="char"/>
+                    <record-element length="0" beanref="student.lastName" converter-name="char"/>
+                    <record-element length="0" beanref="student.grade" converter-name="int"/>
                 </segment-element>
-                <record-element length="0" beanref="class.room" type="char"/>
+                <record-element length="0" beanref="class.room" converter-name="char"/>
             </line>
         </record-definition>
     </record>

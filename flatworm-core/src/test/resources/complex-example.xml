@@ -25,14 +25,14 @@
                method="convertDouble" return-type="java.lang.Double"/>
     <converter name="date"
                class="com.blackbear.flatworm.converters.CoreConverters"
-               method="convertDate" return-type="java.lang.Date"/>
+               method="convertDate" return-type="java.util.Date"/>
 
     <record name="header">
         <record-ident>
             <script-ident>
                 <![CDATA[
 
-                function matchesLine(fileFormat) {
+                function matchesLine(fileFormat, line) {
                     return fileFormat.getLineNumber() == 1;
                 }
 
@@ -40,12 +40,12 @@
             </script-ident>
         </record-ident>
         <record-definition>
-            <bean name="header" class="com.blackbear.flatworm.converters.domain.Header"/>
+            <bean name="header" class="com.blackbear.flatworm.test.domain.Header"/>
             <line>
-                <record-element length="10" beanref="header.source" type="char">
+                <record-element length="10" beanref="header.source" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element length="10" beanref="header.version" type="double">
+                <record-element length="10" beanref="header.version" converter-name="double">
                     <conversion-option name="justify" value="left"/>
                     <conversion-option name="decimal-places" value="2"/>
                 </record-element>
@@ -55,30 +55,30 @@
 
     <record name="dvd">
         <record-ident>
-            <length-ident minlength="85" maxlength="85"/>
+            <length-ident min-length="85" max-length="85"/>
         </record-ident>
         <record-definition>
-            <bean name="dvd" class="com.blackbear.flatworm.converters.domain.Dvd"/>
-            <bean name="film" class="com.blackbear.flatworm.converters.domain.Film"/>
+            <bean name="dvd" class="com.blackbear.flatworm.test.domain.Dvd"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
             <line>
-                <record-element length="30" beanref="film.title" type="char">
+                <record-element length="30" beanref="film.title" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element length="30" beanref="film.studio" type="char">
+                <record-element length="30" beanref="film.studio" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element length="8" beanref="film.releaseDate" type="date">
+                <record-element length="8" beanref="film.releaseDate" converter-name="date">
                     <conversion-option name="format" value="yyyyMMdd"/>
                     <conversion-option name="default-value" value="19990101"/>
                 </record-element>
-                <record-element length="9" beanref="dvd.sku" type="char">
+                <record-element length="9" beanref="dvd.sku" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element length="7" beanref="dvd.price" type="double">
+                <record-element length="7" beanref="dvd.price" converter-name="double">
                     <conversion-option name="justify" value="right"/>
                     <conversion-option name="decimal-places" value="2"/>
                 </record-element>
-                <record-element length="1" beanref="dvd.dualLayer" type="char"/>
+                <record-element length="1" beanref="dvd.dualLayer" converter-name="char"/>
             </line>
         </record-definition>
     </record>
@@ -89,15 +89,15 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="video" class="com.blackbear.flatworm.converters.domain.Videotape"/>
-            <bean name="film" class="com.blackbear.flatworm.converters.domain.Film"/>
+            <bean name="video" class="com.blackbear.flatworm.test.domain.Videotape"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
             <line>
-                <record-element start="1" end="10" beanref="video.sku" type="char">
+                <record-element start="1" end="10" beanref="video.sku" converter-name="char">
                     <conversion-option name="justify" value="right"/>
                     <conversion-option name="pad-character" value="0"/>
                 </record-element>
                 <record-element start="10" end="16"
-                                beanref="video.price" type="double">
+                                beanref="video.price" converter-name="double">
                     <conversion-option name="decimal-implied" value="true"/>
                     <conversion-option name="decimal-places" value="2"/>
                     <conversion-option name="justify" value="right"/>
@@ -105,13 +105,13 @@
                 </record-element>
             </line>
             <line>
-                <record-element start="0" end="30" beanref="film.title" type="char">
+                <record-element start="0" end="30" beanref="film.title" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element start="30" end="60" beanref="film.studio" type="char">
+                <record-element start="30" end="60" beanref="film.studio" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element start="60" end="70" beanref="film.releaseDate" type="date">
+                <record-element start="60" end="70" beanref="film.releaseDate" converter-name="date">
                     <conversion-option name="default-value" value="1980-01-01"/>
                 </record-element>
             </line>
@@ -119,20 +119,20 @@
     </record>
     <record name="book">
         <record-definition>
-            <bean name="book" class="com.blackbear.flatworm.converters.domain.Book"/>
+            <bean name="book" class="com.blackbear.flatworm.test.domain.Book"/>
             <line>
-                <record-element length="9" beanref="book.sku" type="char"/>
-                <record-element length="30" beanref="book.title" type="char">
+                <record-element length="9" beanref="book.sku" converter-name="char"/>
+                <record-element length="30" beanref="book.title" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element length="30" beanref="book.author" type="char">
+                <record-element length="30" beanref="book.author" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
-                <record-element length="7" beanref="book.price" type="double">
+                <record-element length="7" beanref="book.price" converter-name="double">
                     <conversion-option name="decimal-places" value="2"/>
                     <conversion-option name="justify" value="right"/>
                 </record-element>
-                <record-element length="10" beanref="book.releaseDate" type="date">
+                <record-element length="10" beanref="book.releaseDate" converter-name="date">
                     <conversion-option name="default-value" value="1970-01-01"/>
                 </record-element>
             </line>

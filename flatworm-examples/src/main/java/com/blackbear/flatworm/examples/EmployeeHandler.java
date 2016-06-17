@@ -24,12 +24,12 @@ package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.MatchedRecord;
 
-import com.blackbear.flatworm.converters.domain.Employee;
+import com.blackbear.flatworm.test.domain.Employee;
 
 /**
  * @author e50633
  *
- *         To change the template for this generated type comment go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
+ *         To change the template for this generated converterName comment go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  *         Comments
  */
 public class EmployeeHandler {

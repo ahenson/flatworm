@@ -31,29 +31,29 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="employee" class="com.blackbear.flatworm.converters.domain.Employee"/>
+            <bean name="employee" class="com.blackbear.flatworm.test.domain.Employee"/>
             <line delimit=",">
                 <record-element length="2"/>
                 <record-element length="15" beanref="employee.firstName"
-                                type="char2">
+                                converter-name="char2">
                     <conversion-option name="justify" value="left"
-                                       type="both"/>
+                                       converter-name="both"/>
                 </record-element>
                 <record-element length="15" beanref="employee.lastName"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element length="1" beanref="employee.gender"
-                                type="char"/>
+                                converter-name="char"/>
                 <record-element length="11" beanref="employee.ssn"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="strip-chars"
                                        value="non-numeric"/>
                     <conversion-option name="default-value"
                                        value="xxx-xx-xxxx"/>
                 </record-element>
                 <record-element length="10" beanref="employee.salary"
-                                type="decimal">
+                                converter-name="decimal">
                     <conversion-option name="decimal-places" value="2"/>
                     <conversion-option name="decimal-implied"
                                        value="true"/>
@@ -62,7 +62,7 @@
                     <conversion-option name="default-value" value="999"/>
                 </record-element>
                 <record-element length="9" beanref="employee.misc"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="substring" value="1,10"/>
                 </record-element>
             </line>

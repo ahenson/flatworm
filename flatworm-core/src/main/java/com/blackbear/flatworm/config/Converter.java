@@ -20,22 +20,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * Bean class used to represent information about a Converter. That is, a method
  * from CoreConverters or one you implement.
  */
-@Data
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
 public class Converter {
+    @Getter
     private String converterClass;
 
+    @Getter
     private String name;
 
+    @Getter
     private String returnType;
 
+    @Getter
     private String method;
 
     public Converter() {

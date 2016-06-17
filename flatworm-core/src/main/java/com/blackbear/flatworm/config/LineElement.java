@@ -22,4 +22,6 @@ package com.blackbear.flatworm.config;
  */
 public interface LineElement {
     String getBeanRef();
+
+    void setParentLine(Line line);
 }

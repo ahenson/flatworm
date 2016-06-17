@@ -17,18 +17,20 @@
 package com.blackbear.flatworm.config;
 
 import com.blackbear.flatworm.CardinalityMode;
+import com.blackbear.flatworm.config.impl.FieldIdentity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class SegmentElement implements LineElement {
-    private int fieldIdentStart = 0;
-    private int fieldIdentLength = 0;
-    private List<String> fieldIdentMatchStrings = new ArrayList<>();
+    private FieldIdentity fieldIdentity;
+
     private int minCount;
     private int maxCount;
     private String collectionPropertyName;
@@ -38,17 +40,7 @@ public class SegmentElement implements LineElement {
     private CardinalityMode cardinalityMode;
     private List<LineElement> elements = new ArrayList<>();
 
-    public void addFieldIdentMatchString(String s) {
-        fieldIdentMatchStrings.add(s);
-    }
-
-    public boolean matchesId(String id) {
-        return fieldIdentMatchStrings.contains(id);
-    }
-
-    public char getIdentTypeFlag() {
-        return 'F';
-    }
+    private Line parentLine;
 
     @Override
     public String getBeanRef() {
@@ -65,5 +57,29 @@ public class SegmentElement implements LineElement {
 
     public void addElement(LineElement re) {
         elements.add(re);
+    }
+
+    public boolean matchesIdentity(LineToken lineToken) {
+        boolean matchesId = false;
+        if(fieldIdentity != null) {
+            // We aren't using the FieldIdentity::matchesIdentity because it looks at absolutely positioning
+            // and SegmentElement Field Identifiers are positioned relatively.
+            matchesId = fieldIdentity.getMatchingStrings().contains(lineToken.getToken());
+        }
+        return matchesId;
+    }
+
+    @Override
+    public String toString() {
+        return "SegmentElement{" +
+                "fieldIdentity=" + fieldIdentity +
+                ", minCount=" + minCount +
+                ", maxCount=" + maxCount +
+                ", collectionPropertyName='" + collectionPropertyName + '\'' +
+                ", beanRef='" + beanRef + '\'' +
+                ", parentBeanRef='" + parentBeanRef + '\'' +
+                ", addMethod='" + addMethod + '\'' +
+                ", cardinalityMode=" + cardinalityMode +
+                '}';
     }
 }

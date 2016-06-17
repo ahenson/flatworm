@@ -16,13 +16,12 @@
 
 package com.blackbear.flatworm.config;
 
-import com.blackbear.flatworm.converters.ConversionOption;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Bean class used to store the values from the Record-Element XML tag
@@ -41,30 +40,34 @@ public class RecordElement implements LineElement {
     @Setter
     private Integer fieldLength;
 
-    private Integer spacerLength;
-
-    private char fieldType;
-
     @Setter
     private String beanRef;
 
     @Getter
     @Setter
-    private String type;
+    private String converterName;
 
     @Getter
     @Setter
+    private Line parentLine;
+
+    @Getter
+    private Boolean ignoreField;
+
+    // The elements are queried, there are just multiple layers of abstraction that the compiler can't see.
+    @Getter
+    @Setter
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private Map<String, ConversionOption> conversionOptions;
 
     public RecordElement() {
         fieldEnd = null;
         fieldStart = null;
         fieldLength = null;
-        spacerLength = null;
-        fieldType = '\0';
         beanRef = null;
-        type = null;
+        converterName = null;
         conversionOptions = new HashMap<>();
+        ignoreField = false;
     }
 
     public boolean isFieldStartSet() {
@@ -86,5 +89,26 @@ public class RecordElement implements LineElement {
     @Override
     public String getBeanRef() {
         return beanRef;
+    }
+
+    public void setIgnoreField(Boolean ignoreField) {
+        if(ignoreField != null) {
+            this.ignoreField = ignoreField;
+        }
+        else {
+            this.ignoreField = false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "RecordElement{" +
+                "fieldEnd=" + fieldEnd +
+                ", fieldStart=" + fieldStart +
+                ", fieldLength=" + fieldLength +
+                ", beanRef='" + beanRef + '\'' +
+                ", converterName='" + converterName + '\'' +
+                ", ignoreField=" + ignoreField +
+                '}';
     }
 }

@@ -22,9 +22,10 @@ import com.google.common.collect.ListMultimap;
 
 import com.blackbear.flatworm.callbacks.ExceptionCallback;
 import com.blackbear.flatworm.callbacks.RecordCallback;
+import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
-import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -109,7 +110,7 @@ public class FileParser implements Closeable {
 
     /**
      * Provide a callback object that doesn't require reflection to be invoked. The {@code MatchedRecord} will be passed back to the
-     * callback. Add a callback for each record type specified in the configuration file.
+     * callback. Add a callback for each record converterName specified in the configuration file.
      *
      * @param recordName The name of the record.
      * @param callback   The {@link RecordCallback} instance to register.
@@ -134,7 +135,7 @@ public class FileParser implements Closeable {
     }
 
     /**
-     * Set a callback for exceptions that doesn't require reflection to be invoked. The exception (rather than just the exception type) will
+     * Set a callback for exceptions that doesn't require reflection to be invoked. The exception (rather than just the exception converterName) will
      * be passed to the callback, along with the input line that caused the exception. Should only be invoked once as any subsequent
      * invocations will replace the previous callback.
      *
@@ -190,7 +191,7 @@ public class FileParser implements Closeable {
      */
     protected void loadConfiguration() throws FlatwormConfigurationException {
         try {
-            ConfigurationReader parser = new ConfigurationReader();
+            ConfigurationReader parser = new DefaultConfigurationReader();
             if (configFile != null) {
                 fileFormat = parser.loadConfigurationFile(configFile);
             } else {

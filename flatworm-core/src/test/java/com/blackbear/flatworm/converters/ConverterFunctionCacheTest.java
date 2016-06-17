@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm.converters;
 
+import com.blackbear.flatworm.config.ConversionOption;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -57,36 +59,36 @@ public class ConverterFunctionCacheTest {
         try {
             // String value.
             result = convertFromString(String.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // Double value.
             result = convertFromString(Double.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", Double.class, result.getClass());
+            assertEquals("Wrong return converterName", Double.class, result.getClass());
 
             // BigDecimal value.
             result = convertFromString(BigDecimal.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", BigDecimal.class, result.getClass());
+            assertEquals("Wrong return converterName", BigDecimal.class, result.getClass());
 
             // Float value.
             result = convertFromString(Float.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", Float.class, result.getClass());
+            assertEquals("Wrong return converterName", Float.class, result.getClass());
 
             // Long value.
             value = "12345";
             result = convertFromString(Long.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", Long.class, result.getClass());
+            assertEquals("Wrong return converterName", Long.class, result.getClass());
 
             // Integer value.
             value = "12345";
             result = convertFromString(Integer.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", Integer.class, result.getClass());
+            assertEquals("Wrong return converterName", Integer.class, result.getClass());
 
             // Date value.
             value = "06/16/2016";
             Map<String, ConversionOption> options = new HashMap<>(1);
             options.put("format", new ConversionOption("format", "MM/dd/yyyy"));
             result = convertFromString(Date.class, value, options);
-            assertEquals("Wrong return type", Date.class, result.getClass());
+            assertEquals("Wrong return converterName", Date.class, result.getClass());
         } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to convert: " + value + ": " + e.getMessage());
@@ -104,7 +106,7 @@ public class ConverterFunctionCacheTest {
         try {
             // Double value.
             result = convertFromString(LevelTwo.class, value, Collections.emptyMap());
-            assertEquals("Wrong return type", Double.class, result.getClass());
+            assertEquals("Wrong return converterName", Double.class, result.getClass());
 
             assertNotNull("Removing a ToType function failed.", removeToTypeConverterFunction(LevelOne.class));
             assertNull("Removing a ToType function didn't do it's job.", removeToTypeConverterFunction(LevelOne.class));
@@ -141,34 +143,34 @@ public class ConverterFunctionCacheTest {
         try {
             // String value.
             result = convertToString("123", Collections.emptyMap());
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // Double value.
             result = convertToString(123.45D, Collections.emptyMap());
             assertNotNull("Conversion failed", result);
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // BigDecimal value.
             result = convertToString(new BigDecimal("123.45"), Collections.emptyMap());
             assertNotNull("Conversion failed", result);
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // Float value.
             result = convertToString(123.45F, Collections.emptyMap());
             assertNotNull("Conversion failed", result);
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // Long value.
             value = "12345";
             result = convertToString(12345L, Collections.emptyMap());
             assertNotNull("Conversion failed", result);
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // Integer value.
             value = "12345";
             result = convertToString(12345, Collections.emptyMap());
             assertNotNull("Conversion failed", result);
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             // Date value.
             Calendar cal = Calendar.getInstance();
@@ -180,7 +182,7 @@ public class ConverterFunctionCacheTest {
             options.put("format", new ConversionOption("format", "MM/dd/yyyy"));
             result = convertToString(cal.getTime(), options);
             assertNotNull("Conversion failed", result);
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
         } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to convert: " + value + ": " + e.getMessage());
@@ -197,7 +199,7 @@ public class ConverterFunctionCacheTest {
         try {
             // Double value.
             result = convertToString(123.45D, Collections.emptyMap());
-            assertEquals("Wrong return type", String.class, result.getClass());
+            assertEquals("Wrong return converterName", String.class, result.getClass());
 
             assertNotNull("Removing a FromType function failed.", removeFromTypeConverterFunction(LevelOne.class));
             assertNull("Removing a FromType function didn't do it's job.", removeFromTypeConverterFunction(LevelOne.class));

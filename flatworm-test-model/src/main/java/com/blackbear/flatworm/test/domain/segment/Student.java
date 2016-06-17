@@ -14,32 +14,13 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain.segment;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+package com.blackbear.flatworm.test.domain.segment;
 
 import lombok.Data;
 
 @Data
-public class Account {
-    private Date reportingDate;
-    private String accountCode;
-    private Integer accountType;
-    private String accountNumber;
-    private String serviceType;
-    private String companyId;
-
-    private List<Consumer> consumers = new ArrayList<>();
-
-    private List<Address> addresses = new ArrayList<>();
-
-    public void addConsumer(Consumer consumer) {
-        consumers.add(consumer);
-    }
-
-    public void addAddress(Address address) {
-        addresses.add(address);
-    }
+public class Student {
+    private String firstName;
+    private String lastName;
+    private int grade;
 }

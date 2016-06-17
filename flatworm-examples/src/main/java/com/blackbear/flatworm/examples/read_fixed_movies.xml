@@ -27,36 +27,36 @@
                method="convertDate" return-type="java.lang.Date"/>
     <record name="dvd">
         <record-ident>
-            <length-ident minlength="85" maxlength="85"/>
+            <length-ident min-length="85" max-length="85"/>
         </record-ident>
         <record-definition>
-            <bean name="dvd" class="com.blackbear.flatworm.converters.domain.Dvd"/>
-            <bean name="film" class="com.blackbear.flatworm.converters.domain.Film"/>
+            <bean name="dvd" class="com.blackbear.flatworm.test.domain.Dvd"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
             <line>
                 <record-element length="30" beanref="film.title"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element length="30" beanref="film.studio"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element length="8" beanref="film.releaseDate"
-                                type="date">
+                                converter-name="date">
                     <conversion-option name="format" value="yyyyMMdd"/>
                     <conversion-option name="default-value"
                                        value="19990101"/>
                 </record-element>
                 <record-element length="9" beanref="dvd.sku"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element length="7" beanref="dvd.price"
-                                type="decimal">
+                                converter-name="decimal">
                     <conversion-option name="justify" value="right"/>
                 </record-element>
                 <record-element length="1" beanref="dvd.dualLayer"
-                                type="char"/>
+                                converter-name="char"/>
             </line>
         </record-definition>
     </record>
@@ -67,16 +67,16 @@
             </field-ident>
         </record-ident>
         <record-definition>
-            <bean name="video" class="com.blackbear.flatworm.converters.domain.Videotape"/>
-            <bean name="film" class="com.blackbear.flatworm.converters.domain.Film"/>
+            <bean name="video" class="com.blackbear.flatworm.test.domain.Videotape"/>
+            <bean name="film" class="com.blackbear.flatworm.test.domain.Film"/>
             <line>
                 <record-element start="1" end="10" beanref="video.sku"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="right"/>
                     <conversion-option name="pad-character" value="0"/>
                 </record-element>
                 <record-element start="10" end="16"
-                                beanref="video.price" type="decimal">
+                                beanref="video.price" converter-name="decimal">
                     <conversion-option name="decimal-implied"
                                        value="true"/>
                     <conversion-option name="decimal-places" value="2"/>
@@ -86,15 +86,15 @@
             </line>
             <line>
                 <record-element start="0" end="30" beanref="film.title"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element start="30" end="60"
-                                beanref="film.studio" type="char">
+                                beanref="film.studio" converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element start="60" end="70"
-                                beanref="film.releaseDate" type="date">
+                                beanref="film.releaseDate" converter-name="date">
                     <conversion-option name="default-value"
                                        value="1980-01-01"/>
                 </record-element>
@@ -103,24 +103,24 @@
     </record>
     <record name="book">
         <record-definition>
-            <bean name="book" class="com.blackbear.flatworm.converters.domain.Book"/>
+            <bean name="book" class="com.blackbear.flatworm.test.domain.Book"/>
             <line>
                 <record-element length="9" beanref="book.sku"
-                                type="char"/>
+                                converter-name="char"/>
                 <record-element length="30" beanref="book.title"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element length="30" beanref="book.author"
-                                type="char">
+                                converter-name="char">
                     <conversion-option name="justify" value="left"/>
                 </record-element>
                 <record-element length="7" beanref="book.price"
-                                type="decimal">
+                                converter-name="decimal">
                     <conversion-option name="justify" value="right"/>
                 </record-element>
                 <record-element length="10" beanref="book.releaseDate"
-                                type="date">
+                                converter-name="date">
                     <conversion-option name="default-value"
                                        value="1970-01-01"/>
                 </record-element>

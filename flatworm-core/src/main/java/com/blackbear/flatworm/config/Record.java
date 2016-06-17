@@ -16,23 +16,14 @@
 
 package com.blackbear.flatworm.config;
 
-import com.blackbear.flatworm.converters.ConversionHelper;
 import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.converters.ConversionHelper;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
-import org.apache.logging.log4j.util.Strings;
-
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import lombok.Data;
 import lombok.ToString;
@@ -46,146 +37,101 @@ import lombok.extern.slf4j.Slf4j;
 @ToString
 public class Record {
 
-    public static final String FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME = "matchesLine";
+    /**
+     * Default code for a record's identity configuration.
+     */
+    public static final char DEFAULT_IDENTITY_CODE = '\0';
+
+    /**
+     * Identity code for records that are identified by an identity of some sort.
+     */
+    public static final char FIELD_IDENTITY_CODE = 'F';
+
+    /**
+     * Identity code for records that are identified by the length of the record.
+     */
+    public static final char LENGTH_IDENTITY_CODE = 'L';
+
+    /**
+     * Identify code for records that are identified using JavaScript.
+     */
+    public static final char SCRIPT_IDENTITY_CODE = 'S';
 
     private String name;
-    private int lengthIdentMin;
-    private int lengthIdentMax;
-    private int fieldIdentStart;
-    private int fieldIdentLength;
-    private String fieldIdentScript;
-    private List<String> fieldIdentMatchStrings;
-    private char identTypeFlag;
+
+    private Identity recordIdentity;
+
     private RecordDefinition recordDefinition;
-    private Invocable scriptInvocable;
-    private ScriptEngine scriptEngine;
 
     public Record() {
-        lengthIdentMin = 0;
-        lengthIdentMax = 0;
-        fieldIdentStart = 0;
-        fieldIdentLength = 0;
-        fieldIdentMatchStrings = new ArrayList<>();
-        identTypeFlag = '\0';
-
-        ScriptEngineManager engineManager = new ScriptEngineManager();
-        scriptEngine = engineManager.getEngineByName("nashorn");
-        scriptInvocable = (Invocable) scriptEngine;
-    }
-
-    public void addFieldIdentMatchString(String fieldIdentMatch) {
-        fieldIdentMatchStrings.add(fieldIdentMatch);
     }
 
     /**
      * Determine if this {@code Record} instance is capable of parsing the given line.
-     * @param line the input line from the file being parsed.
-     * @param ff   not used at this time, for later expansion?
+     *
+     * @param fileFormat not used at this time, for later expansion?
+     * @param line       the input line from the file being parsed.
      * @return boolean does this line match according to the defined criteria?
-     * @throws FlatwormParserException should the script function lack the {@code FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME} function, which
-     * should take one parameter, the {@link FileFormat} instance - the method should return {@code true} if the line should
-     * be parsed by this {@code Record} instance and {@code false} if not.
+     * @throws FlatwormParserException should the script function lack the {@code DEFAULT_SCRIPT_METHOD_NAME} function, which should take
+     *                                 one parameter, the {@link FileFormat} instance - the method should return {@code true} if the line
+     *                                 should be parsed by this {@code Record} instance and {@code false} if not.
      */
-    public boolean matchesLine(String line, FileFormat ff) throws FlatwormParserException {
+    public boolean matchesLine(FileFormat fileFormat, String line) throws FlatwormParserException {
         boolean matchesLine = true;
-        switch (identTypeFlag) {
-
-            // TODO How to handle default configurations (no record-ident) and ignore-unmapped-lines - these are currently in conflict.
-            // TODO one consideration is to not allow ignore-unmapped-lines == true and default records in the same file
-
-            // Recognition by value in a certain field
-            // TODO: Will this work for delimited lines?
-            case 'F':
-                if (line.length() < fieldIdentStart + fieldIdentLength) {
-                    matchesLine = false;
-                    break;
-                } else {
-                    matchesLine = false;
-                    for (String matchingStrings : fieldIdentMatchStrings) {
-                        if (line.regionMatches(fieldIdentStart, matchingStrings, 0, fieldIdentLength)) {
-                            matchesLine = true;
-                            break;
-                        }
-                    }
-                    if(matchesLine) {
-                        break;
-                    }
-                }
-                matchesLine = false;
-                break;
-
-            // Recognition by length of line
-            case 'L':
-                matchesLine = line.length() >= lengthIdentMin && line.length() <= lengthIdentMax;
-                break;
-            case 'S':
-                if(scriptInvocable != null && !Strings.isBlank(fieldIdentScript)) {
-                    try {
-                        Object result = scriptInvocable.invokeFunction(FIELD_IDENT_SCRIPT_ENTRY_METHOD_NAME, ff);
-                        if(result instanceof Boolean) {
-                            matchesLine = Boolean.class.cast(result);
-                        }
-                        else if(result != null) {
-                            throw new FlatwormParserException(String.format("Record %s has a script identifier that does not return" +
-                                    "a boolean value - a type of %s was returned.", name, result.getClass().getName()));
-                        }
-                    } catch (Exception e) {
-                        throw new FlatwormParserException(e.getMessage(), e);
-                    }
-                }
-                break;
+        if (recordIdentity != null) {
+            matchesLine = recordIdentity.doesMatch(this, fileFormat, line);
         }
         return matchesLine;
     }
 
-    public void setFieldIdentScript(String fieldIdentScript) throws ScriptException {
-        this.fieldIdentScript = fieldIdentScript;
-        if(scriptEngine != null && !Strings.isBlank(fieldIdentScript)) {
-            scriptEngine.eval(this.fieldIdentScript);
+    /**
+     * If the Record's {@link Identity} is an implementation of the {@link LineTokenIdentity} then pass it the {@code lineToken} instance to
+     * see if it matches with the configured identity.
+     *
+     * @param lineToken The {@link LineToken} to test.
+     * @return {@code true} if the {@code recordIdentity} property is set to an instance of {@link LineTokenIdentity} and its {@code
+     * matchesIdentity} return {@code true}. All other cases return {@code false}.
+     */
+    public boolean matchesIdentifier(LineToken lineToken) {
+        boolean matches = false;
+        if (recordIdentity instanceof LineTokenIdentity) {
+            matches = LineTokenIdentity.class.cast(recordIdentity).matchesIdentity(lineToken);
         }
+        return matches;
     }
 
     /**
      * Parse the record into the bean(s).
      *
-     * @param firstLine  first line to be considered.
-     * @param in         used to retrieve additional lines of input for parsing multi-line records.
-     * @param convHelper used to help convert datatypes and format strings.
+     * @param firstLine        first line to be considered.
+     * @param in               used to retrieve additional lines of input for parsing multi-line records.
+     * @param conversionHelper used to help convert datatypes and format strings.
      * @return collection of beans populated with file data.
+     * @throws FlatwormParserException should an error occur while parsing the data.
      */
     public Map<String, Object> parseRecord(String firstLine, BufferedReader in,
-                                           ConversionHelper convHelper) throws FlatwormParserException {
+                                           ConversionHelper conversionHelper) throws FlatwormParserException {
         Map<String, Object> beans = new HashMap<>();
         try {
-            Map<String, Bean> beanHash = recordDefinition.getBeansUsed();
+
             Object beanObj;
-            for (String beanName : beanHash.keySet()) {
-                Bean bean = beanHash.get(beanName);
+            for (Bean bean : recordDefinition.getBeans()) {
                 beanObj = bean.getBeanObjectClass().newInstance();
-                beans.put(beanName, beanObj);
+                beans.put(bean.getBeanName(), beanObj);
             }
 
             List<Line> lines = recordDefinition.getLines();
             String inputLine = firstLine;
             for (int i = 0; i < lines.size(); i++) {
                 Line line = lines.get(i);
-                line.parseInput(inputLine, beans, convHelper);
-                if (i + 1 < lines.size())
+                line.parseInput(inputLine, beans, conversionHelper);
+                if (i + 1 < lines.size()) {
                     inputLine = in.readLine();
+                }
             }
 
-        } catch (SecurityException e) {
-            log.error("Invoking method", e);
-            throw new FlatwormParserException("Couldn't invoke Method");
-        } catch (IOException e) {
-            log.error("Reading input", e);
-            throw new FlatwormParserException("Couldn't read line");
-        } catch (InstantiationException e) {
-            log.error("Creating bean", e);
-            throw new FlatwormParserException("Couldn't create bean");
-        } catch (IllegalAccessException e) {
-            log.error("No access to class", e);
-            throw new FlatwormParserException("Couldn't access class");
+        } catch (Exception e) {
+            throw new FlatwormParserException(e.getMessage(), e);
         }
         return beans;
     }

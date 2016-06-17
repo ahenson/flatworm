@@ -20,10 +20,10 @@ import com.blackbear.flatworm.FileCreator;
 
 import java.util.Date;
 
-import com.blackbear.flatworm.converters.domain.Book;
-import com.blackbear.flatworm.converters.domain.Dvd;
-import com.blackbear.flatworm.converters.domain.Film;
-import com.blackbear.flatworm.converters.domain.Videotape;
+import com.blackbear.flatworm.test.domain.Book;
+import com.blackbear.flatworm.test.domain.Dvd;
+import com.blackbear.flatworm.test.domain.Film;
+import com.blackbear.flatworm.test.domain.Videotape;
 
 public class WriteFixedMovies {
 

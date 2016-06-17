@@ -24,15 +24,15 @@ package com.blackbear.flatworm.examples;
 
 import com.blackbear.flatworm.MatchedRecord;
 
-import com.blackbear.flatworm.converters.domain.Book;
-import com.blackbear.flatworm.converters.domain.Dvd;
-import com.blackbear.flatworm.converters.domain.Film;
-import com.blackbear.flatworm.converters.domain.Videotape;
+import com.blackbear.flatworm.test.domain.Book;
+import com.blackbear.flatworm.test.domain.Dvd;
+import com.blackbear.flatworm.test.domain.Film;
+import com.blackbear.flatworm.test.domain.Videotape;
 
 /**
  * @author e50633
  *
- *         To change the template for this generated type comment go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
+ *         To change the template for this generated converterName comment go to Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and
  *         Comments
  */
 public class ProductHandler {

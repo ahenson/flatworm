@@ -14,20 +14,19 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.converters.domain;
+package com.blackbear.flatworm.config;
 
-import java.util.Date;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * Created by IntelliJ IDEA. User: turner Date: Jun 16, 2004 Time: 1:44:28 AM To change this template use File | Settings | File Templates.
+ * Bean class used to store the values from the Conversion-Option XML tag
  */
 @Data
-public class Film {
-    private Date releaseDate;
-
-    private String title;
-
-    private String studio;
+@EqualsAndHashCode
+@AllArgsConstructor
+public class ConversionOption {
+    private String name;
+    private String value;
 }
