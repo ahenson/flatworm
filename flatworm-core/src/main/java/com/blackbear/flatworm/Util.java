@@ -290,4 +290,21 @@ public final class Util {
         }
         return result;
     }
+
+    /**
+     * Try parse the {@code value} using {@code java.lang.Boolean::parseBoolean}, and if unable return the {@code defaultValue}.
+     *
+     * @param value The value to parse (should be {@code true} or {@code false}.
+     * @param defaultValue The default {@link Boolean} value to return if the {@code value} could not be parsed or is {@code null}.
+     * @return the {@link Boolean} result if {@code value} is valid accordingly to {@code java.lang.Boolean::parseBoolean} or the
+     * {@code defaultValue} if {@code value} could not be parsed..
+     */
+    public static Boolean tryParseBoolean(String value, boolean defaultValue) {
+        Boolean result = tryParseBoolean(value);
+        if (result == null) {
+            result = defaultValue;
+        }
+        return result;
+    }
+
 }

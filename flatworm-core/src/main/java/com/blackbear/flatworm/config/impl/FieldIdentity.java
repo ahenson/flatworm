@@ -16,11 +16,12 @@
 
 package com.blackbear.flatworm.config.impl;
 
+import com.google.common.base.Joiner;
+
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.config.Line;
 import com.blackbear.flatworm.config.LineToken;
 import com.blackbear.flatworm.config.Record;
-import com.blackbear.flatworm.config.impl.AbstractIdentity;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.BufferedWriter;
@@ -50,12 +51,26 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
     @Setter
     private Set<String> matchingStrings;
 
+    @Getter
+    private boolean ignoreCase;
+
     public FieldIdentity() {
         matchingStrings = new HashSet<>();
+        ignoreCase = false;
+    }
+
+    public FieldIdentity(boolean ignoreCase) {
+        this();
+        this.ignoreCase = ignoreCase;
     }
 
     public void addMatchingString(String matchingString) {
-        matchingStrings.add(matchingString);
+        String valueToAdd = matchingString;
+        if (ignoreCase) {
+            valueToAdd = valueToAdd.toLowerCase();
+        }
+
+        matchingStrings.add(valueToAdd);
     }
 
     /**
@@ -67,17 +82,19 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
      * @param line       The line of data to be evaluated.
      * @return {@code true} the {@code line} of data has the appropriate identity labels (i.e. it matches one of the {@code matchingString}
      * instances in the spot identified by the {@code startPosition} and is within the length of the {@code fieldLength} specified.
-     * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script not be a
-     *                                 {@code boolean} value.
+     * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script
+     *                                 not be a {@code boolean} value.
      */
     @Override
     public boolean doesMatch(Record record, FileFormat fileFormat, String line) throws FlatwormParserException {
+        if(line == null) return false;
+
         boolean matchesLine = false;
         if (line.length() < startPosition + fieldLength) {
             matchesLine = false;
         } else {
             for (String matchingString : matchingStrings) {
-                if (line.regionMatches(startPosition, matchingString, 0, fieldLength)) {
+                if (line.regionMatches(ignoreCase, startPosition, matchingString, 0, fieldLength)) {
                     matchesLine = true;
                     break;
                 }
@@ -86,27 +103,48 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
         return matchesLine;
     }
 
+    /**
+     * Write out all delimiters to the given {@link BufferedWriter instance{.}}
+     *
+     * @param writer The {@link BufferedWriter} to write to.
+     * @param record The {@link Record} instance currently being processed.
+     * @param line   The {@link Line} instance currently being processed.
+     * @throws IOException should an I/O exception occur.
+     */
     @Override
     public void write(BufferedWriter writer, Record record, Line line) throws IOException {
+        // TODO [AH] not sure about this approach as it writes out all matching strings instead of the primary one.
+        // TODO [AH] I think the update might be an indicator as to the primary token and if set, only the primary is written - else, all.
         String delimit = line.getDelimiter() != null ? line.getDelimiter() : "";
-        for (String matchingString : matchingStrings) {
-            writer.write(matchingString + delimit);
-        }
+        writer.write(Joiner.on(delimit).join(matchingStrings));
     }
 
+    /**
+     * See if the given {@link LineToken} instance matches any of the registered matching strings.
+     *
+     * @param lineToken The {@link LineToken} instance to evaluate.
+     * @return {@code true} if a match is found and {@code false} if not.
+     */
     @Override
     public boolean matchesIdentity(LineToken lineToken) {
         boolean matches = false;
 
-        if(startPosition != null) {
+        if (startPosition != null) {
             matches = lineToken.getColumnPosition() == startPosition;
         }
 
-        if(fieldLength != null) {
-            matches = matches && lineToken.getFullTokenLength() == fieldLength;
+        if (matches && fieldLength != null) {
+            matches = lineToken.getFullTokenLength() == fieldLength;
         }
 
-        matches = matches && matchingStrings.contains(lineToken.getToken());
+        if (matches) {
+            String comparisonValue = lineToken.getToken();
+            if (ignoreCase) {
+                comparisonValue = comparisonValue.toLowerCase();
+            }
+
+            matches = matchingStrings.contains(comparisonValue);
+        }
 
         return matches;
     }

@@ -14,25 +14,27 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations;
+package com.blackbear.flatworm.config.impl;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.config.Record;
+
+import org.junit.Before;
 
 /**
- * Class description goes here.
+ * Shared functionality between the Identity test cases.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-@interface StringMatchIdentity {
-    String matchString() default "";
-    boolean ignoreCase() default false;
-    boolean trim() default false;
+public abstract class AbstractBaseIdentityTest {
+
+    protected Record record;
+    protected FileFormat fileFormat;
+
+    @Before
+    public void setup() {
+        record = new Record();
+        fileFormat = new FileFormat();
+    }
+
 }

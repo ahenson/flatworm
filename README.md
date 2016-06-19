@@ -45,6 +45,8 @@ Work Completed
 * Added ability to specify ignore-field on a record-element to explicitly ignore it.
 * Changed the record-element "type" attribute to "converter-name" as that's what it's really linked to.
 * Changed the minlength/maxlength attributes for the length-ident element to min-length/max-length for consistency.
+* On Field Identity (field-ident) - added ignore-case tag to indicate whether or not case should play a factor in comparison.
+* 
 
 TODOs
 -------
@@ -60,4 +62,6 @@ TODOs
 * Complete checklist for deploying production jar to Maven Central repository
 * Add default converters based upon reflection
 * Add more broad support for the script-ident so that CDATA isn't required 
-* Add support for other script types and engines.
+* Add support for other script types and engines
+* Refactor the parsing logic from the beans that hold the configuration data
+* Add missing JavaDocs

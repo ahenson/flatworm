@@ -44,7 +44,6 @@ import static org.junit.Assert.fail;
  * Test to ensure that the ConverterFunctionCache is correctly providing the right converter functions.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
 public class ConverterFunctionCacheTest {
 

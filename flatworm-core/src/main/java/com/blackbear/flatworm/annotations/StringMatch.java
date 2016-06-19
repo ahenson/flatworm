@@ -30,8 +30,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@interface ConversionOption {
-    String name();
-
-    String option();
+@interface StringMatch {
+    String matchString() default "";
+    boolean ignoreCase() default false;
 }

@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
  * Class description goes here.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -35,5 +34,5 @@ import java.lang.annotation.Target;
     int fieldStartPosition();
     int fieldLength();
     boolean apply();
-    StringMatchIdentity[] stringMatchIdentities();
+    StringMatch[] stringMatchIdentities();
 }

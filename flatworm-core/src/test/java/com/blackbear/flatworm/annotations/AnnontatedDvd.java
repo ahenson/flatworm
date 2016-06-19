@@ -22,7 +22,6 @@ import lombok.Data;
  * Class description goes here.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
 @Data
 @Record(fieldIdentity =
@@ -31,7 +30,7 @@ import lombok.Data;
         fieldLength = 3,
         apply = true,
         stringMatchIdentities = { @
-                StringMatchIdentity(matchString = "DVD", ignoreCase = true) }))
+                StringMatch(matchString = "DVD", ignoreCase = true) }))
 public class AnnontatedDvd {
 
     @RecordElement(order = 1, length = 30)
@@ -40,7 +39,7 @@ public class AnnontatedDvd {
     @RecordElement(order = 2, length = 30)
     private String dualLayer;
 
-    @RecordElement(order = 2, length = 30)
+    @RecordElement(order = 3, length = 30)
     private double price;
 
     public String toString() {

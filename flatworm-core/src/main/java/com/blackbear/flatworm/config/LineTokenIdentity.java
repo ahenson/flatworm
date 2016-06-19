@@ -21,7 +21,6 @@ package com.blackbear.flatworm.config;
  * found within the line of data being parsed vs. characteristics of the entire line itself)..
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
 public interface LineTokenIdentity extends Identity {
 

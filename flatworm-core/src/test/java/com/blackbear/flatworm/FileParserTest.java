@@ -32,7 +32,6 @@ import static org.mockito.Mockito.verify;
  * Class description goes here.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FileParserTest {

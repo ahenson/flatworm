@@ -14,10 +14,8 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.config;
+package com.blackbear.flatworm.config.impl;
 
-import com.blackbear.flatworm.FileFormat;
-import com.blackbear.flatworm.config.impl.ScriptIdentity;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -32,9 +30,8 @@ import static org.junit.Assert.fail;
  * Test the ScriptIdentity class's capabilities around script parsing and line identification.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
-public class ScriptIdentityTest {
+public class ScriptIdentityTest extends AbstractBaseIdentityTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -48,9 +45,6 @@ public class ScriptIdentityTest {
                     "}",
                     ScriptIdentity.DEFAULT_SCRIPT_METHOD_NAME);
             ScriptIdentity scriptIdentity = new ScriptIdentity(script);
-
-            FileFormat fileFormat = new FileFormat();
-            Record record = new Record();
             String line = "";
             assertTrue(scriptIdentity.doesMatch(record, fileFormat, line));
         } catch (Exception e) {
@@ -65,8 +59,6 @@ public class ScriptIdentityTest {
         String script = "";
         ScriptIdentity scriptIdentity = new ScriptIdentity(script);
 
-        FileFormat fileFormat = new FileFormat();
-        Record record = new Record();
         String line = "";
         scriptIdentity.doesMatch(record, fileFormat, line);
     }

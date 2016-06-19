@@ -24,7 +24,6 @@ import java.util.Map;
  * Provide a contract that aligns with how the {@link CoreConverters} manages its built in Converters.
  *
  * @author Alan Henson
- * @since 2016.1.0.0
  */
 @FunctionalInterface
 public interface FromTypeConverterFunction {

@@ -443,7 +443,10 @@ public class DefaultConfigurationReader implements ConfigurationReader {
      * @return a built {@link FieldIdentity} instance.
      */
     protected FieldIdentity readFieldIdentity(Node node) {
-        FieldIdentity fieldIdentity = new FieldIdentity();
+
+        FieldIdentity fieldIdentity = new FieldIdentity(
+                Util.tryParseBoolean(getAttributeValueNamed(node, "ignore-case"), false)
+        );
 
         fieldIdentity.setStartPosition(Util.tryParseInt(getAttributeValueNamed(node, "field-start")));
         fieldIdentity.setFieldLength(Util.tryParseInt(getAttributeValueNamed(node, "field-length")));
