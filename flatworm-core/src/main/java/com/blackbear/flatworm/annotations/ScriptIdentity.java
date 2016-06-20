@@ -35,6 +35,6 @@ import java.lang.annotation.Target;
 public @interface ScriptIdentity {
     String scriptEngine() default ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE;
     String script();
-    String scriptMethod() default ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME;
+    String methodName() default ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME;
     boolean apply();
 }

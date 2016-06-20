@@ -405,7 +405,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         return new ScriptIdentityImpl(
                 annotatedIdentity.scriptEngine(),
                 annotatedIdentity.script(),
-                annotatedIdentity.scriptMethod()
+                annotatedIdentity.methodName()
         );
     }
 

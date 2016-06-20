@@ -32,7 +32,7 @@ import lombok.Data;
         @ScriptIdentity(
                 scriptEngine = "nashorn",
                 script = "function myMethod(fileFormat, line) { return true; }",
-                scriptMethod = "myMethod",
+                methodName = "myMethod",
                 apply = true
         ))
 public class ScriptIdentityBean {
