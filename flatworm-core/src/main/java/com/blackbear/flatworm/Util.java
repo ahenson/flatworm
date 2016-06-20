@@ -20,15 +20,20 @@ import com.google.common.primitives.Ints;
 
 import com.blackbear.flatworm.config.ConversionOptionBO;
 import com.blackbear.flatworm.config.LineToken;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -330,4 +335,66 @@ public final class Util {
         return fieldType;
     }
 
+    /**
+     * Load all classes within a given package (recursive) that are annotated by the given {@code annotationClass} parameter.
+     * @param packageName The package name to search - it will be recusrively searched.
+     * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
+     * @return The list of classes found annotated by the {@code annotatedClass} parameter.
+     * @throws FlatwormConfigurationException should parsing the classpath fail.
+     */
+    public static List<Class<?>> findRecordAnnotatedClasses(String packageName, Class<? extends Annotation> annotationClass) 
+            throws FlatwormConfigurationException {
+        List<Class<?>> discoveredClasses = new ArrayList<>();
+        try {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            String path = packageName.replace('.', '/');
+            Enumeration<URL> resources = classLoader.getResources(path);
+            List<File> dirs = new ArrayList<>();
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                dirs.add(new File(resource.getFile()));
+            }
+            for (File directory : dirs) {
+                findRecordAnnotatedClasses(directory, packageName, annotationClass, discoveredClasses);
+            }
+        } catch (FlatwormConfigurationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FlatwormConfigurationException(e.getMessage(), e);
+        }
+
+        return discoveredClasses;
+    }
+
+    /**
+     * For a given {@code directory}, recursively look for all classes that are annotated by the {@code annotationClass} parameter
+     * and add them to the {@code classes} list.
+     * @param directory The directory to search - should be a classpath path.
+     * @param packageName The name of the package to search.
+     * @param annotationClass The {@link Annotation} the classes most be annotated by to be included in the results. 
+     * @param classes The classes list that will be built up as annotated clases are found.
+     * @throws FlatwormConfigurationException should parsing the classpath fail.
+     */
+    public static void findRecordAnnotatedClasses(File directory, String packageName, Class<? extends Annotation> annotationClass, 
+                                            List<Class<?>> classes) throws FlatwormConfigurationException {
+        try {
+            if (directory.exists()) {
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        if (file.isDirectory() && file.getName().contains(".")) {
+                            findRecordAnnotatedClasses(file, packageName + "." + file.getName(), annotationClass, classes);
+                        } else if (!file.isDirectory() && file.getName().endsWith(".class")) {
+                            Class<?> clazz = Class.forName(packageName + "." + file.getName().substring(0, file.getName().length() - 6));
+                            if (clazz.isAnnotationPresent(annotationClass)) {
+                                classes.add(clazz);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new FlatwormConfigurationException(e.getMessage(), e);
+        }
+    }
 }

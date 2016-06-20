@@ -75,9 +75,9 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     @Setter
     @Getter
     private boolean performValidation;
-    
+
     private boolean onFirstPassFlag;
-    
+
     @Getter
     private FileFormat fileFormat;
 
@@ -117,12 +117,31 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                     .filter(record -> record.getRecordDefinition() != null)
                     .forEach(record ->
                             record.getRecordDefinition().getLines()
-                                .forEach(this::sortLineElementCollections));
+                                    .forEach(this::sortLineElementCollections));
 
             // Validate that all required metadata has been captured.
             ConfigurationValidator.validateFileFormat(fileFormat);
         }
 
+        return fileFormat;
+    }
+
+    /**
+     * Attempt to find all {@link Record} annotated classes within the given {@code packageName} (and its child packages) and then load
+     * those elements.
+     *
+     * @param packageName The package name to search.
+     * @return The {@link FileFormat} instance constructed from any {@link Record} annotated classes found.
+     * @throws FlatwormConfigurationException should parsing the classpath or the configuration data in the annotations fail for any
+     *                                        reason.
+     */
+    @Override
+    public FileFormat loadConfiguration(String packageName) throws FlatwormConfigurationException {
+        FileFormat fileFormat = null;
+        List<Class<?>> recordAnnotatedClasses = Util.findRecordAnnotatedClasses(packageName, Record.class);
+        if(!recordAnnotatedClasses.isEmpty()) {
+            fileFormat = loadConfiguration(recordAnnotatedClasses);
+        }
         return fileFormat;
     }
 
@@ -503,12 +522,11 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                 segmentElementBO.setPropertyName(field.getName());
                 segmentElementBO.setBeanRef(fieldType.getName());
 
-                if(Collection.class.isAssignableFrom(field.getType()) || field.getType().isArray()) {
+                if (Collection.class.isAssignableFrom(field.getType()) || field.getType().isArray()) {
                     segmentElementBO.setCardinalityMode(annotatedElement.cardinalityMode());
                     segmentElementBO.setMinCount(annotatedElement.mintCount());
                     segmentElementBO.setMaxCount(annotatedElement.maxCount());
-                }
-                else {
+                } else {
                     // This is a singular instance.
                     segmentElementBO.setCardinalityMode(CardinalityMode.SINGLE);
                 }
@@ -540,8 +558,9 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     }
 
     /**
-     * Ensure all {@link LineElementCollection} instances in the tree have been properly sorted - this method is recursively called
-     * to navigate the full tree.
+     * Ensure all {@link LineElementCollection} instances in the tree have been properly sorted - this method is recursively called to
+     * navigate the full tree.
+     *
      * @param lineElementCollection The {@link LineElementCollection} to sort.
      */
     protected void sortLineElementCollections(LineElementCollection lineElementCollection) {

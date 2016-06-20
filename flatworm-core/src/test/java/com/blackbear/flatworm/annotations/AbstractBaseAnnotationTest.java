@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm.annotations;
 
+import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.config.RecordDefinitionBO;
@@ -42,7 +43,14 @@ public class AbstractBaseAnnotationTest {
     public void setup() {
         configLoader = new DefaultAnnotationConfigurationReaderImpl();
     }
-
+    
+    public void validateFileFormat(FileFormat fileFormat, int expectedRecordCount, boolean expectedIgnoreUnmappedRecordsFlag) {
+        assertNotNull("FileFormat instance is null.");
+        assertEquals("Incorrect ignoreUnmappedRecordsFlag", expectedIgnoreUnmappedRecordsFlag, fileFormat.isIgnoreUnmappedRecords());
+        assertNotNull("Null Records for FileFormat.", fileFormat.getRecords());
+        assertEquals("Incorrect number of Records loaded to FileFormat.", expectedRecordCount, fileFormat.getRecords().size());
+    }
+    
     public void validateLines(RecordBO recordBO, int expectedLineCount) {
         assertNotNull("Null RecordDefinition instance.", recordBO.getRecordDefinition());
         assertNotNull("Null RecordDefinition.Lines.", recordBO.getRecordDefinition().getLines());
