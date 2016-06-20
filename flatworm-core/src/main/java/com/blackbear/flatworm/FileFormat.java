@@ -63,6 +63,9 @@ public class FileFormat {
     @Setter
     private boolean ignoreUnmappedRecords;
 
+    @Getter
+    private MatchedRecord lastRecordRead;
+    
     public FileFormat() {
         records = new HashMap<>();
         recordOrder = new ArrayList<>();
@@ -137,7 +140,8 @@ public class FileFormat {
             RecordBO record = findMatchingRecord(currentParsedLine);
             if (record != null) {
                 Map<String, Object> beans = record.parseRecord(currentParsedLine, in, conversionHelper);
-                matchedRecord = new MatchedRecord(record.getName(), beans);
+                matchedRecord = new MatchedRecord(record.getName(), beans, currentParsedLine);
+                lastRecordRead = matchedRecord;
             }
             else if (!ignoreUnmappedRecords) {
                 throw new FlatwormParserException(String.format(

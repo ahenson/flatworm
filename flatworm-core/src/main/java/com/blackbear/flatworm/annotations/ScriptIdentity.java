@@ -33,8 +33,41 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface ScriptIdentity {
+
+    /**
+     * The Script Engine to use. Java must be able to resolve this. The default is specified here: {@code
+     * ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE}.
+     * @return The name of the script engine to use.
+     */
     String scriptEngine() default ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE;
-    String script();
+
+    /**
+     * The script snippet to use (vs. loading a file. This will be used over a specified {@code scriptFile}.
+     *
+     * @return The specified script snippet.
+     */
+    String script() default "";
+
+    /**
+     * The name/path of a script file available on the classpath that contains the script to use. If used then {@code script} must not be
+     * used. If a {@code methodName} is used in the script other than the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} method name,
+     * then the {@code methodName} must also be specified.
+     *
+     * @return The name/path to the script file.
+     */
+    String scriptFile() default "";
+
+    /**
+     * The name of the method in the script that takes the {@link com.blackbear.flatworm.FileFormat} and {@code line} ({@link String})
+     * parameters. This is only required if different than the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} value.
+     *
+     * @return The specified method name if other than the default.
+     */
     String methodName() default ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME;
+
+    /**
+     * Flag indicating that this identity instance should be used.
+     * @return {@code true} if it is to be used and {@code false} if not.
+     */
     boolean apply();
 }

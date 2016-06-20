@@ -467,6 +467,7 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
     protected ScriptIdentityImpl readScriptIdentity(Node node) throws FlatwormConfigurationException {
         String scriptEngineName = getAttributeValueNamed(node, "script-engine");
         String scriptMethodName = getAttributeValueNamed(node, "method-name");
+        String scriptFile = getAttributeValueNamed(node, "script-file");
 
         // Simple JavaScript doesn't require CDATA - see if it exists in the text field alone.
         String script = getChildTextNodeValue(node);
@@ -476,7 +477,14 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
             script = getChildCDataNodeValue(node);
         }
 
-        return new ScriptIdentityImpl(scriptEngineName, script, scriptMethodName);
+        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(scriptEngineName, scriptMethodName);
+        if(!StringUtils.isBlank(script)) {
+            scriptIdentity.setScript(script);
+        }
+        else if(!StringUtils.isBlank(scriptFile)) {
+            scriptIdentity.setScriptFile(scriptFile);
+        }
+        return scriptIdentity;
     }
 
     /**

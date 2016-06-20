@@ -178,8 +178,8 @@ public class ConfigurationValidator {
      * @param errors         A non-null {@link List} that will be appended to if errors are found.
      */
     public static void validateScriptIdentity(ScriptIdentityImpl scriptIdentity, List<String> errors) {
-        if (StringUtils.isBlank(scriptIdentity.getScript())) {
-            errors.add("The script-ident node must include the script to be executed.");
+        if (StringUtils.isBlank(scriptIdentity.getScript()) && StringUtils.isBlank(scriptIdentity.getScriptFile())) {
+            errors.add("The Script Identity configuration must include the script or script-file parameter.");
         }
     }
 

@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+
 /**
  * The <code>MatchedRecord</code> is used to return the record data from a
  * <code>FileFormat</code> record request. It has a name field, which stores the
@@ -33,20 +35,16 @@ import java.util.Map;
 public class MatchedRecord {
     private Map<String, Object> beans = new HashMap<>();
 
+    @Getter
     private String recordName;
+    
+    @Getter
+    private String dataLine;
 
-    public MatchedRecord(String name, Map<String, Object> beans) {
+    public MatchedRecord(String name, Map<String, Object> beans, String dataLine) {
         recordName = name;
         this.beans.putAll(beans);
-    }
-
-    /**
-     * Gets the name of the record found.
-     *
-     * @return The record name
-     */
-    public String getRecordName() {
-        return recordName;
+        this.dataLine = dataLine;
     }
 
     /**

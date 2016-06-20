@@ -43,6 +43,8 @@ import com.blackbear.flatworm.config.RecordElementBO;
 import com.blackbear.flatworm.config.SegmentElementBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -402,11 +404,14 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
      * @return the {@link ScriptIdentityImpl} instance constructed.
      */
     public ScriptIdentityImpl loadScriptIdentity(ScriptIdentity annotatedIdentity) throws FlatwormConfigurationException {
-        return new ScriptIdentityImpl(
-                annotatedIdentity.scriptEngine(),
-                annotatedIdentity.script(),
-                annotatedIdentity.methodName()
-        );
+        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(annotatedIdentity.scriptEngine(), annotatedIdentity.methodName());
+        if(!StringUtils.isBlank(annotatedIdentity.script())) {
+            scriptIdentity.setScript(annotatedIdentity.script());
+        }
+        else if(!StringUtils.isBlank(annotatedIdentity.scriptFile())) {
+            scriptIdentity.setScriptFile(annotatedIdentity.scriptFile());
+        }
+        return scriptIdentity;
     }
 
     /**

@@ -22,6 +22,7 @@ import com.blackbear.flatworm.annotations.beans.FieldIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LengthIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LineBean;
 import com.blackbear.flatworm.annotations.beans.ScriptIdentityBean;
+import com.blackbear.flatworm.annotations.beans.ScriptIdentityFileBean;
 import com.blackbear.flatworm.config.ConverterBO;
 import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.RecordBO;
@@ -173,6 +174,40 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
 
             assertNotNull("Null script method", identity.getMethodName());
             assertEquals("Wrong script method name", "myMethod", identity.getMethodName());
+
+            assertTrue("Failed to match identifier", identity.matchesIdentity(record, new FileFormat(), ""));
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            fail("Failed to correctly parse configuration from object with RecordBO annotation: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void scriptIdentityScriptFileTest() {
+        try {
+            RecordBO record = configLoader.loadRecord(ScriptIdentityFileBean.class);
+
+            validateRecord(record, ScriptIdentityFileBean.class);
+            validateLines(record, 1);
+            validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
+
+            assertTrue("The Length Identity information was not loaded.", record.getRecordIdentity() instanceof ScriptIdentityImpl);
+            ScriptIdentityImpl identity = ScriptIdentityImpl.class.cast(record.getRecordIdentity());
+
+            assertNotNull("Null script engine name", identity.getScriptEngineName());
+            assertEquals("Wrong script engine name", "nashorn", identity.getScriptEngineName());
+
+            assertNotNull("Null script", identity.getScript());
+            assertEquals("Wrong script", "var myMethod = function(fileFormat, line) { return true; };", identity.getScript().trim());
+
+            assertNotNull("Null script file", identity.getScriptFile());
+            assertEquals("Wrong script", "script_identity_script_file.js", identity.getScriptFile());
+
+            assertNotNull("Null script method", identity.getMethodName());
+            assertEquals("Wrong script method name", "myMethod", identity.getMethodName());
+            
+            assertTrue("Failed to match identifier", identity.matchesIdentity(record, new FileFormat(), ""));
         }
         catch(Exception e) {
             e.printStackTrace();

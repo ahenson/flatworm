@@ -44,7 +44,8 @@ public class ScriptIdentityTest extends AbstractBaseIdentityTest {
                     "   return fileFormat.getLineNumber() == 0; " +
                     "}",
                     ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME);
-            ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(script);
+            ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl();
+            scriptIdentity.setScript(script);
             String line = "";
             assertTrue(scriptIdentity.matchesIdentity(record, fileFormat, line));
         } catch (Exception e) {
@@ -57,7 +58,8 @@ public class ScriptIdentityTest extends AbstractBaseIdentityTest {
     public void invalidScript() throws FlatwormParserException, FlatwormConfigurationException {
         thrown.expect(FlatwormParserException.class);
         String script = "";
-        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(script);
+        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl();
+        scriptIdentity.setScript(script);
 
         String line = "";
         scriptIdentity.matchesIdentity(record, fileFormat, line);
