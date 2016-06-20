@@ -45,7 +45,7 @@ Work Completed
 * Added use of `Streams` and `Lambdas` where it mae code cleaners
 * Cleaned up some comments
 * Removed com.blackbear.flatworm.Callback - use ExceptionCallback or RecordCallback instead (moved to new callbacks package).
-* Added ability to use a JavaScript snippet to see if a line should be processed by a given Record
+* Added ability to use a JavaScript snippet to see if a line should be processed by a given Record (can also specify a script file and method name to keep scripts external to code)
 * Added ability to specify ignore-field on a record-element to explicitly ignore it.
 * Changed the record-element "type" attribute to "converter-name" as that's what it's really linked to.
 * Changed the minlength/maxlength attributes for the length-ident element to min-length/max-length for consistency.
@@ -53,22 +53,19 @@ Work Completed
 * Added support for single segment-element configurations where the child doesn't have to be a collection
 * Added support for non-delimited segment-elements - a "child" line can be a non-delimited line
 * Added line identifiers
+* Added annotation support
+* Added ability to auto-resolve the converter type based upon the field's type (given that it's a common type in String, Double, Float, Long, or Integer).
+* Added more constants where appropriate. There is likely more that can be done here.
 
 TODOs
 -------
 * Update the "Field Guide" to reflect the latest changes and usages
 * Update the examples to reflect the latest capabilities and provide more guidance within the examples
-* Add annotations support to all for beans to define their record makeup
 * Add the ability to specify a type in addition-to or instead-of a converter
-* Introduce constants where string literals are used
 * Complete checklist for deploying production jar to Maven Central repository
-* Add default converters based upon reflection
-* Add more broad support for the script-ident so that CDATA isn't required 
-* Add support for other script types and engines
 * Refactor the parsing logic from the beans that hold the configuration data
 * Add missing JavaDocs
 * Add ability for folks to write their own Identity implementations and make them annotation enabled. Right now they would have to build their own annotation configuration loader and extend the relevant parts - which is fine, but this can be done more cleanly I think.
-* Add ability for the Script Identity approach to load scripts from files
 * Add more verbose logging
 * Is the field-length attribute really needed on Field Identity? We know the length by the matching strings. They should all be the same length else the match will always fail.
 
