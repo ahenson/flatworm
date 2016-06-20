@@ -15,13 +15,6 @@
  */
 package com.blackbear.flatworm;
 
-import org.junit.Test;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-
 import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.test.domain.Book;
@@ -29,6 +22,13 @@ import com.blackbear.flatworm.test.domain.Dvd;
 import com.blackbear.flatworm.test.domain.Film;
 import com.blackbear.flatworm.test.domain.Header;
 import com.blackbear.flatworm.test.domain.Videotape;
+
+import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

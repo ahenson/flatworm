@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -62,6 +61,11 @@ public class RecordBO {
 
     private RecordDefinitionBO recordDefinition;
 
+    private ScriptletBO beforeScriptlet;
+    private ScriptletBO afterScriptlet;
+    
+    private FileFormat parentFileFormat;
+
     public RecordBO() {
     }
 
@@ -71,7 +75,7 @@ public class RecordBO {
      * @param fileFormat not used at this time, for later expansion?
      * @param line       the input line from the file being parsed.
      * @return boolean does this line match according to the defined criteria?
-     * @throws FlatwormParserException should the script function lack the {@code DEFAULT_SCRIPT_METHOD_NAME} function, which should take
+     * @throws FlatwormParserException should the script function lack the {@code DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME} function, which should take
      *                                 one parameter, the {@link FileFormat} instance - the method should return {@code true} if the line
      *                                 should be parsed by this {@code RecordBO} instance and {@code false} if not.
      */
@@ -84,8 +88,8 @@ public class RecordBO {
     }
 
     /**
-     * If the RecordBO's {@link Identity} is an implementation of the {@link LineTokenIdentity} then pass it the {@code lineToken} instance to
-     * see if it matches with the configured identity.
+     * If the RecordBO's {@link Identity} is an implementation of the {@link LineTokenIdentity} then pass it the {@code lineToken} instance
+     * to see if it matches with the configured identity.
      *
      * @param lineToken The {@link LineToken} to test.
      * @return {@code true} if the {@code recordIdentity} property is set to an instance of {@link LineTokenIdentity} and its {@code

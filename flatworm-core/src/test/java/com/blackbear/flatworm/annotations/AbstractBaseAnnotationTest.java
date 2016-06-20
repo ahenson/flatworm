@@ -20,6 +20,7 @@ import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.config.RecordDefinitionBO;
+import com.blackbear.flatworm.config.ScriptletBO;
 import com.blackbear.flatworm.config.impl.DefaultAnnotationConfigurationReaderImpl;
 
 import org.apache.commons.lang.StringUtils;
@@ -82,4 +83,29 @@ public class AbstractBaseAnnotationTest {
         assertNotNull(String.format("Null %s.parentRecord", record.getName()), definition.getParentRecord());
         assertTrue(String.format("Incorrect %s.parentRecord", record.getName()), record == definition.getParentRecord());
     }
+    
+    public void validateScriptlet(ScriptletBO scriptlet, String expectedEngineName, 
+                                  String expectedScript, String expectedFunctionName, 
+                                  String expectedScriptFile) {
+        if (expectedEngineName != null) {
+            assertNotNull("Null script engine name", scriptlet.getScriptEngineName());
+            assertEquals("Wrong script engine name", expectedEngineName, scriptlet.getScriptEngineName());
+        }
+
+        if (expectedScript != null) {
+            assertNotNull("Null script", scriptlet.getScript());
+            assertEquals("Wrong script", expectedScript, scriptlet.getScript().trim());
+        }
+
+        if (expectedScriptFile != null) {
+            assertNotNull("Null script file", scriptlet.getScriptFile());
+            assertEquals("Wrong script", expectedScriptFile, scriptlet.getScriptFile());
+        }
+
+        if (expectedFunctionName != null) {
+            assertNotNull("Null script function", scriptlet.getFunctionName());
+            assertEquals("Wrong script function name", expectedFunctionName, scriptlet.getFunctionName());
+        }
+    }
+    
 }

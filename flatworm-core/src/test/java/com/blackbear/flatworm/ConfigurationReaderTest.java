@@ -20,9 +20,9 @@ import com.blackbear.flatworm.config.BeanBO;
 import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.RecordBO;
-import com.blackbear.flatworm.config.impl.LengthIdentityImpl;
 import com.blackbear.flatworm.config.RecordDefinitionBO;
 import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
+import com.blackbear.flatworm.config.impl.LengthIdentityImpl;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;

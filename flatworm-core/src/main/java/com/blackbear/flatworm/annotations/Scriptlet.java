@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm.annotations;
 
-import com.blackbear.flatworm.config.impl.ScriptIdentityImpl;
+import com.blackbear.flatworm.config.ScriptletBO;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -25,24 +25,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Provides the ability to configure the Script Identity element of the flatworm XML configuration using annotations.
+ * Used for capturing the data necessary to perform some action using a JVM-friendly script.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface ScriptIdentity {
+public @interface Scriptlet {
 
     /**
      * The Script Engine to use. Java must be able to resolve this. The default is specified here: {@code
-     * ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE}.
+     * ScriptletBO.DEFAULT_SCRIPT_ENGINE}.
+     *
      * @return The name of the script engine to use.
      */
-    String scriptEngine() default ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE;
+    String scriptEngine() default ScriptletBO.DEFAULT_SCRIPT_ENGINE;
 
     /**
-     * The script snippet to use (vs. loading a file. This will be used over a specified {@code scriptFile}.
+     * The script snippet to use (vs. loading a file). This will be used over a specified {@code scriptFile}.
      *
      * @return The specified script snippet.
      */
@@ -50,24 +51,26 @@ public @interface ScriptIdentity {
 
     /**
      * The name/path of a script file available on the classpath that contains the script to use. If used then {@code script} must not be
-     * used. If a {@code methodName} is used in the script other than the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} method name,
-     * then the {@code methodName} must also be specified.
+     * used. If a {@code functionName} is used in the script other than the {@code ScriptIdentityImp.DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME}
+     * method name, then the {@code functionName} must also be specified.
      *
      * @return The name/path to the script file.
      */
     String scriptFile() default "";
 
     /**
-     * The name of the method in the script that takes the {@link com.blackbear.flatworm.FileFormat} and {@code line} ({@link String})
-     * parameters. This is only required if different than the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} value.
+     * The name of the function in the script to invoke. See specific documentation for the use of this annotation to see what the parameter
+     * requirements are.
      *
-     * @return The specified method name if other than the default.
+     * @return The specified function name if other than the default.
      */
-    String methodName() default ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME;
+    String functionName() default "";
 
     /**
-     * Flag indicating that this identity instance should be used.
-     * @return {@code true} if it is to be used and {@code false} if not.
+     * Flag to indicate whether or not this {@code Scriptlet} should be applied - set to {@code false} to have the framework ignore it.
+     * Default is {@code false} so that it is not accidentally included.
+     *
+     * @return {@code true} if the {@code Scriptlet} is to be processed and executed and {@code false} if not.
      */
-    boolean apply();
+    boolean apply() default false;
 }

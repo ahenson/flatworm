@@ -178,7 +178,17 @@ public class ConfigurationValidator {
      * @param errors         A non-null {@link List} that will be appended to if errors are found.
      */
     public static void validateScriptIdentity(ScriptIdentityImpl scriptIdentity, List<String> errors) {
-        if (StringUtils.isBlank(scriptIdentity.getScript()) && StringUtils.isBlank(scriptIdentity.getScriptFile())) {
+        validateScriptlet(scriptIdentity.getScriptlet(), errors);
+    }
+
+    /**
+     * Validate that the {@code Scriptlet} information was properly configured.
+     *
+     * @param scriptlet The {@link ScriptletBO} instance containing the values to validate.
+     * @param errors    A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateScriptlet(ScriptletBO scriptlet, List<String> errors) {
+        if (StringUtils.isBlank(scriptlet.getScript()) && StringUtils.isBlank(scriptlet.getScriptFile())) {
             errors.add("The Script Identity configuration must include the script or script-file parameter.");
         }
     }

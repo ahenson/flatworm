@@ -26,11 +26,9 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The default BeanMappingStrategy. Uses Jakarta Commons PropertyUtils to map
- * the raw input data into the specified beans.
+ * The default BeanMappingStrategy. Uses Jakarta Commons PropertyUtils to map the raw input data into the specified beans.
  *
  * @author Dave Derry
- *
  */
 @Slf4j
 public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {

@@ -27,7 +27,7 @@ import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.annotations.RecordElement;
 import com.blackbear.flatworm.annotations.RecordLink;
-import com.blackbear.flatworm.annotations.ScriptIdentity;
+import com.blackbear.flatworm.annotations.Scriptlet;
 import com.blackbear.flatworm.annotations.SegmentElement;
 import com.blackbear.flatworm.config.AnnotationConfigurationReader;
 import com.blackbear.flatworm.config.BeanBO;
@@ -40,6 +40,7 @@ import com.blackbear.flatworm.config.LineElementCollection;
 import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.config.RecordDefinitionBO;
 import com.blackbear.flatworm.config.RecordElementBO;
+import com.blackbear.flatworm.config.ScriptletBO;
 import com.blackbear.flatworm.config.SegmentElementBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
@@ -300,6 +301,21 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
 
                 // Load the lines.
                 loadLines(record, annotatedRecord);
+                
+                // Load the before and after scriptlets.
+                if(annotatedRecord.beforeReadRecordScript().apply()) {
+                    record.setBeforeScriptlet(loadScriptlet(annotatedRecord.beforeReadRecordScript()));
+                }
+                else {
+                    record.setBeforeScriptlet(null);
+                }
+                
+                if(annotatedRecord.afterReadRecordScript().apply()) {
+                    record.setAfterScriptlet(loadScriptlet(annotatedRecord.afterReadRecordScript()));
+                }
+                else {
+                    record.setAfterScriptlet(null);
+                }
             }
         }
         return record;
@@ -346,8 +362,9 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
      * @param record          The {@link RecordBO} instance being built up.
      * @param annotatedRecord The loaded {@link Record} annotation.
      * @return a {@link List} of {@link Line} instances loaded.
+     * @throws FlatwormConfigurationException should parsing the annotation's values fail for any reason.
      */
-    public List<LineBO> loadLines(RecordBO record, Record annotatedRecord) {
+    public List<LineBO> loadLines(RecordBO record, Record annotatedRecord) throws FlatwormConfigurationException {
         List<LineBO> lines = new ArrayList<>();
         LineBO line;
         for (Line annotatedLine : annotatedRecord.lines()) {
@@ -357,6 +374,21 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
             line.setId(annotatedLine.id());
             record.getRecordDefinition().addLine(line);
             lineCache.put(annotatedLine.id(), line);
+            
+            if(annotatedLine.beforeParseLine().apply()) {
+                line.setBeforeScriptlet(loadScriptlet(annotatedLine.beforeParseLine()));
+            }
+            else {
+                line.setBeforeScriptlet(null);
+            }
+            
+            if(annotatedLine.afterParseLine().apply()) {
+                line.setAfterScriptlet(loadScriptlet(annotatedLine.afterParseLine()));
+            }
+            else {
+                line.setAfterScriptlet(null);
+            }
+            
             lines.add(line);
         }
         return lines;
@@ -419,20 +451,33 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     }
 
     /**
-     * Load the {@link ScriptIdentity} annotation configuration into a {@link ScriptIdentityImpl} instance and return it.
+     * Load the {@link Scriptlet} annotation configuration into a {@link ScriptIdentityImpl} instance and return it.
      *
-     * @param annotatedIdentity The {@link ScriptIdentity} annotation instance.
+     * @param annotatedScriptlet The {@link Scriptlet} annotation instance.
      * @return the {@link ScriptIdentityImpl} instance constructed.
+     * @throws FlatwormConfigurationException should the parsing of the configuration data fail for any reason.
      */
-    public ScriptIdentityImpl loadScriptIdentity(ScriptIdentity annotatedIdentity) throws FlatwormConfigurationException {
-        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(annotatedIdentity.scriptEngine(), annotatedIdentity.methodName());
-        if(!StringUtils.isBlank(annotatedIdentity.script())) {
-            scriptIdentity.setScript(annotatedIdentity.script());
+    public ScriptIdentityImpl loadScriptIdentity(Scriptlet annotatedScriptlet) throws FlatwormConfigurationException {
+        ScriptletBO scriptlet = loadScriptlet(annotatedScriptlet);
+        return new ScriptIdentityImpl(scriptlet);
+    }
+
+    /**
+     * Load the {@link Scriptlet} annotation configuration into a {@link ScriptletBO} instance and return it.
+     *
+     * @param annotatedScriptlet The {@link Scriptlet} annotation instance.
+     * @return the {@link ScriptletBO} instance constructed.
+     * @throws FlatwormConfigurationException should the parsing of the configuration data fail for any reason.
+     */
+    public ScriptletBO loadScriptlet(Scriptlet annotatedScriptlet) throws FlatwormConfigurationException {
+        ScriptletBO scriptlet = new ScriptletBO(annotatedScriptlet.scriptEngine(), annotatedScriptlet.functionName());
+        if(!StringUtils.isBlank(annotatedScriptlet.script())) {
+            scriptlet.setScript(annotatedScriptlet.script());
         }
-        else if(!StringUtils.isBlank(annotatedIdentity.scriptFile())) {
-            scriptIdentity.setScriptFile(annotatedIdentity.scriptFile());
+        else if(!StringUtils.isBlank(annotatedScriptlet.scriptFile())) {
+            scriptlet.setScriptFile(annotatedScriptlet.scriptFile());
         }
-        return scriptIdentity;
+        return scriptlet;
     }
 
     /**

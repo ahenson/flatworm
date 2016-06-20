@@ -64,6 +64,14 @@ public class LineBO extends AbstractLineElementCollection {
     @Setter
     private String id;
     
+    @Getter
+    @Setter
+    private ScriptletBO beforeScriptlet;
+
+    @Getter
+    @Setter
+    private ScriptletBO afterScriptlet;
+    
     public LineBO() {
     }
 
@@ -110,6 +118,10 @@ public class LineBO extends AbstractLineElementCollection {
         this.conversionHelper = conversionHelper;
         this.beans = beans;
 
+        if(beforeScriptlet != null) {
+            beforeScriptlet.invokeFunction(this, inputLine, beans, conversionHelper);
+        }
+        
         // JBL - check for delimited status
         if (isDelimited()) {
             // Don't parse empty lines
@@ -120,6 +132,10 @@ public class LineBO extends AbstractLineElementCollection {
         else {
             int charPos = 0;
             parseInput(inputLine, elements, charPos);
+        }
+        
+        if(afterScriptlet != null) {
+            afterScriptlet.invokeFunction(this, inputLine, beans, conversionHelper);
         }
     }
 

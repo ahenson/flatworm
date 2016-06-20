@@ -16,16 +16,16 @@
 
 package com.blackbear.flatworm;
 
+import com.blackbear.flatworm.config.ConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
+import com.blackbear.flatworm.test.domain.segment.ClassPeriod;
+
 import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
-import com.blackbear.flatworm.test.domain.segment.ClassPeriod;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

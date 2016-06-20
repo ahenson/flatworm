@@ -65,7 +65,7 @@ public class FileFormat {
 
     @Getter
     private MatchedRecord lastRecordRead;
-    
+
     public FileFormat() {
         records = new HashMap<>();
         recordOrder = new ArrayList<>();
@@ -76,11 +76,12 @@ public class FileFormat {
         conversionHelper = new ConversionHelper();
     }
 
-    public Collection<RecordBO> getRecords() {
-        return records.values();
+    public List<RecordBO> getRecords() {
+        return new ArrayList<>(records.values());
     }
 
     public void addRecord(RecordBO r) {
+        r.setParentFileFormat(this);
         records.put(r.getName(), r);
         recordOrder.add(r);
     }
@@ -101,8 +102,8 @@ public class FileFormat {
     }
 
     /**
-     * See if any of the {@code RecordBO} instances collected thus far are "default" records in that they lack a
-     * record identifier.
+     * See if any of the {@code RecordBO} instances collected thus far are "default" records in that they lack a record identifier.
+     *
      * @return {@code true} if there is a {@code RecordBO} that lacks an identifier.
      */
     public boolean hasDefaultRecord() {
@@ -124,11 +125,12 @@ public class FileFormat {
 
     /**
      * When called with a {@code BufferedReader}, reads sufficient lines to parse a record, and returns the beans created.
-     * @param in The stream to read from. Note that the reader is not closed by this method so the caller must perform the
-     *           {@code close()} operation on the reader.
+     *
+     * @param in The stream to read from. Note that the reader is not closed by this method so the caller must perform the {@code close()}
+     *           operation on the reader.
      * @return The created beans in a MatchedRecord object.
      * @throws FlatwormParserException should an issue occur while parsing the data content.
-     * @throws IOException Should an I/O issue occur.
+     * @throws IOException             Should an I/O issue occur.
      */
     public MatchedRecord nextRecord(BufferedReader in) throws FlatwormParserException, IOException {
 
@@ -139,11 +141,19 @@ public class FileFormat {
         if (currentParsedLine != null) {
             RecordBO record = findMatchingRecord(currentParsedLine);
             if (record != null) {
+
+                if (record.getBeforeScriptlet() != null) {
+                    record.getBeforeScriptlet().invokeFunction(this, currentParsedLine);
+                }
+
                 Map<String, Object> beans = record.parseRecord(currentParsedLine, in, conversionHelper);
                 matchedRecord = new MatchedRecord(record.getName(), beans, currentParsedLine);
                 lastRecordRead = matchedRecord;
-            }
-            else if (!ignoreUnmappedRecords) {
+
+                if (record.getAfterScriptlet() != null) {
+                    record.getAfterScriptlet().invokeFunction(this);
+                }
+            } else if (!ignoreUnmappedRecords) {
                 throw new FlatwormParserException(String.format(
                         "Configuration not found for line in input file [line: %d] - %s", lineNumber, currentParsedLine
                 ));
@@ -155,8 +165,9 @@ public class FileFormat {
 
     /**
      * Manually provide the next data to be parsed.
-     * @param line The line of data that should be parsed - this could be multiple lines if the {@code line.separator} is used
-     *             to separate the lines within the {@code line} parameter.
+     *
+     * @param line The line of data that should be parsed - this could be multiple lines if the {@code line.separator} is used to separate
+     *             the lines within the {@code line} parameter.
      * @return The {@link MatchedRecord} for the given data if the data could be parsed.
      * @throws FlatwormParserException should an issue occur while parsing the data content.
      */
@@ -164,8 +175,7 @@ public class FileFormat {
         MatchedRecord matchedRecord;
         try {
             matchedRecord = nextRecord(new BufferedReader(new StringReader(line)));
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             throw new FlatwormParserException(e.getMessage(), e);
         }
         return matchedRecord;
@@ -173,8 +183,9 @@ public class FileFormat {
 
     /**
      * Manually provide the next data to be parsed.
-     * @param lines The lines of data that should be parsed - this wll be appended together with the correct system-based
-     *              {@code line.separator}.
+     *
+     * @param lines The lines of data that should be parsed - this wll be appended together with the correct system-based {@code
+     *              line.separator}.
      * @return The {@link MatchedRecord} for the given data if the data could be parsed.
      * @throws FlatwormParserException should an issue occur while parsing the data content.
      */
@@ -184,8 +195,7 @@ public class FileFormat {
             StringBuilder builder = new StringBuilder();
             lines.forEach(line -> builder.append(line).append(String.format("%n")));
             matchedRecord = nextRecord(new BufferedReader(new StringReader(builder.toString())));
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             throw new FlatwormParserException(e.getMessage(), e);
         }
         return matchedRecord;

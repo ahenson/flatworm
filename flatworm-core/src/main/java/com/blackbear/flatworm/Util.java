@@ -302,10 +302,10 @@ public final class Util {
     /**
      * Try parse the {@code value} using {@code java.lang.Boolean::parseBoolean}, and if unable return the {@code defaultValue}.
      *
-     * @param value The value to parse (should be {@code true} or {@code false}.
+     * @param value        The value to parse (should be {@code true} or {@code false}.
      * @param defaultValue The default {@link Boolean} value to return if the {@code value} could not be parsed or is {@code null}.
-     * @return the {@link Boolean} result if {@code value} is valid accordingly to {@code java.lang.Boolean::parseBoolean} or the
-     * {@code defaultValue} if {@code value} could not be parsed..
+     * @return the {@link Boolean} result if {@code value} is valid accordingly to {@code java.lang.Boolean::parseBoolean} or the {@code
+     * defaultValue} if {@code value} could not be parsed..
      */
     public static Boolean tryParseBoolean(String value, boolean defaultValue) {
         Boolean result = tryParseBoolean(value);
@@ -317,19 +317,19 @@ public final class Util {
 
     /**
      * See if the field is based upon generics and if so, get the underlying type, else return the declared type of the field.
+     *
      * @param field The field to interrogate.
      * @return the type of the field if there are no generics or collections at play or the declared type.
      */
     public static Class<?> getActualFieldType(Field field) {
         Class<?> fieldType = null;
         ParameterizedType paramType;
-        if(field.getGenericType() instanceof ParameterizedType) {
+        if (field.getGenericType() instanceof ParameterizedType) {
             paramType = ParameterizedType.class.cast(field.getGenericType());
-            if(paramType.getActualTypeArguments().length > 0) {
+            if (paramType.getActualTypeArguments().length > 0) {
                 fieldType = (Class<?>) paramType.getActualTypeArguments()[0];
             }
-        }
-        else {
+        } else {
             fieldType = field.getType();
         }
         return fieldType;
@@ -337,28 +337,30 @@ public final class Util {
 
     /**
      * Load all classes within the given packages (recursive) that are annotated by the given {@code annotationClass} parameter.
-     * @param packageNames The package names to search - it will be recursively searched.
+     *
+     * @param packageNames    The package names to search - it will be recursively searched.
      * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
      * @return The list of classes found annotated by the {@code annotatedClass} parameter.
      * @throws FlatwormConfigurationException should parsing the classpath fail.
      */
-    public static List<Class<?>> findRecordAnnotatedClasses(Collection<String> packageNames, Class<? extends Annotation> annotationClass) 
+    public static List<Class<?>> findRecordAnnotatedClasses(Collection<String> packageNames, Class<? extends Annotation> annotationClass)
             throws FlatwormConfigurationException {
         List<Class<?>> discoveredClasses = new ArrayList<>();
-        for(String packageName : packageNames) {
+        for (String packageName : packageNames) {
             discoveredClasses.addAll(findRecordAnnotatedClasses(packageName, annotationClass));
         }
         return discoveredClasses;
     }
-    
+
     /**
      * Load all classes within a given package (recursive) that are annotated by the given {@code annotationClass} parameter.
-     * @param packageName The package name to search - it will be recursively searched.
+     *
+     * @param packageName     The package name to search - it will be recursively searched.
      * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
      * @return The list of classes found annotated by the {@code annotatedClass} parameter.
      * @throws FlatwormConfigurationException should parsing the classpath fail.
      */
-    public static List<Class<?>> findRecordAnnotatedClasses(String packageName, Class<? extends Annotation> annotationClass) 
+    public static List<Class<?>> findRecordAnnotatedClasses(String packageName, Class<? extends Annotation> annotationClass)
             throws FlatwormConfigurationException {
         List<Class<?>> discoveredClasses = new ArrayList<>();
         try {
@@ -383,16 +385,17 @@ public final class Util {
     }
 
     /**
-     * For a given {@code directory}, recursively look for all classes that are annotated by the {@code annotationClass} parameter
-     * and add them to the {@code classes} list.
-     * @param directory The directory to search - should be a classpath path.
-     * @param packageName The name of the package to search.
-     * @param annotationClass The {@link Annotation} the classes most be annotated by to be included in the results. 
-     * @param classes The classes list that will be built up as annotated clases are found.
+     * For a given {@code directory}, recursively look for all classes that are annotated by the {@code annotationClass} parameter and add
+     * them to the {@code classes} list.
+     *
+     * @param directory       The directory to search - should be a classpath path.
+     * @param packageName     The name of the package to search.
+     * @param annotationClass The {@link Annotation} the classes most be annotated by to be included in the results.
+     * @param classes         The classes list that will be built up as annotated clases are found.
      * @throws FlatwormConfigurationException should parsing the classpath fail.
      */
-    public static void findRecordAnnotatedClasses(File directory, String packageName, Class<? extends Annotation> annotationClass, 
-                                            List<Class<?>> classes) throws FlatwormConfigurationException {
+    public static void findRecordAnnotatedClasses(File directory, String packageName, Class<? extends Annotation> annotationClass,
+                                                  List<Class<?>> classes) throws FlatwormConfigurationException {
         try {
             if (directory.exists()) {
                 File[] files = directory.listFiles();

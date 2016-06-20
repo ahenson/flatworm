@@ -734,7 +734,8 @@ a &lt;record-ident&gt; element. The identifier must be the first field in the se
 the Java class it can just be consumed. There must be a beanref attribute because Flatworm will construct an instance of the specified bean
 for
 each segment that it encounters. It then invokes the addMethod on the parent-beanref, which must have a Collection property for that
-converterName. There is an additional attribute that is not shown here; cardinality-mode. This attribute defines how to handle segments that don't
+converterName. There is an additional attribute that is not shown here; cardinality-mode. This attribute defines how to handle segments that
+don't
 adhere to the specified cardinality; that is when there are fewer than the minCount, or more than the maxCount. The default mode is
 LOOSE, which means that an error is logged for any violations, but no other action is taken. For cardinality mode RESTRICTED,
 in addition to logging an error, no more than the maxCount instances will be added to the parent collection. If the cardinality mode
@@ -830,7 +831,8 @@ ComplexFlatwormExample) have required that you load the configuration file. Then
 FileFormat that you got back from parsing the configuration file) to retrieve the records from the data file. This works very well, and
 provides you with a good bit of control over the process. But if you would prefer something a little bit simpler you can use the FileParser
 (since version 1.2). To use the FileParser, you instantiate an instance with the name of the configuration file, and the data file. For each
-record converterName that you have defined you call the setBeanHandler(String, Object, String) method, passing the name of the record converterName, the
+record converterName that you have defined you call the setBeanHandler(String, Object, String) method, passing the name of the record
+converterName, the
 object
 to be invoked on the callback, and the callback method to be invoked. You also set an exception handler by calling the
 setExceptionHandler(Object,
@@ -888,7 +890,8 @@ public class SimpleFlatwormExample
 <br/>
 With version 2.0 a new object based callback mechanism has been introduced. Passing a class that implements RecordCallback to the
 FileParser's
-addRecordCallback(String, RecordCallback) method for each record converterName to be processed avoids the reflective method invocation of the
+addRecordCallback(String, RecordCallback) method for each record converterName to be processed avoids the reflective method invocation of
+the
 previous
 callback mechanism. The previous mechanism is still supported, but will likely be removed in a future version. To set an exception callback
 with

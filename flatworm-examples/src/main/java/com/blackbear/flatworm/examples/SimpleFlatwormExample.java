@@ -16,9 +16,9 @@
 
 package com.blackbear.flatworm.examples;
 
-import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.MatchedRecord;
+import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 
 import java.io.BufferedReader;

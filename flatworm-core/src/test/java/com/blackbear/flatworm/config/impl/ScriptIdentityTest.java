@@ -43,7 +43,7 @@ public class ScriptIdentityTest extends AbstractBaseIdentityTest {
                     "function %s(fileFormat, line) { " +
                     "   return fileFormat.getLineNumber() == 0; " +
                     "}",
-                    ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME);
+                    ScriptIdentityImpl.DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME);
             ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl();
             scriptIdentity.setScript(script);
             String line = "";

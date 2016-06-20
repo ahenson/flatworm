@@ -56,6 +56,22 @@ Work Completed
 * Added annotation support
 * Added ability to auto-resolve the converter type based upon the field's type (given that it's a common type in String, Double, Float, Long, or Integer).
 * Added more constants where appropriate. There is likely more that can be done here.
+* Added support for scripts to be executed before a record is read and after a record is read - which allows for dynamic reconfiguration of a FileFile during parsing - some files specify their parsing rules within the file so static configuration must be updated at run time.
+	* Record
+		* Before record is read:
+			* Parameters: (FileFormat fileFormat, String line)
+			* Return: ignored
+		* After record is read:
+			* Parameters: (FileFormat fileFormat)
+			* Return: ignored
+	* Line
+		* Before line is read:
+			* Parameters: (LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)
+			* Return: ignored
+		* After line is read:
+			* Parameters: (LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)
+			* Return: ignored
+* Added ability to specify multiple configuration options and then specify the preferred one at run time.
 
 TODOs
 -------

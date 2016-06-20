@@ -44,24 +44,23 @@ public class ParseUtils {
 
     /**
      * Invoke a setter for a the given {@code propertyName}.
-     * @param target The {@code Object} that contains the setter property to be invoked.
+     *
+     * @param target       The {@code Object} that contains the setter property to be invoked.
      * @param propertyName The name of the property.
-     * @param toAdd The value to pass to the property.
+     * @param toAdd        The value to pass to the property.
      * @throws FlatwormParserException should invoking the setter method fail for any reason.
      */
     public static void setProperty(Object target, String propertyName, Object toAdd) throws FlatwormParserException {
         try {
             PropertyUtils.setProperty(target, propertyName, toAdd);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             throw new FlatwormParserException(e.getMessage(), e);
         }
     }
 
     /**
      * Determine how best to add the {@code toAdd} instance to the collection found in {@code target} by seeing if either the {@code
-     * Segment.addMethod} has a value or if {@code Segment.propertyName} has a value. If neither values exist then no action is
-     * taken.
+     * Segment.addMethod} has a value or if {@code Segment.propertyName} has a value. If neither values exist then no action is taken.
      *
      * @param segment The {@link SegmentElementBO} instance containing the configuration information.
      * @param target  The instance with the collection to which the {@code toAdd} instance is to be added.
@@ -78,11 +77,11 @@ public class ParseUtils {
     }
 
     /**
-     * Invoke an add method on the {@code target} instance by the {@code methodName} and pass it the {@code toAdd} instance to add.
+     * Invoke an add method on the {@code target} instance by the {@code functionName} and pass it the {@code toAdd} instance to add.
      *
-     * @param target     The instance on which the {@code methodName} (addMethod) will be invoked.
+     * @param target     The instance on which the {@code functionName} (addMethod) will be invoked.
      * @param methodName The name of the "add" method to be invoked - it should take an Object parameter.
-     * @param toAdd      The instance to pass to the {@code methodName} method.
+     * @param toAdd      The instance to pass to the {@code functionName} method.
      * @throws FlatwormParserException should invoking the method fail for any reason.
      */
     public static void invokeAddMethod(Object target, String methodName, Object toAdd) throws FlatwormParserException {
@@ -97,18 +96,18 @@ public class ParseUtils {
     }
 
     /**
-     * Attempt to find the collection property on {@code target} indicated by the {@code propertyName} and then see if the
-     * "collection" returned has an {@code add(Object)} method and if it does - invoke it with the {@code toAdd} instance. If any of the
-     * parameters are {@code null} then no action is taken.
+     * Attempt to find the collection property on {@code target} indicated by the {@code propertyName} and then see if the "collection"
+     * returned has an {@code add(Object)} method and if it does - invoke it with the {@code toAdd} instance. If any of the parameters are
+     * {@code null} then no action is taken.
      *
      * @param target                 The object that has the collection property for which the {@code toAdd} instance will be added.
      * @param collectionPropertyName The name of the Java BeanBO property that will return a collection (may not be a {@link
      *                               java.util.Collection} so long as there is an {@code add(Object)} method). Note that if this returns a
      *                               null value a {@link FlatwormConfigurationException} will be thrown.
      * @param toAdd                  The instance to add to the collection indicated.
-     * @throws FlatwormParserException Should the underlying collection referenced by {@code propertyName} be {@code null} or
-     *                                 non-existent, should no {@code add(Object)} method exist on the collection and should any error occur
-     *                                 while invoking the {@code add(Object)} method if it is found (reflection style errors).
+     * @throws FlatwormParserException Should the underlying collection referenced by {@code propertyName} be {@code null} or non-existent,
+     *                                 should no {@code add(Object)} method exist on the collection and should any error occur while
+     *                                 invoking the {@code add(Object)} method if it is found (reflection style errors).
      */
     public static void addValueToCollection(Object target, String collectionPropertyName, Object toAdd) throws FlatwormParserException {
         if (target == null || StringUtils.isBlank(collectionPropertyName) || toAdd == null) return;

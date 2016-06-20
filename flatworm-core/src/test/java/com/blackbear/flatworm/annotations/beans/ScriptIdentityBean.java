@@ -17,23 +17,36 @@
 package com.blackbear.flatworm.annotations.beans;
 
 import com.blackbear.flatworm.annotations.Record;
-import com.blackbear.flatworm.annotations.ScriptIdentity;
+import com.blackbear.flatworm.annotations.Scriptlet;
 
 import lombok.Data;
 
 /**
- * Basic bean for testing the ScriptIdentity annotation.
+ * Basic bean for testing the Scriptlet scriptIdentity annotation.
  *
  * @author Alan Henson
  */
 @Data
 @Record(name = "ScriptIdentityBean",
         scriptIdentity =
-        @ScriptIdentity(
+        @Scriptlet(
                 scriptEngine = "nashorn",
-                script = "function myMethod(fileFormat, line) { return true; }",
-                methodName = "myMethod",
+                script = "function myFunction(fileFormat, line) { return true; }",
+                functionName = "myFunction",
                 apply = true
-        ))
+        ),
+        beforeReadRecordScript = @Scriptlet (
+                scriptEngine = "nashorn",
+                script = "function myFunction(fileFormat, line) { return true; }",
+                functionName = "myFunction",
+                apply = true
+        ),
+        afterReadRecordScript = @Scriptlet (
+                scriptEngine = "nashorn",
+                script = "function myFunction(fileFormat) { return true; }",
+                functionName = "myFunction",
+                apply = true
+        )
+)
 public class ScriptIdentityBean {
 }

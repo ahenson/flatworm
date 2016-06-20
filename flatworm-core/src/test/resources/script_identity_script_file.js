@@ -1,1 +1,1 @@
-var myMethod = function(fileFormat, line) { return true; };
+var myFunction = function (fileFormat, line) { return true; };

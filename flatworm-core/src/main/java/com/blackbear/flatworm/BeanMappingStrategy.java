@@ -22,11 +22,9 @@ import com.blackbear.flatworm.errors.FlatwormParserException;
 import java.util.Map;
 
 /**
- * Provides the ability to specify how the raw data parsed from the input file
- * is to be mapped into the beans.
+ * Provides the ability to specify how the raw data parsed from the input file is to be mapped into the beans.
  *
  * @author Dave Derry
- *
  */
 public interface BeanMappingStrategy {
     void mapBean(Object bean, String beanName, String property, Object value,

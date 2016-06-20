@@ -135,9 +135,9 @@ public class FileParser implements Closeable {
     }
 
     /**
-     * Set a callback for exceptions that doesn't require reflection to be invoked. The exception (rather than just the exception converterName) will
-     * be passed to the callback, along with the input line that caused the exception. Should only be invoked once as any subsequent
-     * invocations will replace the previous callback.
+     * Set a callback for exceptions that doesn't require reflection to be invoked. The exception (rather than just the exception
+     * converterName) will be passed to the callback, along with the input line that caused the exception. Should only be invoked once as
+     * any subsequent invocations will replace the previous callback.
      *
      * @param callback The {@link ExceptionCallback} instance to register.
      */
@@ -187,6 +187,7 @@ public class FileParser implements Closeable {
 
     /**
      * Load the configuration file content.
+     *
      * @throws FlatwormConfigurationException should parsing the content cause any issues.
      */
     protected void loadConfiguration() throws FlatwormConfigurationException {

@@ -20,6 +20,7 @@ import com.blackbear.flatworm.annotations.FieldIdentity;
 import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.annotations.RecordElement;
+import com.blackbear.flatworm.annotations.Scriptlet;
 import com.blackbear.flatworm.annotations.SegmentElement;
 
 import java.util.ArrayList;
@@ -45,7 +46,13 @@ import lombok.Data;
         lines = {
                 @Line(delimiter = "|"),
                 @Line(id = "line2")
-        }
+        },
+        afterReadRecordScript = @Scriptlet(
+                scriptEngine = "nashorn",
+                scriptFile = "before_after_script_test.js",
+                functionName = "modifyRecord",
+                apply = true
+        )
 )
 public class RecordBeanOne {
 

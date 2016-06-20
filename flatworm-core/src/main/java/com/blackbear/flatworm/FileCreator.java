@@ -164,7 +164,7 @@ public class FileCreator {
      * method.
      *
      * @param recordName The name specified in your flatworm configuration file for this record
-     * @throws IOException              - If the file system has a problem with you writing information to the recently opened file.
+     * @throws IOException                    - If the file system has a problem with you writing information to the recently opened file.
      * @throws FlatwormConfigurationException - wraps various Exceptions so client doesn't have to handle too many
      */
     public void write(String recordName) throws IOException, FlatwormConfigurationException {
@@ -186,7 +186,7 @@ public class FileCreator {
             // For multiline records they should only be written for the first line -
             // Dave Derry 11/2009
             if (first) {
-                if(record.getRecordIdentity() != null) {
+                if (record.getRecordIdentity() != null) {
                     record.getRecordIdentity().write(bufOut, record, line);
                 }
             }

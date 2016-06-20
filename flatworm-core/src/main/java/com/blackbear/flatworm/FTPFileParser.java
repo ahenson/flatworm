@@ -17,7 +17,6 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
-import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.BufferedReader;
 import java.io.File;

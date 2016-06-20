@@ -31,6 +31,7 @@ import com.blackbear.flatworm.config.LineElement;
 import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.config.RecordDefinitionBO;
 import com.blackbear.flatworm.config.RecordElementBO;
+import com.blackbear.flatworm.config.ScriptletBO;
 import com.blackbear.flatworm.config.SegmentElementBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
@@ -415,11 +416,16 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
             }
         }
 
+        // Before/After Scriptlets.
+        record.setBeforeScriptlet(readScriptlet(node, "before-scriptlet"));
+        record.setAfterScriptlet(readScriptlet(node, "after-scriptlet"));
+        
+        // Record Definition
         Node recordChild = getChildElementNodeName(node, "record-definition");
-
         RecordDefinitionBO recordDefinition = readRecordDefinition(recordChild);
         recordDefinition.setParentRecord(record);
         record.setRecordDefinition(recordDefinition);
+
         return record;
     }
 
@@ -465,6 +471,40 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
      * @throws FlatwormConfigurationException should the {@code script-ident} node be invalid.
      */
     protected ScriptIdentityImpl readScriptIdentity(Node node) throws FlatwormConfigurationException {
+        ScriptIdentityImpl scriptIdentity = null;
+        ScriptletBO scriptlet = readScriptlet(node);
+        if(scriptlet != null) {
+            scriptIdentity = new ScriptIdentityImpl(scriptlet);
+        }
+        return scriptIdentity;
+    }
+
+    /**
+     * Read the {@link ScriptletBO} data values from the given child node (identified by the {@code elementName} parameter), 
+     * and return it a constructed instance.
+     *
+     * @param node The parent node containing the child node {@link ScriptletBO} data.
+     * @param elementName The name of the child element within the {@code node} that has the scriptlet data.             
+     * @return a built {@link ScriptletBO} instance.
+     * @throws FlatwormConfigurationException should the node not contain valid information.
+     */
+    protected ScriptletBO readScriptlet(Node node, String elementName) throws FlatwormConfigurationException {
+        ScriptletBO scriptlet = null;
+        Node scriptletNode = getChildElementNodeName(node, elementName);
+        if(scriptletNode != null) {
+            scriptlet = readScriptlet(scriptletNode);
+        }
+        return scriptlet;
+    }
+    
+    /**
+     * Read the {@link ScriptletBO} data values from the given node and return it a constructed instance.
+     *
+     * @param node The node containing the data.
+     * @return a built {@link ScriptletBO} instance.
+     * @throws FlatwormConfigurationException should the node not contain valid information.
+     */
+    protected ScriptletBO readScriptlet(Node node) throws FlatwormConfigurationException {
         String scriptEngineName = getAttributeValueNamed(node, "script-engine");
         String scriptMethodName = getAttributeValueNamed(node, "method-name");
         String scriptFile = getAttributeValueNamed(node, "script-file");
@@ -477,16 +517,16 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
             script = getChildCDataNodeValue(node);
         }
 
-        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(scriptEngineName, scriptMethodName);
+        ScriptletBO scriptlet = new ScriptletBO(scriptEngineName, scriptMethodName);
         if(!StringUtils.isBlank(script)) {
-            scriptIdentity.setScript(script);
+            scriptlet.setScript(script);
         }
         else if(!StringUtils.isBlank(scriptFile)) {
-            scriptIdentity.setScriptFile(scriptFile);
+            scriptlet.setScriptFile(scriptFile);
         }
-        return scriptIdentity;
+        return scriptlet;
     }
-
+    
     /**
      * Parse a {@link RecordDefinitionBO} instance out of the information found in the given node.
      *
@@ -544,6 +584,10 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         line.setDelimiter(getAttributeValueNamed(node, "delimit"));
         line.setQuoteChar(getAttributeValueNamed(node, "quote"));
 
+        // Before/After Scriptlets.
+        line.setBeforeScriptlet(readScriptlet(node, "before-scriptlet"));
+        line.setAfterScriptlet(readScriptlet(node, "after-scriptlet"));
+        
         // Note the child nodes will be a collection of record-elements and segment-elements.
         List<Object> childNodes = getChildNodes(node);
         childNodes.stream()

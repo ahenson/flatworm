@@ -16,26 +16,13 @@
 
 package com.blackbear.flatworm.config.impl;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.config.RecordBO;
+import com.blackbear.flatworm.config.ScriptletBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
-import org.apache.commons.lang.StringUtils;
-
-import java.io.IOException;
-import java.net.URL;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Manages script identity instances (script-ident) found in the flatworm configuration. This class is not thread safe.
@@ -43,77 +30,56 @@ import lombok.Setter;
  * @author Alan Henson
  */
 public class ScriptIdentityImpl extends AbstractIdentity {
+
     /**
-     * Default JavaScript method name that will be invoked for Script Identity configurations.
+     * Default JavaScript function name that will be invoked for Script Identity configurations.
      */
-    public static final String DEFAULT_SCRIPT_METHOD_NAME = "matchesLine";
+    public static final String DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME = "matchesLine";
+    @Getter
+    private ScriptletBO scriptlet;
 
     /**
-     * Default Script Engine to use - nashorn.
+     * Constructor for {@code ScriptIdentityImpl} that takes the composited {@link ScriptletBO} and wraps it.
+     * @param scriptlet The {@link ScriptletBO} instance to wrap.
      */
-    public static final String DEFAULT_SCRIPT_ENGINE = "nashorn";
-
-    @Getter
-    private String scriptEngineName;
-
-    @Getter
-    private String script;
-
-    @Getter
-    private String scriptFile;
-
-    private ScriptEngine scriptEngine;
-
-    @Getter
-    private String methodName;
-
-    private Invocable scriptInvocable;
-
+    public ScriptIdentityImpl(ScriptletBO scriptlet) {
+        this.scriptlet = scriptlet;
+    }
+    
     /**
-     * Constructor for ScriptIdentityImpl. The default Script Engine is used ({@code ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE}) and the
-     * default method name {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} is used.
+     * Constructor for ScriptIdentityImpl. The default Script Engine is used ({@code ScriptletBO.DEFAULT_SCRIPT_ENGINE}) and the
+     * default function name {@code ScriptIdentityImp.DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME} is used.
      */
     public ScriptIdentityImpl() throws FlatwormConfigurationException {
-        this(DEFAULT_SCRIPT_ENGINE, DEFAULT_SCRIPT_METHOD_NAME);
+        this(ScriptletBO.DEFAULT_SCRIPT_ENGINE, DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME);
     }
 
     /**
-     * Constructor for ScriptIdentityImpl that attempts to load the Script Engine specified by name. The default method name ({@code
-     * ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME}) is used.
+     * Constructor for ScriptIdentityImpl that attempts to load the Script Engine specified by name. The default function name ({@code
+     * ScriptIdentityImp.DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME}) is used.
      *
-     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE}
+     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptletBO.DEFAULT_SCRIPT_ENGINE}
      *                         is used.
      * @throws FlatwormConfigurationException should the script be invalid or should the {@code scriptEngineName} not resolve to a valid
      *                                        script engine.
      */
     public ScriptIdentityImpl(String scriptEngineName) throws FlatwormConfigurationException {
-        this(scriptEngineName, DEFAULT_SCRIPT_METHOD_NAME);
+        this(scriptEngineName, DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME);
     }
 
     /**
      * Constructor for ScriptIdentityImpl that attempts to load the Script Engine specified by name.
      *
-     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE}
+     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptletBO.DEFAULT_SCRIPT_ENGINE}
      *                         is used.
-     * @param methodName       The name of the method in the script that should be executed - the {@link com.blackbear.flatworm.FileFormat}
-     *                         instance will be the only parameter sent to the function specified. If the {@code methodName} is {@code null}
-     *                         then the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} value will be used.
+     * @param functionName       The name of the function in the script that should be executed - the {@link com.blackbear.flatworm.FileFormat}
+     *                         instance will be the only parameter sent to the function specified. If the {@code functionName} is {@code null}
+     *                         then the {@code ScriptIdentityImp.DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME} value will be used.
      * @throws FlatwormConfigurationException should the script be invalid or should the {@code scriptEngineName} not resolve to a valid
      *                                        script engine.
      */
-    public ScriptIdentityImpl(String scriptEngineName, String methodName) throws FlatwormConfigurationException {
-        this.scriptEngineName = StringUtils.isBlank(scriptEngineName) ? DEFAULT_SCRIPT_ENGINE : scriptEngineName;
-        this.methodName = StringUtils.isBlank(methodName) ? DEFAULT_SCRIPT_METHOD_NAME : methodName;
-
-        ScriptEngineManager engineManager = new ScriptEngineManager();
-        scriptEngine = engineManager.getEngineByName(this.scriptEngineName);
-
-        if (scriptEngine == null) {
-            throw new FlatwormConfigurationException(String.format("The %s ScriptEngine could not be found by the given name.",
-                    this.scriptEngineName));
-        } else {
-            scriptInvocable = (Invocable) scriptEngine;
-        }
+    public ScriptIdentityImpl(String scriptEngineName, String functionName) throws FlatwormConfigurationException {
+        scriptlet = new ScriptletBO(scriptEngineName, functionName);
     }
 
     /**
@@ -125,13 +91,7 @@ public class ScriptIdentityImpl extends AbstractIdentity {
      *                                        script engine.
      */
     public void setScript(String script) throws FlatwormConfigurationException {
-        this.script = script;
-        try {
-            scriptEngine.eval(script);
-        } catch (ScriptException e) {
-            throw new FlatwormConfigurationException(String.format("The script provided failed to evaluate: %s%n%s",
-                    e.getMessage(), script), e);
-        }
+        scriptlet.setScript(script);
     }
 
     /**
@@ -141,14 +101,7 @@ public class ScriptIdentityImpl extends AbstractIdentity {
      * accordingly the script engine specified.
      */
     public void setScriptFile(String scriptFile) throws FlatwormConfigurationException {
-        this.scriptFile = scriptFile;
-        try {
-            URL url = Resources.getResource(scriptFile);
-            String scriptContents = Resources.toString(url, Charsets.UTF_8);
-            setScript(scriptContents);
-        } catch (IOException e) {
-            throw new FlatwormConfigurationException("Failed to load scriptFile: " + scriptFile, e);
-        }
+        scriptlet.setScriptFile(scriptFile);
     }
 
     /**
@@ -167,7 +120,7 @@ public class ScriptIdentityImpl extends AbstractIdentity {
     public boolean matchesIdentity(RecordBO record, FileFormat fileFormat, String line) throws FlatwormParserException {
         boolean matches = false;
         try {
-            Object result = scriptInvocable.invokeFunction(methodName, fileFormat, line);
+            Object result = scriptlet.invokeFunction(fileFormat, line);
             if (result instanceof Boolean) {
                 matches = Boolean.class.cast(result);
             } else if (result != null) {

@@ -24,10 +24,7 @@ import com.blackbear.flatworm.annotations.beans.RecordBeanOne;
 import com.blackbear.flatworm.annotations.beans.RecordBeanSix;
 import com.blackbear.flatworm.annotations.beans.RecordBeanThreeChildToTwo;
 import com.blackbear.flatworm.annotations.beans.RecordBeanTwoChildToOne;
-import com.blackbear.flatworm.config.RecordBO;
-import com.blackbear.flatworm.config.RecordDefinitionBO;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -35,8 +32,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -109,8 +104,8 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
             bean = matchedRecord.getBean(RecordBeanSix.class.getName());
             assertTrue("RecordBeanSix read, but is of the wrong type.", bean instanceof RecordBeanSix);
             RecordBeanSix beanSix = RecordBeanSix.class.cast(bean);
-            assertEquals("RecordBeanSix.valueOne value is incorrect", "valueOne6      ", beanSix.getValueOne());
-            assertEquals("RecordBeanSix.valueTwo value is incorrect", "valueTwo6      ", beanSix.getValueTwo());
+            assertEquals("RecordBeanSix.valueOne value is incorrect", "valueOne6     ", beanSix.getValueOne());
+            assertEquals("RecordBeanSix.valueTwo value is incorrect", "valueTwo6     ", beanSix.getValueTwo());
 
         } catch (Exception e) {
             e.printStackTrace();
