@@ -59,18 +59,18 @@ Work Completed
 * Added support for scripts to be executed before a record is read and after a record is read - which allows for dynamic reconfiguration of a FileFile during parsing - some files specify their parsing rules within the file so static configuration must be updated at run time.
 	* Record
 		* Before record is read:
-			* Parameters: (FileFormat fileFormat, String line)
-			* Return: ignored
+			* Parameters: `(FileFormat fileFormat, String line)`
+			* Return: `ignored`
 		* After record is read:
-			* Parameters: (FileFormat fileFormat)
-			* Return: ignored
+			* Parameters: `(FileFormat fileFormat)`
+			* Return: `ignored`
 	* Line
 		* Before line is read:
-			* Parameters: (LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)
-			* Return: ignored
+			* Parameters: `(LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)`
+			* Return: `ignored`
 		* After line is read:
-			* Parameters: (LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)
-			* Return: ignored
+			* Parameters: `(LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)`
+			* Return: `ignored`
 * Added ability to specify multiple configuration options and then specify the preferred one at run time.
 
 TODOs
