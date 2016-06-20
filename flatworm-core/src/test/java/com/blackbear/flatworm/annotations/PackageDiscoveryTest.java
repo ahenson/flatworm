@@ -46,7 +46,7 @@ public class PackageDiscoveryTest extends AbstractBaseAnnotationTest {
     @Test
     public void loadAllRecords() {
         try {
-            String packageName = RecordBeanOne.class.getName().substring(0, RecordBeanOne.class.getName().lastIndexOf('.'));
+            String packageName = RecordBeanOne.class.getPackage().getName();
             FileFormat fileFormat = configLoader.loadConfiguration(packageName);
 
             List<Class<?>> classes = Util.findRecordAnnotatedClasses(packageName, Record.class);
