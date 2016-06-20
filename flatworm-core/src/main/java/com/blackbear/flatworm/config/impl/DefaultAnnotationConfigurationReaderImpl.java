@@ -129,6 +129,27 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     }
 
     /**
+     * Given the dot-noted package names, attempt to load all classes accessible within the given {@code getClass().getClassLoader()} or
+     * {@code Thread.currentThread().getContextClassloader()} instance and then search for classes that have the {@code Record} annotation
+     * and load them accordingly.
+     *
+     * @param packageNames The collection of package names to search.
+     * @return The {@link FileFormat} instance created from any classes found with the {@link Record}
+     * annotation within the specified packages.
+     * @throws FlatwormConfigurationException should parsing the classpaths cause an issue or if parsing the configuration causes
+     * any issues.
+     */
+    @Override
+    public FileFormat loadConfigurationByPackageNames(Collection<String> packageNames) throws FlatwormConfigurationException {
+        FileFormat fileFormat = null;
+        List<Class<?>> recordAnnotatedClasses = Util.findRecordAnnotatedClasses(packageNames, Record.class);
+        if(!recordAnnotatedClasses.isEmpty()) {
+            fileFormat = loadConfiguration(recordAnnotatedClasses);
+        }
+        return fileFormat;
+    }
+
+    /**
      * Attempt to find all {@link Record} annotated classes within the given {@code packageName} (and its child packages) and then load
      * those elements.
      *
@@ -138,7 +159,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
      *                                        reason.
      */
     @Override
-    public FileFormat loadConfiguration(String packageName) throws FlatwormConfigurationException {
+    public FileFormat loadConfigurationByPackageName(String packageName) throws FlatwormConfigurationException {
         FileFormat fileFormat = null;
         List<Class<?>> recordAnnotatedClasses = Util.findRecordAnnotatedClasses(packageName, Record.class);
         if(!recordAnnotatedClasses.isEmpty()) {

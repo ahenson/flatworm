@@ -19,10 +19,12 @@ package com.blackbear.flatworm.annotations;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.Util;
 import com.blackbear.flatworm.annotations.beans.RecordBeanOne;
+import com.blackbear.flatworm.annotations.otherbean.RecordBeanOther;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,12 +46,36 @@ public class PackageDiscoveryTest extends AbstractBaseAnnotationTest {
     }
     
     @Test
-    public void loadAllRecords() {
+    public void loadAllRecordsSinglePackage() {
         try {
             String packageName = RecordBeanOne.class.getPackage().getName();
-            FileFormat fileFormat = configLoader.loadConfiguration(packageName);
-
+            FileFormat fileFormat = configLoader.loadConfigurationByPackageName(packageName);
+            
             List<Class<?>> classes = Util.findRecordAnnotatedClasses(packageName, Record.class);
+
+            Set<String> simpleClassNames = new HashSet<>();
+            classes.forEach(clazz -> simpleClassNames.add(clazz.getSimpleName()));
+            
+            validateFileFormat(fileFormat, classes.size(), false);
+            fileFormat.getRecords().forEach(record -> 
+                    assertTrue("Failed to find loaded Record: " + record.getName(), simpleClassNames.contains(record.getName())));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            fail("Failed to load all Record annotated classes and their configuration: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void loadAllRecordsMultiplePackages() {
+        try {
+            List<String> packageNames = new ArrayList<>(2);
+            packageNames.add(RecordBeanOne.class.getPackage().getName());
+            packageNames.add(RecordBeanOther.class.getPackage().getName());
+            
+            FileFormat fileFormat = configLoader.loadConfigurationByPackageNames(packageNames);
+            
+            List<Class<?>> classes = Util.findRecordAnnotatedClasses(packageNames, Record.class);
 
             Set<String> simpleClassNames = new HashSet<>();
             classes.forEach(clazz -> simpleClassNames.add(clazz.getSimpleName()));

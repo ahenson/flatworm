@@ -336,8 +336,24 @@ public final class Util {
     }
 
     /**
+     * Load all classes within the given packages (recursive) that are annotated by the given {@code annotationClass} parameter.
+     * @param packageNames The package names to search - it will be recursively searched.
+     * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
+     * @return The list of classes found annotated by the {@code annotatedClass} parameter.
+     * @throws FlatwormConfigurationException should parsing the classpath fail.
+     */
+    public static List<Class<?>> findRecordAnnotatedClasses(Collection<String> packageNames, Class<? extends Annotation> annotationClass) 
+            throws FlatwormConfigurationException {
+        List<Class<?>> discoveredClasses = new ArrayList<>();
+        for(String packageName : packageNames) {
+            discoveredClasses.addAll(findRecordAnnotatedClasses(packageName, annotationClass));
+        }
+        return discoveredClasses;
+    }
+    
+    /**
      * Load all classes within a given package (recursive) that are annotated by the given {@code annotationClass} parameter.
-     * @param packageName The package name to search - it will be recusrively searched.
+     * @param packageName The package name to search - it will be recursively searched.
      * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
      * @return The list of classes found annotated by the {@code annotatedClass} parameter.
      * @throws FlatwormConfigurationException should parsing the classpath fail.

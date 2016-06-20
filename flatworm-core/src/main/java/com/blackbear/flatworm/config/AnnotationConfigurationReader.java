@@ -58,9 +58,22 @@ public interface AnnotationConfigurationReader {
      *
      * @param packageName The package name to search.
      * @return The {@link FileFormat} instance created from any classes found with the {@link com.blackbear.flatworm.annotations.Record}
-     * annotation.
-     * @throws FlatwormConfigurationException should parsing the class paths cause an issue or if parsing the configuration causes
+     * annotation within the specified package.
+     * @throws FlatwormConfigurationException should parsing the classpaths cause an issue or if parsing the configuration causes
      * any issues.
      */
-    FileFormat loadConfiguration(String packageName) throws FlatwormConfigurationException;
+    FileFormat loadConfigurationByPackageName(String packageName) throws FlatwormConfigurationException;
+
+    /**
+     * Given the dot-noted package names, attempt to load all classes accessible within the given {@code getClass().getClassLoader()} or
+     * {@code Thread.currentThread().getContextClassloader()} instance and then search for classes that have the {@code Record} annotation
+     * and load them accordingly.
+     *
+     * @param packageNames The collection of package names to search.
+     * @return The {@link FileFormat} instance created from any classes found with the {@link com.blackbear.flatworm.annotations.Record}
+     * annotation within the specified packages.
+     * @throws FlatwormConfigurationException should parsing the classpaths cause an issue or if parsing the configuration causes
+     * any issues.
+     */
+    FileFormat loadConfigurationByPackageNames(Collection<String> packageNames) throws FlatwormConfigurationException;
 }
