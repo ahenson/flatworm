@@ -6,7 +6,7 @@ Requires JDK 1.8 or higher (as 4.0.0-SNAPSHOT).
 
 Latest release
 --------------
-The most recent release is [flatworm 3.0.3]() 
+The most recent release is [flatworm 3.0.2][], which was released by Josh Brackett. Work on [flatworm 4.0.0-SNAPSHOT][] is currently underway, but is in SNAPSHOT release so it is not yet available via Maven Central repository.
 
 To add a dependency on Guava using Maven, use the following:
 
@@ -18,7 +18,7 @@ To add a dependency on Guava using Maven, use the following:
 </dependency>
 ```
 
-The actively developed release is [flatworm 4.0.0-SNAPSHOT](). Starting with 4.0.0, it will not be backwards compatible with prior releases.
+The actively developed release is [flatworm 4.0.0-SNAPSHOT][]. flatworm 4.0.0 will not be backwards compatible with as there was far too much new functionality added to maintain the original structure and support, but the change will be worth it.
 
 Background
 ----------
@@ -29,6 +29,10 @@ Alan Henson has since taken over the code base and has modified it to be compati
 License
 -------
 flatworm is open source and is licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
+
+Documentation
+-------------
+There is an *.html file in the docs folder that explains usage, but it's a bit out of date. The hope is to get this updated soon. In the mean time, have a look at the test cases for the best examples of usage. The examples are also out of date, there is a TODO item for that as well.
 
 Work Completed
 --------------
@@ -48,14 +52,11 @@ Work Completed
 * On Field Identity (field-ident) - added ignore-case tag to indicate whether or not case should play a factor in comparison.
 * Added support for single segment-element configurations where the child doesn't have to be a collection
 * Added support for non-delimited segment-elements - a "child" line can be a non-delimited line
+* Added line identifiers
 
 TODOs
 -------
 * Update the "Field Guide" to reflect the latest changes and usages
- * file-format::ignore-unmapped-record
- * record-ident::script-ident
- * segment-element::property-name
- * removal segment-element::name 
 * Update the examples to reflect the latest capabilities and provide more guidance within the examples
 * Add annotations support to all for beans to define their record makeup
 * Add the ability to specify a type in addition-to or instead-of a converter
@@ -70,3 +71,6 @@ TODOs
 * Add ability for the Script Identity approach to load scripts from files
 * Add more verbose logging
 * Is the field-length attribute really needed on Field Identity? We know the length by the matching strings. They should all be the same length else the match will always fail.
+
+[flatworm 3.0.2]: https://github.com/trx/flatworm
+[flatworm 4.0.0-SNAPSHOT]: https://github.com/ahenson/flatworm
