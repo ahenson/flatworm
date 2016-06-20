@@ -14,21 +14,25 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.annotations.beans;
 
-import com.blackbear.flatworm.config.ConversionOptionBO;
-import com.blackbear.flatworm.errors.FlatwormParserException;
+import com.blackbear.flatworm.annotations.RecordElement;
+import com.blackbear.flatworm.annotations.RecordLink;
 
-import java.util.Map;
+import lombok.Data;
 
 /**
- * Provides the ability to specify how the raw data parsed from the input file
- * is to be mapped into the beans.
+ * A more complex bean used to test the DefaultAnnotationConfigurationReaderImpl instance.
  *
- * @author Dave Derry
- *
+ * @author Alan Henson
  */
-public interface BeanMappingStrategy {
-    void mapBean(Object bean, String beanName, String property, Object value,
-                 Map<String, ConversionOptionBO> conv) throws FlatwormParserException;
+@Data
+@RecordLink(recordClass = RecordBeanOne.class)
+public class RecordBeanThreeChildToTwo {
+
+    @RecordElement(order = 1)
+    private String valueOne;
+
+    @RecordElement(order = 2)
+    private String valueTwo;
 }

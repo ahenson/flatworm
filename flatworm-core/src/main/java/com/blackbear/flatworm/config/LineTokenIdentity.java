@@ -30,4 +30,12 @@ public interface LineTokenIdentity extends Identity {
      * @return {@code true} if it matches and {@code false} if not.
      */
     boolean matchesIdentity(LineToken lineToken);
+
+    /**
+     * See if the given token matches any of the pre-configured field identifiers. Note that this does ignore positioning and merely
+     * checks to see if the token matches an identifiers.
+     * @param token The token to test.
+     * @return {@code true} if it matches and {@code false} if not.
+     */
+    boolean matchesIdentity(String token);
 }

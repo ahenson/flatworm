@@ -17,8 +17,8 @@
 package com.blackbear.flatworm.config.impl;
 
 import com.blackbear.flatworm.config.Identity;
-import com.blackbear.flatworm.config.Line;
-import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.LineBO;
+import com.blackbear.flatworm.config.RecordBO;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,12 +33,12 @@ public abstract class AbstractIdentity implements Identity {
     /**
      * Writes nothing.
      * @param writer The {@link BufferedWriter} to write to.
-     * @param record The {@link Record} instance currently being processed.
-     * @param line The {@link Line} instance currently being processed.
+     * @param record The {@link RecordBO} instance currently being processed.
+     * @param line The {@link LineBO} instance currently being processed.
      * @throws IOException never thrown as no activity is taken against the {@code writer}.
      */
     @Override
-    public void write(BufferedWriter writer, Record record, Line line) throws IOException {
+    public void write(BufferedWriter writer, RecordBO record, LineBO line) throws IOException {
         // do nothing.
     }
 }

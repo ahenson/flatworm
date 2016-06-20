@@ -17,7 +17,7 @@
 package com.blackbear.flatworm.config.impl;
 
 import com.blackbear.flatworm.FileFormat;
-import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -35,7 +35,7 @@ import lombok.Getter;
  *
  * @author Alan Henson
  */
-public class ScriptIdentity extends AbstractIdentity {
+public class ScriptIdentityImpl extends AbstractIdentity {
     /**
      * Default JavaScript method name that will be invoked for Script Identity configurations.
      */
@@ -58,44 +58,44 @@ public class ScriptIdentity extends AbstractIdentity {
     private Invocable scriptInvocable;
 
     /**
-     * Constructor for ScriptIdentity. The default Script Engine is used ({@code ScriptIdentity.DEFAULT_SCRIPT_ENGINE}) and the default
-     * method name {@code ScriptIdentity.DEFAULT_SCRIPT_METHOD_NAME} is used.
+     * Constructor for ScriptIdentityImpl. The default Script Engine is used ({@code ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE}) and the default
+     * method name {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} is used.
      *
      * @param script The script that will be executed - should take two parameters with the first being (@link FileFormat} and the second
      *               being a {@link String}, which will be the line of data to examine. The script should return a {@link Boolean}.
      */
-    public ScriptIdentity(String script) throws FlatwormConfigurationException {
+    public ScriptIdentityImpl(String script) throws FlatwormConfigurationException {
         this(DEFAULT_SCRIPT_ENGINE, script, DEFAULT_SCRIPT_METHOD_NAME);
     }
 
 
     /**
-     * Constructor for ScriptIdentity that attempts to load the Script Engine specified by name. The default method name ({@code
-     * ScriptIdentity.DEFAULT_SCRIPT_METHOD_NAME}) is used.
+     * Constructor for ScriptIdentityImpl that attempts to load the Script Engine specified by name. The default method name ({@code
+     * ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME}) is used.
      *
-     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptIdentity.DEFAULT_SCRIPT_ENGINE} is
+     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE} is
           *                         used.
      * @param script           The script that will be executed - should take two parameters with the first being (@link FileFormat} and the
      *                         second being a {@link String}, which will be the line of data to examine. The script should return a {@link
      *                         Boolean}.
      */
-    public ScriptIdentity(String scriptEngineName, String script) throws FlatwormConfigurationException {
+    public ScriptIdentityImpl(String scriptEngineName, String script) throws FlatwormConfigurationException {
         this(scriptEngineName, script, DEFAULT_SCRIPT_METHOD_NAME);
     }
 
     /**
-     * Constructor for ScriptIdentity that attempts to load the Script Engine specified by name.
+     * Constructor for ScriptIdentityImpl that attempts to load the Script Engine specified by name.
      *
-     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptIdentity.DEFAULT_SCRIPT_ENGINE} is
+     * @param scriptEngineName The name of the script engine to load. If {@code null} the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE} is
      *                         used.
      * @param script           The script that will be executed - should take two parameters with the first being (@link FileFormat} and the
      *                         second being a {@link String}, which will be the line of data to examine. The script should return a {@link
      *                         Boolean}.
      * @param methodName       The name of the method in the script that should be executed - the {@link com.blackbear.flatworm.FileFormat}
      *                         instance will be the only parameter sent to the function specified. If the {@code methodName} is {@code null}
-     *                         then the {@code ScriptIdentity.DEFAULT_SCRIPT_METHOD_NAME} value will be used.
+     *                         then the {@code ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME} value will be used.
      */
-    public ScriptIdentity(String scriptEngineName, String script, String methodName) throws FlatwormConfigurationException {
+    public ScriptIdentityImpl(String scriptEngineName, String script, String methodName) throws FlatwormConfigurationException {
         this.script = script;
         this.scriptEngineName = StringUtils.isBlank(scriptEngineName) ? DEFAULT_SCRIPT_ENGINE : scriptEngineName;
         this.methodName = StringUtils.isBlank(methodName) ? DEFAULT_SCRIPT_METHOD_NAME : methodName;
@@ -119,9 +119,9 @@ public class ScriptIdentity extends AbstractIdentity {
     }
 
     /**
-     * Determine if the given {@link Record} instance should be used to parse the line.
+     * Determine if the given {@link RecordBO} instance should be used to parse the line.
      *
-     * @param record     The {@link Record} instance whose {@link ScriptIdentity} instance is being tested.
+     * @param record     The {@link RecordBO} instance whose {@link ScriptIdentityImpl} instance is being tested.
      * @param fileFormat The {@link FileFormat} instance representing the configuration that is driving the parsing and the last line that
      *                   was read.
      * @param line       The line of data to be evaluated.
@@ -131,14 +131,14 @@ public class ScriptIdentity extends AbstractIdentity {
      *                                 {@code boolean} value.
      */
     @Override
-    public boolean doesMatch(Record record, FileFormat fileFormat, String line) throws FlatwormParserException {
+    public boolean matchesIdentity(RecordBO record, FileFormat fileFormat, String line) throws FlatwormParserException {
         boolean matches = false;
         try {
             Object result = scriptInvocable.invokeFunction(methodName, fileFormat, line);
             if (result instanceof Boolean) {
                 matches = Boolean.class.cast(result);
             } else if (result != null) {
-                throw new FlatwormParserException(String.format("Record %s has a script identifier that does not return" +
+                throw new FlatwormParserException(String.format("RecordBO %s has a script identifier that does not return" +
                         "a boolean value - a converterName of %s was returned.", record.getName(), result.getClass().getName()));
             }
         } catch (FlatwormParserException e) {

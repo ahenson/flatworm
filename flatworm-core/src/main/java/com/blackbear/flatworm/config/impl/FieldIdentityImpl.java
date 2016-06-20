@@ -19,9 +19,9 @@ package com.blackbear.flatworm.config.impl;
 import com.google.common.base.Joiner;
 
 import com.blackbear.flatworm.FileFormat;
-import com.blackbear.flatworm.config.Line;
+import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.LineToken;
-import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.io.BufferedWriter;
@@ -37,7 +37,7 @@ import lombok.Setter;
  *
  * @author Alan Henson
  */
-public class FieldIdentity extends AbstractLineTokenIdentity {
+public class FieldIdentityImpl extends AbstractLineTokenIdentity {
 
     @Getter
     @Setter
@@ -54,12 +54,12 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
     @Getter
     private boolean ignoreCase;
 
-    public FieldIdentity() {
+    public FieldIdentityImpl() {
         matchingStrings = new HashSet<>();
         ignoreCase = false;
     }
 
-    public FieldIdentity(boolean ignoreCase) {
+    public FieldIdentityImpl(boolean ignoreCase) {
         this();
         this.ignoreCase = ignoreCase;
     }
@@ -74,9 +74,9 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
     }
 
     /**
-     * Determine if the given {@link Record} instance should be used to parse the line.
+     * Determine if the given {@link RecordBO} instance should be used to parse the line.
      *
-     * @param record     The {@link Record} instance.
+     * @param record     The {@link RecordBO} instance.
      * @param fileFormat The {@link FileFormat} instance representing the configuration that is driving the parsing and the last line that
      *                   was read.
      * @param line       The line of data to be evaluated.
@@ -86,7 +86,7 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
      *                                 not be a {@code boolean} value.
      */
     @Override
-    public boolean doesMatch(Record record, FileFormat fileFormat, String line) throws FlatwormParserException {
+    public boolean matchesIdentity(RecordBO record, FileFormat fileFormat, String line) throws FlatwormParserException {
         if(line == null) return false;
 
         boolean matchesLine = false;
@@ -107,12 +107,12 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
      * Write out all delimiters to the given {@link BufferedWriter instance{.}}
      *
      * @param writer The {@link BufferedWriter} to write to.
-     * @param record The {@link Record} instance currently being processed.
-     * @param line   The {@link Line} instance currently being processed.
+     * @param record The {@link RecordBO} instance currently being processed.
+     * @param line   The {@link LineBO} instance currently being processed.
      * @throws IOException should an I/O exception occur.
      */
     @Override
-    public void write(BufferedWriter writer, Record record, Line line) throws IOException {
+    public void write(BufferedWriter writer, RecordBO record, LineBO line) throws IOException {
         // TODO [AH] not sure about this approach as it writes out all matching strings instead of the primary one.
         // TODO [AH] I think the update might be an indicator as to the primary token and if set, only the primary is written - else, all.
         String delimit = line.getDelimiter() != null ? line.getDelimiter() : "";
@@ -147,5 +147,14 @@ public class FieldIdentity extends AbstractLineTokenIdentity {
         }
 
         return matches;
+    }
+
+    @Override
+    public boolean matchesIdentity(String token) {
+        String tokenToTest = token;
+        if(ignoreCase) {
+            tokenToTest = tokenToTest.toLowerCase();
+        }
+        return matchingStrings.contains(tokenToTest);
     }
 }

@@ -17,13 +17,13 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.ConversionOption;
-import com.blackbear.flatworm.config.Line;
+import com.blackbear.flatworm.config.ConversionOptionBO;
+import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.LineElement;
-import com.blackbear.flatworm.config.Record;
-import com.blackbear.flatworm.config.RecordDefinition;
-import com.blackbear.flatworm.config.RecordElement;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.RecordBO;
+import com.blackbear.flatworm.config.RecordDefinitionBO;
+import com.blackbear.flatworm.config.RecordElementBO;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.converters.ConversionHelper;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
@@ -94,7 +94,7 @@ public class FileCreator {
     }
 
     private void loadConfigurationFile(InputStream configStream) throws FlatwormConfigurationException {
-        ConfigurationReader parser = new DefaultConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReaderImpl();
         try {
             ff = parser.loadConfigurationFile(configStream);
         } catch (Exception ex) {
@@ -105,7 +105,7 @@ public class FileCreator {
     private void loadConfigurationFile(String config) throws FlatwormConfigurationException {
         // Load configuration xml file
         try {
-            ConfigurationReader parser = new DefaultConfigurationReader();
+            ConfigurationReader parser = new DefaultConfigurationReaderImpl();
             InputStream configStream = this.getClass().getClassLoader().getResourceAsStream(config);
             if (configStream != null) {
                 ff = parser.loadConfigurationFile(configStream);
@@ -168,14 +168,14 @@ public class FileCreator {
      * @throws FlatwormConfigurationException - wraps various Exceptions so client doesn't have to handle too many
      */
     public void write(String recordName) throws IOException, FlatwormConfigurationException {
-        Record record = ff.getRecord(recordName);
-        RecordDefinition recDef = record.getRecordDefinition();
+        RecordBO record = ff.getRecord(recordName);
+        RecordDefinitionBO recDef = record.getRecordDefinition();
 
-        List<Line> lines = recDef.getLines();
+        List<LineBO> lines = recDef.getLines();
 
         // Iterate over lines
         boolean first = true;
-        for (Line line : lines) {
+        for (LineBO line : lines) {
             String delimit = line.getDelimiter();
             if (null == delimit)
                 delimit = "";
@@ -192,11 +192,11 @@ public class FileCreator {
             }
 
             // Iterate over record-element items
-            List<LineElement> recElements = line.getElements();
+            List<LineElement> recElements = line.getLineElements();
             for (Iterator<LineElement> itRecElements = recElements.iterator(); itRecElements.hasNext(); ) {
                 LineElement lineElement = itRecElements.next();
-                if (lineElement instanceof RecordElement) {
-                    RecordElement recElement = (RecordElement) lineElement;
+                if (lineElement instanceof RecordElementBO) {
+                    RecordElementBO recElement = (RecordElementBO) lineElement;
                     String beanRef = recElement.getBeanRef();
                     String type = recElement.getConverterName();
 
@@ -206,7 +206,7 @@ public class FileCreator {
                                         beanRef));
                     }
 
-                    Map<String, ConversionOption> convOptions = recElement.getConversionOptions();
+                    Map<String, ConversionOptionBO> convOptions = recElement.getConversionOptions();
 
                     String val = "";
                     ConversionHelper convHelper = ff.getConversionHelper();

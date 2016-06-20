@@ -16,6 +16,8 @@
 
 package com.blackbear.flatworm.annotations;
 
+import com.blackbear.flatworm.config.impl.ScriptIdentityImpl;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,16 +25,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure the Script Identity element of the flatworm XML configuration using annotations.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@interface ScriptIdentity {
-    String script() default "";
-    String scriptFile() default "";
-    String scriptMethod() default "";
-    boolean apply() default false;
+public @interface ScriptIdentity {
+    String scriptEngine() default ScriptIdentityImpl.DEFAULT_SCRIPT_ENGINE;
+    String script();
+    String scriptMethod() default ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME;
+    boolean apply();
 }

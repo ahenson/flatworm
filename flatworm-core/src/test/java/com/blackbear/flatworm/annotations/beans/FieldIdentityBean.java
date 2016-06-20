@@ -14,21 +14,27 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.annotations.beans;
 
-import com.blackbear.flatworm.config.ConversionOptionBO;
-import com.blackbear.flatworm.errors.FlatwormParserException;
+import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.Record;
 
-import java.util.Map;
+import lombok.Data;
 
 /**
- * Provides the ability to specify how the raw data parsed from the input file
- * is to be mapped into the beans.
+ * Basic bean for testing the FieldIdentity annotation.
  *
- * @author Dave Derry
- *
+ * @author Alan Henson
  */
-public interface BeanMappingStrategy {
-    void mapBean(Object bean, String beanName, String property, Object value,
-                 Map<String, ConversionOptionBO> conv) throws FlatwormParserException;
+@Data
+@Record(name = "FieldIdentityBean",
+        fieldIdentity =
+        @FieldIdentity(
+                startPosition = 0,
+                fieldLength = 3,
+                ignoreCase = true,
+                matchIdentities = {"FLD"},
+                apply = true
+        ))
+public class FieldIdentityBean {
 }

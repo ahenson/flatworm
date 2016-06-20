@@ -17,7 +17,7 @@
 package com.blackbear.flatworm.config.impl;
 
 import com.blackbear.flatworm.FileFormat;
-import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.RecordBO;
 
 import org.junit.Before;
 
@@ -28,12 +28,12 @@ import org.junit.Before;
  */
 public abstract class AbstractBaseIdentityTest {
 
-    protected Record record;
+    protected RecordBO record;
     protected FileFormat fileFormat;
 
     @Before
     public void setup() {
-        record = new Record();
+        record = new RecordBO();
         fileFormat = new FileFormat();
     }
 

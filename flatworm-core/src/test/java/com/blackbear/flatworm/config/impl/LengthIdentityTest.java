@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Test the LengthIdentity implementation.
+ * Test the LengthIdentityImpl implementation.
  *
  * @author Alan Henson
  */
@@ -33,23 +33,23 @@ public class LengthIdentityTest extends AbstractBaseIdentityTest {
     public void simpleTest() {
         try {
             String line = "DVDFrozen Disney";
-            LengthIdentity identity = new LengthIdentity();
+            LengthIdentityImpl identity = new LengthIdentityImpl();
             identity.setMinLength(0);
             identity.setMaxLength(Integer.MAX_VALUE);
 
-            boolean matches = identity.doesMatch(record, fileFormat, line);
+            boolean matches = identity.matchesIdentity(record, fileFormat, line);
 
             assertTrue("Length Identity failed to correctly match line.", matches);
 
             identity.setMinLength(line.length() + 1);
             identity.setMaxLength(identity.getMinLength());
 
-            matches = identity.doesMatch(record, fileFormat, line);
+            matches = identity.matchesIdentity(record, fileFormat, line);
             assertFalse("Length Identity incorrect matched line.", matches);
 
             identity.setMinLength(line.length());
             identity.setMaxLength(identity.getMinLength());
-            matches = identity.doesMatch(record, fileFormat, line);
+            matches = identity.matchesIdentity(record, fileFormat, line);
             assertTrue("Length Identity failed to correctly match line.", matches);
         }
         catch (Exception e) {
@@ -62,11 +62,11 @@ public class LengthIdentityTest extends AbstractBaseIdentityTest {
     public void invalidTest() {
         try {
             String line = "DVDFrozen Disney";
-            LengthIdentity identity = new LengthIdentity();
+            LengthIdentityImpl identity = new LengthIdentityImpl();
             identity.setMinLength(10);
             identity.setMaxLength(0);
 
-            boolean matches = identity.doesMatch(record, fileFormat, line);
+            boolean matches = identity.matchesIdentity(record, fileFormat, line);
             assertFalse("Length Identity incorrect matched line.", matches);
         }
         catch (Exception e) {

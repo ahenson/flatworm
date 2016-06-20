@@ -16,8 +16,8 @@
 
 package com.blackbear.flatworm.converters;
 
-import com.blackbear.flatworm.config.ConversionOption;
-import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.ConversionOptionBO;
+import com.blackbear.flatworm.config.RecordBO;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -29,7 +29,7 @@ import java.util.Optional;
 /**
  * Goes above and beyond the {@link ConversionHelper} by providing a singleton like experience where multiple converter methods can be
  * registered based upon which property types they support. This is meant to be a generic approach so if you need a specific {@code
- * Converter} then please add it to the configuration file and reference it from your given {@link Record}
+ * ConverterBO} then please add it to the configuration file and reference it from your given {@link RecordBO}
  * configurations.
  *
  * @author Alan Henson
@@ -70,7 +70,7 @@ public class ConverterFunctionCache {
      * @return The {@link Object} instance created from the {@code value} if the conversion was successful and {@code null} if not.
      * @throws Exception Should the conversion process have unexpected issues.
      */
-    public static Object convertFromString(Class<?> clazz, String value, Map<String, ConversionOption> options) throws Exception {
+    public static Object convertFromString(Class<?> clazz, String value, Map<String, ConversionOptionBO> options) throws Exception {
         Object result = null;
         ToTypeConverterFunction function = findToTypeConverter(clazz);
         if(function != null) {
@@ -86,7 +86,7 @@ public class ConverterFunctionCache {
      * @return The {@link String} instance created from the {@code value} if the conversion was successful and {@code null} if not.
      * @throws Exception Should the conversion process have unexpected issues.
      */
-    public static String convertToString(Object value, Map<String, ConversionOption> options) throws Exception {
+    public static String convertToString(Object value, Map<String, ConversionOptionBO> options) throws Exception {
         String result = null;
         FromTypeConverterFunction function = findFromTypeConverter(value.getClass());
         if(function != null) {

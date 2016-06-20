@@ -46,14 +46,15 @@ Work Completed
 * Changed the record-element "type" attribute to "converter-name" as that's what it's really linked to.
 * Changed the minlength/maxlength attributes for the length-ident element to min-length/max-length for consistency.
 * On Field Identity (field-ident) - added ignore-case tag to indicate whether or not case should play a factor in comparison.
-* 
+* Added support for single segment-element configurations where the child doesn't have to be a collection
+* Added support for non-delimited segment-elements - a "child" line can be a non-delimited line
 
 TODOs
 -------
 * Update the "Field Guide" to reflect the latest changes and usages
  * file-format::ignore-unmapped-record
  * record-ident::script-ident
- * segment-element::collection-property-name
+ * segment-element::property-name
  * removal segment-element::name 
 * Update the examples to reflect the latest capabilities and provide more guidance within the examples
 * Add annotations support to all for beans to define their record makeup
@@ -65,3 +66,7 @@ TODOs
 * Add support for other script types and engines
 * Refactor the parsing logic from the beans that hold the configuration data
 * Add missing JavaDocs
+* Add ability for folks to write their own Identity implementations and make them annotation enabled. Right now they would have to build their own annotation configuration loader and extend the relevant parts - which is fine, but this can be done more cleanly I think.
+* Add ability for the Script Identity approach to load scripts from files
+* Add more verbose logging
+* Is the field-length attribute really needed on Field Identity? We know the length by the matching strings. They should all be the same length else the match will always fail.

@@ -28,8 +28,6 @@ import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +37,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Bean class used to store the values from the Line XML tag
+ * BeanBO class used to store the values from the LineBO XML tag
  */
 @Slf4j
-public class Line {
-    private List<LineElement> elements = new ArrayList<>();
+public class LineBO extends AbstractLineElementCollection {
     private ConversionHelper conversionHelper;
     private Map<String, Object> beans;
     private BeanMappingStrategy mappingStrategy = new PropertyUtilsMappingStrategy();
@@ -57,13 +54,17 @@ public class Line {
     private String delimiter;
 
     @Getter
-    private char chrQuote = '\0';
+    private char quoteChar = '\0';
 
     @Getter
     @Setter
-    private RecordDefinition parentRecordDefinition;
+    private RecordDefinitionBO parentRecordDefinition;
 
-    public Line() {
+    @Getter
+    @Setter
+    private String id;
+    
+    public LineBO() {
     }
 
     /**
@@ -73,21 +74,25 @@ public class Line {
      */
     public void setQuoteChar(String quote) {
         if (quote != null) {
-            chrQuote = quote.charAt(0);
+            quoteChar = quote.charAt(0);
         }
     }
 
+    public void setQuoteChar(char quote) {
+        quoteChar = quote;
+    }
+
     public boolean isDelimited() {
-        return (null != delimiter);
+        return !StringUtils.isBlank(delimiter);
     }
 
-    public List<LineElement> getElements() {
-        return Collections.unmodifiableList(elements);
-    }
-
-    public void addElement(LineElement lineElement) {
-        lineElement.setParentLine(this);
-        elements.add(lineElement);
+    @Override
+    public void addLineElement(LineElement recordElement) {
+        recordElement.setParentLine(this);
+        if(recordElement.getOrder() == null) {
+            recordElement.setOrder(elements.size() + 1);
+        }
+        super.addLineElement(recordElement);
     }
 
     @Override
@@ -96,13 +101,13 @@ public class Line {
     }
 
     /**
-     * @param inputLine  A single line from file to be parsed into its corresponding bean
-     * @param beans      A Hashmap containing a collection of beans which will be populated with parsed data
-     * @param convHelper A ConversionHelper which aids in the conversion of datatypes and string formatting
+     * @param inputLine        A single line from file to be parsed into its corresponding bean
+     * @param beans            A HashMap containing a collection of beans which will be populated with parsed data
+     * @param conversionHelper A ConversionHelper which aids in the conversion of datatypes and string formatting
      * @throws FlatwormParserException should any issues occur while parsing the data.
      */
-    public void parseInput(String inputLine, Map<String, Object> beans, ConversionHelper convHelper) throws FlatwormParserException {
-        this.conversionHelper = convHelper;
+    public void parseInput(String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper) throws FlatwormParserException {
+        this.conversionHelper = conversionHelper;
         this.beans = beans;
 
         // JBL - check for delimited status
@@ -110,80 +115,68 @@ public class Line {
             // Don't parse empty lines
             if (!Strings.isNullOrEmpty(inputLine)) {
                 parseInputDelimited(inputLine);
-                return;
             }
         }
+        else {
+            int charPos = 0;
+            parseInput(inputLine, elements, charPos);
+        }
+    }
 
-        int charPos = 0;
-        for (LineElement le : elements) {
-            if (le instanceof RecordElement) {
-                RecordElement re = (RecordElement) le;
+    /**
+     * Parse out the content of the line based upon the configured {@link RecordElementBO} and {@link SegmentElementBO} instances.
+     * @param inputLine The line of data to parse.
+     * @param lineElements The {@link LineElement} instances that drive how the line of data will be parsed.
+     * @param charPos The character position of the line to begin at.
+     * @return The last characater position of the line that was processed.
+     * @throws FlatwormParserException should the parsing fail for any reason.
+     */
+    private int parseInput(String inputLine, List<LineElement> lineElements, int charPos) throws FlatwormParserException {
+        for (LineElement lineElement : lineElements) {
+            if (lineElement instanceof RecordElementBO) {
+                RecordElementBO recordElement = (RecordElementBO) lineElement;
                 int start = charPos;
                 int end = charPos;
-                if (re.isFieldStartSet())
-                    start = re.getFieldStart();
-                if (re.isFieldEndSet()) {
-                    end = re.getFieldEnd();
+                if (recordElement.isFieldStartSet())
+                    start = recordElement.getFieldStart();
+                if (recordElement.isFieldEndSet()) {
+                    end = recordElement.getFieldEnd();
                     charPos = end;
                 }
-                if (re.isFieldLengthSet()) {
-                    end = start + re.getFieldLength();
+                if (recordElement.isFieldLengthSet()) {
+                    end = start + recordElement.getFieldLength();
                     charPos = end;
                 }
                 if (end > inputLine.length())
-                    throw new FlatwormParserException("Looking for field " + re.getBeanRef()
+                    throw new FlatwormParserException("Looking for field " + recordElement.getBeanRef()
                             + " at pos " + start + ", end " + end + ", input length = " + inputLine.length());
-                String beanRef = re.getBeanRef();
+                String beanRef = recordElement.getBeanRef();
                 if (beanRef != null) {
                     String fieldChars = inputLine.substring(start, end);
 
                     // JBL - to keep from dup. code, moved this to a private method
-                    mapField(fieldChars, re);
+                    mapField(fieldChars, recordElement);
                 }
             }
-            /* TODO - to be added. For now we only support delimited. But there really is no reason not to support fixed-format as well
-            else if (le instanceof SegmentElement) {
-                SegmentElement se = (SegmentElement) le;
-                int start = charPos;
-                int end = charPos;
-                if (se.isFieldStartSet())
-                    start = se.getFieldStart();
-                if (se.isFieldEndSet())
-                {
-                    end = se.getFieldEnd();
-                    charPos = end;
-                }
-                if (se.isFieldLengthSet())
-                {
-                    end = start + se.getFieldLength();
-                    charPos = end;
-                }
-                if (end > inputLine.length())
-                    throw new FlatwormParseException("Looking for field " + se.getBeanRef() + " at pos " + start
-                            + ", end " + end + ", input length = " + inputLine.length());
-                String beanRef = se.getBeanRef();
-                if (beanRef != null)
-                {
-                    String fieldChars = inputLine.substring(start, end);
-
-                    // JBL - to keep from dup. code, moved this to a private method
-                    mapField(conversionHelper, fieldChars, se, beans);
-                }
+            else if (lineElement instanceof SegmentElementBO) {
+                SegmentElementBO segmentElement = (SegmentElementBO) lineElement;
+                charPos = parseInput(inputLine, segmentElement.getLineElements(), charPos);
+                captureSegmentBean(segmentElement);
             }
-            */
         }
+        return charPos;
     }
 
     /**
      * Convert string field from file into appropriate converterName and set bean's value<br>
      *
      * @param fieldChars    the raw string data read from the field
-     * @param recordElement the RecordElement, which contains detailed information about the field
+     * @param recordElement the RecordElementBO, which contains detailed information about the field
      * @throws FlatwormParserException should any issues occur while parsing the data.
      */
-    private void mapField(String fieldChars, RecordElement recordElement) throws FlatwormParserException {
+    private void mapField(String fieldChars, RecordElementBO recordElement) throws FlatwormParserException {
         String beanRef = recordElement.getBeanRef();
-        int posOfFirstDot = beanRef.indexOf('.');
+        int posOfFirstDot = beanRef.lastIndexOf('.');
         String beanName = beanRef.substring(0, posOfFirstDot);
         String property = beanRef.substring(posOfFirstDot + 1);
         Object bean = beans.get(beanName);
@@ -201,6 +194,27 @@ public class Line {
         mappingStrategy.mapBean(bean, beanName, property, value, recordElement.getConversionOptions());
     }
 
+    /**
+     * For non-delimited lines that are under a {@link SegmentElementBO} instance, capture them into the parent bean.
+     * @param segmentElement The {@link SegmentElementBO} instance being processed.
+     * @throws FlatwormParserException should invoking the necessary reflection methods fail for any reason.
+     */
+    private void captureSegmentBean(SegmentElementBO segmentElement) throws FlatwormParserException {
+        String beanRef = segmentElement.getBeanRef();
+        String parentBeanRef = segmentElement.getParentBeanRef();
+        String property = segmentElement.getPropertyName();
+        
+        Object parent = beans.get(parentBeanRef);
+        Object toAdd = beans.get(beanRef);
+        
+        if(segmentElement.getCardinalityMode() == CardinalityMode.SINGLE) {
+            ParseUtils.setProperty(parent, property, toAdd);
+        }
+        else {
+            ParseUtils.addValueToCollection(segmentElement, parent, toAdd);
+        }
+    }
+    
     /**
      * Convert string field from file into appropriate converterName and set bean's value. This is used for delimited files only<br>
      *
@@ -232,7 +246,7 @@ public class Line {
                     break;
             }
         }
-        lineTokens = Util.split(inputLine, split, chrQuote);
+        lineTokens = Util.split(inputLine, split, quoteChar);
         cleanupLineTokens();
         currentField = 0;
         doParseDelimitedInput(elements);
@@ -240,9 +254,9 @@ public class Line {
 
     /**
      * Remove any record-level, {@link LineTokenIdentity} instance tokens from the list of line tokens so that they don't affect the
-     * processing of the data elements. Additional, for any place where there are segment-records, the {@link LineToken} instances
-     * need to have the positional information updated to reflect that they are virtually at the head of the segment-record
-     * even though they aren't at the head of the line.
+     * processing of the data elements. Additional, for any place where there are segment-records, the {@link LineToken} instances need to
+     * have the positional information updated to reflect that they are virtually at the head of the segment-record even though they aren't
+     * at the head of the line.
      */
     private void cleanupLineTokens() {
         Iterator<LineToken> lineTokenIterator = lineTokens.iterator();
@@ -255,28 +269,28 @@ public class Line {
 
     private void doParseDelimitedInput(List<LineElement> elements) throws FlatwormParserException {
         for (LineElement lineElement : elements) {
-            if (lineElement instanceof RecordElement) {
+            if (lineElement instanceof RecordElementBO) {
                 try {
-                    RecordElement recordElement = RecordElement.class.cast(lineElement);
+                    RecordElementBO recordElement = RecordElementBO.class.cast(lineElement);
                     parseDelimitedRecordElement(recordElement, lineTokens.get(currentField).getToken());
                     ++currentField;
                 } catch (ArrayIndexOutOfBoundsException ex) {
                     log.warn("Ran out of data on field " + (currentField + 1));
                 }
-            } else if (lineElement instanceof SegmentElement) {
-                parseDelimitedSegmentElement(SegmentElement.class.cast(lineElement));
+            } else if (lineElement instanceof SegmentElementBO) {
+                parseDelimitedSegmentElement(SegmentElementBO.class.cast(lineElement));
             }
         }
     }
 
-    private void parseDelimitedRecordElement(RecordElement recordElement, String fieldStr) throws FlatwormParserException {
+    private void parseDelimitedRecordElement(RecordElementBO recordElement, String fieldStr) throws FlatwormParserException {
         if (!recordElement.getIgnoreField()) {
             // JBL - to keep from dup. code, moved this to a private method
             mapField(fieldStr, recordElement);
         }
     }
 
-    private void parseDelimitedSegmentElement(SegmentElement segment) throws FlatwormParserException {
+    private void parseDelimitedSegmentElement(SegmentElementBO segment) throws FlatwormParserException {
         int minCount = segment.getMinCount();
         int maxCount = segment.getMaxCount();
         if (maxCount <= 0) {
@@ -286,10 +300,9 @@ public class Line {
             minCount = 0;
         }
 
-        // TODO: handle allowance for a single instance that is for a field rather than a list
         String beanRef = segment.getBeanRef();
-        if (!segment.matchesIdentity(lineTokens.get(currentField)) && minCount > 0) {
-            log.error("Segment " + segment.getCollectionPropertyName() + " with minimum required count of " + minCount + " missing.");
+        if (currentField < lineTokens.size() && !segment.matchesIdentity(lineTokens.get(currentField)) && minCount > 0) {
+            log.error("Segment " + segment.getPropertyName() + " with minimum required count of " + minCount + " missing.");
         }
         int cardinality = 0;
         try {
@@ -301,22 +314,29 @@ public class Line {
                     if (parentRef != null) {
                         Object instance = ParseUtils.newBeanInstance(beans.get(beanRef));
                         beans.put(beanRef, instance);
-                        if (cardinality > maxCount) {
-                            if (segment.getCardinalityMode() == CardinalityMode.STRICT) {
-                                throw new FlatwormParserException("Cardinality exceeded with mode set to STRICT");
-                            } else if (segment.getCardinalityMode() != CardinalityMode.RESTRICTED) {
+                        // Handle collections
+                        if (segment.getCardinalityMode() != CardinalityMode.SINGLE) {
+                            if (cardinality > maxCount) {
+                                if (segment.getCardinalityMode() == CardinalityMode.STRICT) {
+                                    throw new FlatwormParserException("Cardinality exceeded with mode set to STRICT");
+                                } else if (segment.getCardinalityMode() != CardinalityMode.RESTRICTED) {
+                                    ParseUtils.addValueToCollection(segment, beans.get(parentRef), instance);
+                                }
+                            } else {
                                 ParseUtils.addValueToCollection(segment, beans.get(parentRef), instance);
                             }
-                        } else {
-                            ParseUtils.addValueToCollection(segment, beans.get(parentRef), instance);
+                        }
+                        // Handle single child instances.
+                        else {
+                            ParseUtils.setProperty(beans.get(parentRef), segment.getPropertyName(), instance);
                         }
                     }
-                    doParseDelimitedInput(segment.getElements());
+                    doParseDelimitedInput(segment.getLineElements());
                 }
             }
         } finally {
             if (cardinality > maxCount) {
-                log.error("Segment '" + segment.getCollectionPropertyName() + "' with maximum of " + maxCount
+                log.error("Segment '" + segment.getPropertyName() + "' with maximum of " + maxCount
                         + " encountered actual count of " + cardinality);
             }
         }

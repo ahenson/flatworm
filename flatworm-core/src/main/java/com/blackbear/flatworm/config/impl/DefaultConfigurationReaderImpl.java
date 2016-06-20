@@ -21,17 +21,17 @@ import com.google.common.base.Joiner;
 import com.blackbear.flatworm.CardinalityMode;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.Util;
-import com.blackbear.flatworm.config.Bean;
+import com.blackbear.flatworm.config.BeanBO;
 import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.config.ConfigurationValidator;
-import com.blackbear.flatworm.config.ConversionOption;
-import com.blackbear.flatworm.config.Converter;
-import com.blackbear.flatworm.config.Line;
+import com.blackbear.flatworm.config.ConversionOptionBO;
+import com.blackbear.flatworm.config.ConverterBO;
+import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.LineElement;
-import com.blackbear.flatworm.config.Record;
-import com.blackbear.flatworm.config.RecordDefinition;
-import com.blackbear.flatworm.config.RecordElement;
-import com.blackbear.flatworm.config.SegmentElement;
+import com.blackbear.flatworm.config.RecordBO;
+import com.blackbear.flatworm.config.RecordDefinitionBO;
+import com.blackbear.flatworm.config.RecordElementBO;
+import com.blackbear.flatworm.config.SegmentElementBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -60,7 +60,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
  *
  * @author Alan Henson
  */
-public class DefaultConfigurationReader implements ConfigurationReader {
+public class DefaultConfigurationReaderImpl implements ConfigurationReader {
     /**
      * {@code loadConfigurationFile} takes an XML configuration file, and returns a {@code FileFormat} object, which can be used to parse an
      * input file into beans.
@@ -309,27 +309,27 @@ public class DefaultConfigurationReader implements ConfigurationReader {
                 return fileFormat;
             }
 
-            // Converter.
+            // ConverterBO.
             if (nodeName.equals("converter")) {
                 return readConverter(node);
             }
 
-            // Record.
+            // RecordBO.
             if (nodeName.equals("record")) {
                 return readRecord(node);
             }
 
-            // Record Definition.
+            // RecordBO Definition.
             if (nodeName.equals("record-definition")) {
                 return readRecordDefinition(node);
             }
 
-            // Bean.
+            // BeanBO.
             if (nodeName.equals("bean")) {
                 return readBean(node);
             }
 
-            // Line.
+            // LineBO.
             if (nodeName.equals("line")) {
                 return readLine(node);
             }
@@ -367,23 +367,23 @@ public class DefaultConfigurationReader implements ConfigurationReader {
 
         List<Object> childNodes = getChildNodes(node);
         childNodes.forEach(childNode -> {
-            if (childNode.getClass().isAssignableFrom(Converter.class)) {
-                fileFormat.addConverter(Converter.class.cast(childNode));
-            } else if (childNode.getClass().isAssignableFrom(Record.class)) {
-                fileFormat.addRecord(Record.class.cast(childNode));
+            if (childNode.getClass().isAssignableFrom(ConverterBO.class)) {
+                fileFormat.addConverter(ConverterBO.class.cast(childNode));
+            } else if (childNode.getClass().isAssignableFrom(RecordBO.class)) {
+                fileFormat.addRecord(RecordBO.class.cast(childNode));
             }
         });
         return fileFormat;
     }
 
     /**
-     * Read a {@link Converter} instance from the given {@code node}.
+     * Read a {@link ConverterBO} instance from the given {@code node}.
      *
      * @param node The node to parse.
-     * @return a constructed {@link Converter} instance.
+     * @return a constructed {@link ConverterBO} instance.
      */
-    protected Converter readConverter(Node node) {
-        return Converter.builder()
+    protected ConverterBO readConverter(Node node) {
+        return ConverterBO.builder()
                 .converterClass(getAttributeValueNamed(node, "class"))
                 .method(getAttributeValueNamed(node, "method"))
                 .returnType(getAttributeValueNamed(node, "return-type"))
@@ -392,14 +392,14 @@ public class DefaultConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * Parse a {@link Record} instance out of the information found in the given node.
+     * Parse a {@link RecordBO} instance out of the information found in the given node.
      *
      * @param node The node.
-     * @return a constructed {@link Record} instance.
+     * @return a constructed {@link RecordBO} instance.
      * @throws FlatwormConfigurationException should the configuration data contain invalid syntax or values.
      */
-    protected Record readRecord(Node node) throws FlatwormConfigurationException {
-        Record record = new Record();
+    protected RecordBO readRecord(Node node) throws FlatwormConfigurationException {
+        RecordBO record = new RecordBO();
         record.setName(getAttributeValueNamed(node, "name"));
         Node identChild = getChildElementNodeName(node, "record-ident");
         if (identChild != null) {
@@ -417,34 +417,34 @@ public class DefaultConfigurationReader implements ConfigurationReader {
 
         Node recordChild = getChildElementNodeName(node, "record-definition");
 
-        RecordDefinition recordDefinition = readRecordDefinition(recordChild);
+        RecordDefinitionBO recordDefinition = readRecordDefinition(recordChild);
         recordDefinition.setParentRecord(record);
         record.setRecordDefinition(recordDefinition);
         return record;
     }
 
     /**
-     * Read the {@code length-ident} information from the given {@code node} and populate it in the {@link Record} instance.
+     * Read the {@code length-ident} information from the given {@code node} and populate it in the {@link RecordBO} instance.
      *
      * @param node The node containing the data.
-     * @return a built {@link LengthIdentity} instance.
+     * @return a built {@link LengthIdentityImpl} instance.
      */
-    protected LengthIdentity readLengthIdentity(Node node) {
-        LengthIdentity lengthIdentity = new LengthIdentity();
+    protected LengthIdentityImpl readLengthIdentity(Node node) {
+        LengthIdentityImpl lengthIdentity = new LengthIdentityImpl();
         lengthIdentity.setMinLength(Util.tryParseInt(getAttributeValueNamed(node, "min-length")));
         lengthIdentity.setMaxLength(Util.tryParseInt(getAttributeValueNamed(node, "max-length")));
         return lengthIdentity;
     }
 
     /**
-     * Read the {@code field-ident} information from the given {@code node} and populate it in the {@link Record} instance.
+     * Read the {@code field-ident} information from the given {@code node} and populate it in the {@link RecordBO} instance.
      *
      * @param node The node containing the data.
-     * @return a built {@link FieldIdentity} instance.
+     * @return a built {@link FieldIdentityImpl} instance.
      */
-    protected FieldIdentity readFieldIdentity(Node node) {
+    protected FieldIdentityImpl readFieldIdentity(Node node) {
 
-        FieldIdentity fieldIdentity = new FieldIdentity(
+        FieldIdentityImpl fieldIdentity = new FieldIdentityImpl(
                 Util.tryParseBoolean(getAttributeValueNamed(node, "ignore-case"), false)
         );
 
@@ -458,13 +458,13 @@ public class DefaultConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * Read the {@code script-identity} tag values from the given node and populate the {@link Record} instance with the values.
+     * Read the {@code script-identity} tag values from the given node and populate the {@link RecordBO} instance with the values.
      *
      * @param node The node containing the data.
-     * @return a built {@link ScriptIdentity} instance.
+     * @return a built {@link ScriptIdentityImpl} instance.
      * @throws FlatwormConfigurationException should the {@code script-ident} node be invalid.
      */
-    protected ScriptIdentity readScriptIdentity(Node node) throws FlatwormConfigurationException {
+    protected ScriptIdentityImpl readScriptIdentity(Node node) throws FlatwormConfigurationException {
         String scriptEngineName = getAttributeValueNamed(node, "script-engine");
         String scriptMethodName = getAttributeValueNamed(node, "method-name");
 
@@ -476,39 +476,39 @@ public class DefaultConfigurationReader implements ConfigurationReader {
             script = getChildCDataNodeValue(node);
         }
 
-        return new ScriptIdentity(scriptEngineName, script, scriptMethodName);
+        return new ScriptIdentityImpl(scriptEngineName, script, scriptMethodName);
     }
 
     /**
-     * Parse a {@link RecordDefinition} instance out of the information found in the given node.
+     * Parse a {@link RecordDefinitionBO} instance out of the information found in the given node.
      *
      * @param node The node.
-     * @return a constructed {@link RecordDefinition} instance.
+     * @return a constructed {@link RecordDefinitionBO} instance.
      * @throws FlatwormConfigurationException should the configuration data contain invalid syntax or values.
      */
-    protected RecordDefinition readRecordDefinition(Node node) throws FlatwormConfigurationException {
-        RecordDefinition rd = new RecordDefinition();
+    protected RecordDefinitionBO readRecordDefinition(Node node) throws FlatwormConfigurationException {
+        RecordDefinitionBO rd = new RecordDefinitionBO();
 
         List<Object> childNodes = getChildNodes(node);
         childNodes.forEach(childNode -> {
-            if (childNode.getClass().isAssignableFrom(Bean.class)) {
-                rd.addBean(Bean.class.cast(childNode));
-            } else if (childNode.getClass().isAssignableFrom(Line.class)) {
-                rd.addLine(Line.class.cast(childNode));
+            if (childNode.getClass().isAssignableFrom(BeanBO.class)) {
+                rd.addBean(BeanBO.class.cast(childNode));
+            } else if (childNode.getClass().isAssignableFrom(LineBO.class)) {
+                rd.addLine(LineBO.class.cast(childNode));
             }
         });
         return rd;
     }
 
     /**
-     * Parse a {@link Bean} instance out of the information found in the given node.
+     * Parse a {@link BeanBO} instance out of the information found in the given node.
      *
      * @param node The node.
-     * @return a constructed {@link Bean} instance.
+     * @return a constructed {@link BeanBO} instance.
      * @throws FlatwormConfigurationException should the configuration data contain invalid syntax or values.
      */
-    protected Bean readBean(Node node) throws FlatwormConfigurationException {
-        Bean bean = new Bean();
+    protected BeanBO readBean(Node node) throws FlatwormConfigurationException {
+        BeanBO bean = new BeanBO();
         bean.setBeanName(getAttributeValueNamed(node, "name"));
         bean.setBeanClass(getAttributeValueNamed(node, "class"));
         try {
@@ -520,47 +520,47 @@ public class DefaultConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * Parse a {@link Line} instance out of the information found in the given node.
+     * Parse a {@link LineBO} instance out of the information found in the given node.
      *
      * @param node The node.
-     * @return a constructed {@link Line} instance.
+     * @return a constructed {@link LineBO} instance.
      * @throws FlatwormConfigurationException should the configuration data contain invalid syntax or values.
      */
-    protected Line readLine(Node node) throws FlatwormConfigurationException {
-        Line line = new Line();
+    protected LineBO readLine(Node node) throws FlatwormConfigurationException {
+        LineBO line = new LineBO();
 
         // JBL - Determine if this line is delimited
         // Determine value of quote character, default = "
         // These fields are optional
+        line.setId(getAttributeValueNamed(node, "id"));
         line.setDelimiter(getAttributeValueNamed(node, "delimit"));
         line.setQuoteChar(getAttributeValueNamed(node, "quote"));
 
         // Note the child nodes will be a collection of record-elements and segment-elements.
-        // TODO - create a readLineElement method.
         List<Object> childNodes = getChildNodes(node);
         childNodes.stream()
                 .filter(childNode -> childNode instanceof LineElement)
                 .map(LineElement.class::cast)
-                .forEach(line::addElement);
+                .forEach(line::addLineElement);
 
         return line;
     }
 
     /**
-     * Parse a {@link SegmentElement} instance out of the information found in the given node.
+     * Parse a {@link SegmentElementBO} instance out of the information found in the given node.
      *
      * @param node The node.
-     * @return a constructed {@link SegmentElement} instance.
+     * @return a constructed {@link SegmentElementBO} instance.
      * @throws FlatwormConfigurationException should the configuration data contain invalid syntax or values.
      */
-    protected SegmentElement readSegmentElement(Node node) throws FlatwormConfigurationException {
-        SegmentElement segment = new SegmentElement();
+    protected SegmentElementBO readSegmentElement(Node node) throws FlatwormConfigurationException {
+        SegmentElementBO segment = new SegmentElementBO();
         segment.setMinCount(Util.tryParseInt(getAttributeValueNamed(node, "minCount")));
         segment.setMaxCount(Util.tryParseInt(getAttributeValueNamed(node, "maxCount")));
         segment.setBeanRef(getAttributeValueNamed(node, "beanref"));
         segment.setParentBeanRef(getAttributeValueNamed(node, "parent-beanref"));
         segment.setAddMethod(getAttributeValueNamed(node, "add-method"));
-        segment.setCollectionPropertyName(getAttributeValueNamed(node, "collection-property-name"));
+        segment.setPropertyName(getAttributeValueNamed(node, "property-name"));
 
         readCardinalityMode(node, segment);
 
@@ -573,25 +573,29 @@ public class DefaultConfigurationReader implements ConfigurationReader {
         childNodes.stream()
                 .filter(childNode -> childNode instanceof LineElement)
                 .map(LineElement.class::cast)
-                .forEach(segment::addElement);
+                .forEach(segment::addLineElement);
 
         return segment;
     }
 
     /**
-     * Parse a {@link SegmentElement}'s cardinality-mode out of the information found in the given node.
+     * Parse a {@link SegmentElementBO}'s cardinality-mode out of the information found in the given node.
      *
      * @param node    The node.
-     * @param segment The {@link SegmentElement} instance to populate with the data found.
+     * @param segment The {@link SegmentElementBO} instance to populate with the data found.
      */
-    protected void readCardinalityMode(Node node, SegmentElement segment) {
+    protected void readCardinalityMode(Node node, SegmentElementBO segment) {
         String segmentMode = getAttributeValueNamed(node, "cardinality-mode");
 
         if (!StringUtils.isBlank(segmentMode)) {
-            if (segmentMode.toLowerCase().startsWith("strict")) {
-                segment.setCardinalityMode(CardinalityMode.STRICT);
-            } else if (segmentMode.toLowerCase().startsWith("restrict")) {
+            if (segmentMode.toUpperCase().startsWith(CardinalityMode.LOOSE.name())) {
+                segment.setCardinalityMode(CardinalityMode.LOOSE);
+            } else if (segmentMode.toUpperCase().startsWith(CardinalityMode.RESTRICTED.name())) {
                 segment.setCardinalityMode(CardinalityMode.RESTRICTED);
+            } else if (segmentMode.toUpperCase().startsWith(CardinalityMode.STRICT.name())) {
+                segment.setCardinalityMode(CardinalityMode.STRICT);
+            } else if (segmentMode.toUpperCase().startsWith(CardinalityMode.SINGLE.name())) {
+                segment.setCardinalityMode(CardinalityMode.SINGLE);
             }
         } else {
             segment.setCardinalityMode(CardinalityMode.LOOSE);
@@ -599,14 +603,14 @@ public class DefaultConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * Parse a {@link RecordElement} instance out of the information found in the given node.
+     * Parse a {@link RecordElementBO} instance out of the information found in the given node.
      *
      * @param node The node.
-     * @return a constructed {@link RecordElement} instance.
+     * @return a constructed {@link RecordElementBO} instance.
      * @throws FlatwormConfigurationException should the configuration data contain invalid syntax or values.
      */
-    protected RecordElement readRecordElement(Node node) throws FlatwormConfigurationException {
-        RecordElement recordElement = new RecordElement();
+    protected RecordElementBO readRecordElement(Node node) throws FlatwormConfigurationException {
+        RecordElementBO recordElement = new RecordElementBO();
 
         Node start = getAttributeNamed(node, "start");
         Node end = getAttributeNamed(node, "end");
@@ -640,17 +644,17 @@ public class DefaultConfigurationReader implements ConfigurationReader {
     }
 
     /**
-     * Parse a {@link ConversionOption}s out of the information found in the given node.
+     * Parse a {@link ConversionOptionBO}s out of the information found in the given node.
      *
      * @param node          The node.
-     * @param recordElement The {@link RecordElement} instance to update with the {@link ConversionOption} instances found.
+     * @param recordElement The {@link RecordElementBO} instance to update with the {@link ConversionOptionBO} instances found.
      */
-    protected void readConversionOptions(Node node, RecordElement recordElement) {
+    protected void readConversionOptions(Node node, RecordElementBO recordElement) {
         List<Node> childNodes = getChildElementNodesOfType(node, "conversion-option");
         for (Node o : childNodes) {
             String name = getAttributeValueNamed(o, "name");
             String value = getAttributeValueNamed(o, "value");
-            ConversionOption co = new ConversionOption(name, value);
+            ConversionOptionBO co = new ConversionOptionBO(name, value);
             recordElement.addConversionOption(name, co);
         }
     }

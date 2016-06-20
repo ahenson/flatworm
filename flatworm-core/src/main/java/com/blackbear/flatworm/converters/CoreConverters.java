@@ -17,7 +17,7 @@
 package com.blackbear.flatworm.converters;
 
 import com.blackbear.flatworm.Util;
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import java.math.BigDecimal;
@@ -57,7 +57,7 @@ public class CoreConverters {
      * @return The string with padding removed
      */
 
-    public String convertChar(String str, Map<String, ConversionOption> options) {
+    public String convertChar(String str, Map<String, ConversionOptionBO> options) {
         // nothing extra do do, since convHelper calls removePadding now
         return str;
     }
@@ -69,7 +69,7 @@ public class CoreConverters {
      * @param options The conversion-option values for the field
      * @return The string result
      */
-    public String convertChar(Object obj, Map<String, ConversionOption> options) {
+    public String convertChar(Object obj, Map<String, ConversionOptionBO> options) {
         return obj.toString();
     }
 
@@ -83,7 +83,7 @@ public class CoreConverters {
      * @return The converted date
      * @throws FlatwormParserException if the date fails to parse correctly.
      */
-    public Date convertDate(String str, Map<String, ConversionOption> options)
+    public Date convertDate(String str, Map<String, ConversionOptionBO> options)
             throws FlatwormParserException {
         try {
             String format = Util.getValue(options, "format");
@@ -108,7 +108,7 @@ public class CoreConverters {
      * @param options The conversion-option values for the field
      * @return the string result
      */
-    public String convertDate(Object obj, Map<String, ConversionOption> options) {
+    public String convertDate(Object obj, Map<String, ConversionOptionBO> options) {
         Date date = (Date) obj;
         String format = Util.getValue(options, "format");
         if (obj == null)
@@ -134,10 +134,10 @@ public class CoreConverters {
      * @throws FlatwormParserException If the source number fails to parse as a double or the decimal places option fails to parse as an
      *                                 integer value.
      */
-    public Double convertDouble(String str, Map<String, ConversionOption> options) throws FlatwormParserException {
+    public Double convertDouble(String str, Map<String, ConversionOptionBO> options) throws FlatwormParserException {
         try {
             int decimalPlaces = 0;
-            ConversionOption conv = options.get("decimal-places");
+            ConversionOptionBO conv = options.get("decimal-places");
 
             String decimalPlacesOption = null;
             if (null != conv)
@@ -171,17 +171,17 @@ public class CoreConverters {
      * {@code decimal-implied} is set.</dd> </dl>
      *
      * @param obj     The {@code obj} to convert.
-     * @param options The {@code ConversionOption} provided.
+     * @param options The {@code ConversionOptionBO} provided.
      * @return the {@code obj} converted to a {@link String}.
      */
-    public String convertDouble(Object obj, Map<String, ConversionOption> options) {
+    public String convertDouble(Object obj, Map<String, ConversionOptionBO> options) {
         Double d = (Double) obj;
         if (d == null) {
             return null;
         }
 
         int decimalPlaces = 0;
-        ConversionOption conv = options.get("decimal-places");
+        ConversionOptionBO conv = options.get("decimal-places");
 
         String decimalPlacesOption = null;
         if (null != conv)
@@ -220,10 +220,10 @@ public class CoreConverters {
      * @throws FlatwormParserException If the source number fails to parse as a float or the decimal places option fails to parse as an
      *                                 integer value.
      */
-    public Float convertFloat(String str, Map<String, ConversionOption> options) throws FlatwormParserException {
+    public Float convertFloat(String str, Map<String, ConversionOptionBO> options) throws FlatwormParserException {
         try {
             int decimalPlaces = 0;
-            ConversionOption conv = options.get("decimal-places");
+            ConversionOptionBO conv = options.get("decimal-places");
 
             String decimalPlacesOption = null;
             if (null != conv)
@@ -257,17 +257,17 @@ public class CoreConverters {
      * {@code decimal-implied} is set.</dd> </dl>
      *
      * @param obj     The {@code obj} to convert.
-     * @param options The {@code ConversionOption} provided.
+     * @param options The {@code ConversionOptionBO} provided.
      * @return the {@code obj} converted to a {@link String}.
      */
-    public String convertFloat(Object obj, Map<String, ConversionOption> options) {
+    public String convertFloat(Object obj, Map<String, ConversionOptionBO> options) {
         Float f = (Float) obj;
         if (f == null) {
             return null;
         }
 
         int decimalPlaces = 0;
-        ConversionOption conv = options.get("decimal-places");
+        ConversionOptionBO conv = options.get("decimal-places");
 
         String decimalPlacesOption = null;
         if (null != conv)
@@ -299,7 +299,7 @@ public class CoreConverters {
      * @return The converted integer value
      * @throws FlatwormParserException If the source number fails to parse as an integer value.
      */
-    public Integer convertInteger(String str, Map<String, ConversionOption> options)
+    public Integer convertInteger(String str, Map<String, ConversionOptionBO> options)
             throws FlatwormParserException {
         try {
             if (str.length() == 0) {
@@ -317,10 +317,10 @@ public class CoreConverters {
      * Conver an {@link Integer} to a {@link String}.
      *
      * @param obj     The {@code obj} to convert.
-     * @param options The {@code ConversionOption} provided.
+     * @param options The {@code ConversionOptionBO} provided.
      * @return the {@code obj} converted to a {@link String}.
      */
-    public String convertInteger(Object obj, Map<String, ConversionOption> options) {
+    public String convertInteger(Object obj, Map<String, ConversionOptionBO> options) {
         if (obj == null) {
             return null;
         }
@@ -336,7 +336,7 @@ public class CoreConverters {
      * @return The converted long value
      * @throws FlatwormParserException If the source number fails to parse as an long value.
      */
-    public Long convertLong(String str, Map<String, ConversionOption> options)
+    public Long convertLong(String str, Map<String, ConversionOptionBO> options)
             throws FlatwormParserException {
         try {
             if (str.length() == 0) {
@@ -354,10 +354,10 @@ public class CoreConverters {
      * Conver an {@link Long} to a {@link String}.
      *
      * @param obj     The {@code obj} to convert.
-     * @param options The {@code ConversionOption} provided.
+     * @param options The {@code ConversionOptionBO} provided.
      * @return the {@code obj} converted to a {@link String}.
      */
-    public String convertLong(Object obj, Map<String, ConversionOption> options) {
+    public String convertLong(Object obj, Map<String, ConversionOptionBO> options) {
         if (obj == null) {
             return null;
         }
@@ -380,7 +380,7 @@ public class CoreConverters {
      * @throws FlatwormParserException If the source number fails to parse as a big decimal or the decimal places option fails to parse as
      *                                 an integer value.
      */
-    public BigDecimal convertBigDecimal(String str, Map<String, ConversionOption> options)
+    public BigDecimal convertBigDecimal(String str, Map<String, ConversionOptionBO> options)
             throws FlatwormParserException {
         try {
             int decimalPlaces = 0;
@@ -412,10 +412,10 @@ public class CoreConverters {
      * if {@code decimal-implied} is set.</dd> </dl>
      *
      * @param obj     The {@code obj} to convert.
-     * @param options The {@code ConversionOption} provided.
+     * @param options The {@code ConversionOptionBO} provided.
      * @return the {@code obj} converted to a {@link String}.
      */
-    public String convertBigDecimal(Object obj, Map<String, ConversionOption> options) {
+    public String convertBigDecimal(Object obj, Map<String, ConversionOptionBO> options) {
         if (obj == null) {
             return null;
         }

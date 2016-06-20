@@ -17,8 +17,8 @@
 package com.blackbear.flatworm.converters;
 
 import com.blackbear.flatworm.Util;
-import com.blackbear.flatworm.config.ConversionOption;
-import com.blackbear.flatworm.config.Converter;
+import com.blackbear.flatworm.config.ConversionOptionBO;
+import com.blackbear.flatworm.config.ConverterBO;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -39,10 +39,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ConversionHelper {
-    private Map<String, Converter> converters;
+    private Map<String, ConverterBO> converters;
 
-    private Map<Converter, Method> converterMethodCache;
-    private Map<Converter, Method> converterToStringMethodCache;
+    private Map<ConverterBO, Method> converterMethodCache;
+    private Map<ConverterBO, Method> converterToStringMethodCache;
     private Map<String, Object> converterObjectCache;
 
     public ConversionHelper() {
@@ -62,7 +62,7 @@ public class ConversionHelper {
      * @return The {@link Object} constructed from the {@code fieldChars} value.
      * @throws FlatwormParserException should parsing the value to a {@link Object} fail for any reason.
      */
-    public Object convert(String converterName, String fieldChars, Map<String, ConversionOption> options, String beanRef)
+    public Object convert(String converterName, String fieldChars, Map<String, ConversionOptionBO> options, String beanRef)
             throws FlatwormParserException {
 
         Object value;
@@ -90,11 +90,11 @@ public class ConversionHelper {
      * @param beanName     The name of the bean as configured.
      * @param propertyName The name of the property that is to be set.
      * @param fieldChars   The value.
-     * @param options      The {@link ConversionOption}s.
+     * @param options      The {@link ConversionOptionBO}s.
      * @return The {@link Object} constructed from the {@code fieldChars} value.
      * @throws FlatwormParserException should parsing the value to a {@link Object} fail for any reason.
      */
-    public Object convert(Object bean, String beanName, String propertyName, String fieldChars, Map<String, ConversionOption> options)
+    public Object convert(Object bean, String beanName, String propertyName, String fieldChars, Map<String, ConversionOptionBO> options)
             throws FlatwormParserException {
         Object value;
         try {
@@ -112,12 +112,12 @@ public class ConversionHelper {
      *
      * @param type    The converter converterName specified.
      * @param obj     The {@link Object} to convert to a String.
-     * @param options The {@link ConversionOption}s.
+     * @param options The {@link ConversionOptionBO}s.
      * @param beanRef The reference to the bean that has the property.
      * @return The {@link String} value of the {@link Object}.
      * @throws FlatwormParserException should converting the {@link Object} fail for any reason.
      */
-    public String convert(String type, Object obj, Map<String, ConversionOption> options, String beanRef) throws FlatwormParserException {
+    public String convert(String type, Object obj, Map<String, ConversionOptionBO> options, String beanRef) throws FlatwormParserException {
         String result;
         try {
             Object converter = getConverterObject(type);
@@ -133,12 +133,12 @@ public class ConversionHelper {
     /**
      * Convert a given {@link Object} to a String.
      * @param obj     The {@link Object} to convert to a String.
-     * @param options The {@link ConversionOption}s.
+     * @param options The {@link ConversionOptionBO}s.
      * @param beanRef The reference to the bean that has the property.
      * @return The {@link String} value of the {@link Object}.
      * @throws FlatwormParserException should converting the {@link Object} fail for any reason.
      */
-    public String convert(Object obj, Map<String, ConversionOption> options, String beanRef) throws FlatwormParserException {
+    public String convert(Object obj, Map<String, ConversionOptionBO> options, String beanRef) throws FlatwormParserException {
         String result;
         try {
             result = ConverterFunctionCache.convertToString(obj, options);
@@ -152,18 +152,18 @@ public class ConversionHelper {
      * Handles the processing of the Conversion-Options from the flatworm XML file
      *
      * @param fieldChars The string to be transformed
-     * @param options    Collection of ConversionOption objects
+     * @param options    Collection of ConversionOptionBO objects
      * @param length     Used in justification to ensure proper formatting
      * @return The transformed string
      */
-    public String transformString(String fieldChars, Map<String, ConversionOption> options, int length) {
+    public String transformString(String fieldChars, Map<String, ConversionOptionBO> options, int length) {
         // JBL - Implement iteration of conversion-options
         // Iterate over conversion-options, that way, the xml file
         // can drive the order of conversions, instead of having them
         // hard-coded like in 'removePadding' (old way)
         Set<String> keys = options.keySet();
         for (String key : keys) {
-            ConversionOption conv = options.get(key);
+            ConversionOptionBO conv = options.get(key);
 
             if (conv.getName().equals("justify"))
                 fieldChars = Util.justify(fieldChars, conv.getValue(), options, length);
@@ -187,24 +187,24 @@ public class ConversionHelper {
      *
      * @param converter The converter to be added
      */
-    public void addConverter(Converter converter) {
+    public void addConverter(ConverterBO converter) {
         converters.put(converter.getName(), converter);
     }
 
     /**
-     * Return all of the currently registered {@link Converter} instances.
-     * @return the currently registered {@link Converter} instances.
+     * Return all of the currently registered {@link ConverterBO} instances.
+     * @return the currently registered {@link ConverterBO} instances.
      */
-    public Collection<Converter> getConverters() {
+    public Collection<ConverterBO> getConverters() {
         return converters.values();
     }
 
     /**
-     * Get the {@link Converter} by name.
+     * Get the {@link ConverterBO} by name.
      * @param name The name.
-     * @return The {@link Converter} instance if found by the {@code name} and {@code null} if not.
+     * @return The {@link ConverterBO} instance if found by the {@code name} and {@code null} if not.
      */
-    public Converter getConverter(String name) {
+    public ConverterBO getConverter(String name) {
         return converters.get(name);
     }
 
@@ -216,7 +216,7 @@ public class ConversionHelper {
      */
     private Method getConverterMethod(String converterName) throws FlatwormParserException {
         try {
-            Converter c = converters.get(converterName);
+            ConverterBO c = converters.get(converterName);
             if (converterMethodCache.get(c) != null)
                 return converterMethodCache.get(c);
             Method meth;
@@ -243,7 +243,7 @@ public class ConversionHelper {
      * @throws FlatwormParserException should attempting to retrieving the {@link Method} fail for any reason.
      */
     private Method getToStringConverterMethod(String converterName) throws FlatwormParserException {
-        Converter c = converters.get(converterName);
+        ConverterBO c = converters.get(converterName);
         if (converterToStringMethodCache.get(c) != null)
             return converterToStringMethodCache.get(c);
         try {
@@ -259,16 +259,16 @@ public class ConversionHelper {
     }
 
     /**
-     * Fetch the {@link Converter} object read from the config data.
+     * Fetch the {@link ConverterBO} object read from the config data.
      *
      * @param converterName The name of the converter. Used for lookup.
      * @return An instance of the conversion class.
-     * @throws FlatwormParserException if there is no Converter registered with the specified name or the {@link Method} failed be
+     * @throws FlatwormParserException if there is no ConverterBO registered with the specified name or the {@link Method} failed be
      *                                 retrieved.
      */
     private Object getConverterObject(String converterName) throws FlatwormParserException {
         try {
-            Converter c = converters.get(converterName);
+            ConverterBO c = converters.get(converterName);
             if (c == null) {
                 throw new FlatwormParserException("converterName '" + converterName + "' not registered");
             }

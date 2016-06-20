@@ -14,18 +14,25 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.config;
+package com.blackbear.flatworm.annotations.beans;
+
+import com.blackbear.flatworm.annotations.RecordElement;
+import com.blackbear.flatworm.annotations.RecordLink;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
+/**
+ * A more complex bean used to test the DefaultAnnotationConfigurationReaderImpl instance.
+ *
+ * @author Alan Henson
+ */
 @Data
-@ToString
-@EqualsAndHashCode
-public class Bean {
-    private String beanName;
-    private String beanClass;
-    private Class beanObjectClass;
-    private RecordDefinition parentRecordDefinition;
+@RecordLink(recordClass = RecordBeanOne.class)
+public class RecordBeanFourChildToTwo {
+
+    @RecordElement(order = 2)
+    private String valueTwo;
+
+    @RecordElement(order = 1)
+    private String valueOne;
 }

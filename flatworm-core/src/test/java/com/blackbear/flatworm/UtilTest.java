@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 
 import org.junit.Test;
 
@@ -39,7 +39,7 @@ public class UtilTest {
     @Test
     public void testMultiplePadCharacters() {
         HashMap options = new HashMap();
-        options.put("pad-character", new ConversionOption("pad-character", "0Oo"));
+        options.put("pad-character", new ConversionOptionBO("pad-character", "0Oo"));
         assertEquals("f", Util.justify("foo", "both", options, 0));
         assertEquals("f", Util.justify("fooOO00", "both", options, 0));
         assertEquals("f", Util.justify("oofoo", "both", options, 0));

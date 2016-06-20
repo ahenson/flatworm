@@ -23,14 +23,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure a Length Identity via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@interface LengthIdentity {
+public @interface LengthIdentity {
 
     int minLength();
     int maxLength();

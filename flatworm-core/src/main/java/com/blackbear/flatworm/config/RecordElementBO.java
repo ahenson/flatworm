@@ -21,12 +21,11 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * Bean class used to store the values from the Record-Element XML tag
+ * BeanBO class used to store the values from the RecordBO-Element XML tag
  */
-public class RecordElement implements LineElement {
+public class RecordElementBO implements LineElement {
 
     @Getter
     @Setter
@@ -49,18 +48,22 @@ public class RecordElement implements LineElement {
 
     @Getter
     @Setter
-    private Line parentLine;
+    private LineBO parentLine;
 
     @Getter
     private Boolean ignoreField;
+
+    @Getter
+    @Setter
+    private Integer order;
 
     // The elements are queried, there are just multiple layers of abstraction that the compiler can't see.
     @Getter
     @Setter
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private Map<String, ConversionOption> conversionOptions;
+    private Map<String, ConversionOptionBO> conversionOptions;
 
-    public RecordElement() {
+    public RecordElementBO() {
         fieldEnd = null;
         fieldStart = null;
         fieldLength = null;
@@ -82,7 +85,7 @@ public class RecordElement implements LineElement {
         return fieldLength != null;
     }
 
-    public void addConversionOption(String name, ConversionOption option) {
+    public void addConversionOption(String name, ConversionOptionBO option) {
         conversionOptions.put(name, option);
     }
 
@@ -102,7 +105,7 @@ public class RecordElement implements LineElement {
 
     @Override
     public String toString() {
-        return "RecordElement{" +
+        return "RecordElementBO{" +
                 "fieldEnd=" + fieldEnd +
                 ", fieldStart=" + fieldStart +
                 ", fieldLength=" + fieldLength +

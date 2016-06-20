@@ -50,7 +50,7 @@
                 <record-element beanref="account.serviceType" converter-name="char"/>
                 <record-element beanref="account.companyId" converter-name="char"/>
                 <segment-element beanref="consumer" minCount="0" maxCount="5" parent-beanref="account" add-method="addConsumer"
-                                 cardinality-mode="restrict">
+                                 cardinality-mode="restricted">
                     <field-ident field-start="0" field-length="2">
                         <match-string>ID</match-string>
                     </field-ident>

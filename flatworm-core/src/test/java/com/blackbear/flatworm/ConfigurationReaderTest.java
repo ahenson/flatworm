@@ -16,13 +16,13 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.config.Bean;
+import com.blackbear.flatworm.config.BeanBO;
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.impl.LengthIdentity;
-import com.blackbear.flatworm.config.Line;
-import com.blackbear.flatworm.config.Record;
-import com.blackbear.flatworm.config.RecordDefinition;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.LineBO;
+import com.blackbear.flatworm.config.RecordBO;
+import com.blackbear.flatworm.config.impl.LengthIdentityImpl;
+import com.blackbear.flatworm.config.RecordDefinitionBO;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class ConfigurationReaderTest {
     private FileFormat format;
 
     public void loadFileFormat(String configFile) {
-        ConfigurationReader reader = new DefaultConfigurationReader();
+        ConfigurationReader reader = new DefaultConfigurationReaderImpl();
         try {
             format = reader.loadConfigurationFile(configFile);
         } catch (Exception e) {
@@ -54,7 +54,7 @@ public class ConfigurationReaderTest {
     public void testComplexRecordsRead() {
         loadFileFormat("complex-example.xml");
         assertNotNull(format);
-        Record record = format.getRecord("dvd");
+        RecordBO record = format.getRecord("dvd");
         assertNotNull(record);
         assertDvdRecord(record);
         assertNotNull(format.getRecord("videotape"));
@@ -68,19 +68,19 @@ public class ConfigurationReaderTest {
         assertNotNull(format);
     }
 
-    private void assertDvdRecord(Record dvd) {
+    private void assertDvdRecord(RecordBO dvd) {
         assertNotNull(dvd.getRecordIdentity());
-        assertTrue(dvd.getRecordIdentity() instanceof LengthIdentity);
+        assertTrue(dvd.getRecordIdentity() instanceof LengthIdentityImpl);
 
-        LengthIdentity identity = LengthIdentity.class.cast(dvd.getRecordIdentity());
+        LengthIdentityImpl identity = LengthIdentityImpl.class.cast(dvd.getRecordIdentity());
 
         assertNotNull(identity.getMinLength());
         assertNotNull(identity.getMaxLength());
         assertEquals(85, identity.getMinLength().intValue());
         assertEquals(85, identity.getMaxLength().intValue());
-        RecordDefinition def = dvd.getRecordDefinition();
+        RecordDefinitionBO def = dvd.getRecordDefinition();
         assertNotNull(def);
-        Collection<Bean> beans = def.getBeans();
+        Collection<BeanBO> beans = def.getBeans();
         assertEquals(2, beans.size());
 
         beans.forEach(Assert::assertNotNull);
@@ -91,9 +91,9 @@ public class ConfigurationReaderTest {
                 .filter(bean -> "film".endsWith(bean.getBeanName()))
                 .findAny().isPresent());
 
-        List<Line> lines = def.getLines();
+        List<LineBO> lines = def.getLines();
         assertEquals(1, lines.size());
-        Line line = lines.get(0);
-        assertEquals(6, line.getElements().size());
+        LineBO line = lines.get(0);
+        assertEquals(6, line.getLineElements().size());
     }
 }

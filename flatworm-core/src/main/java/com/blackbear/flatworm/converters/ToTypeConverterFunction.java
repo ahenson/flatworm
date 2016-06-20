@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm.converters;
 
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 
 import java.util.Map;
 
@@ -32,9 +32,9 @@ public interface ToTypeConverterFunction {
      * Convert the given {@code value} into another format. ({@code Object} is used here to make this as generic
      * as possible while still allowing for caching.
      * @param value The {@code value} to convert.
-     * @param options Any {@link ConversionOption}s that were configured to go along with the converter.
+     * @param options Any {@link ConversionOptionBO}s that were configured to go along with the converter.
      * @return The {@code value} value converted.
      * @throws Exception should anything unexpected occur.
      */
-    Object convert(String value, Map<String, ConversionOption> options) throws Exception;
+    Object convert(String value, Map<String, ConversionOptionBO> options) throws Exception;
 }

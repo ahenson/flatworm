@@ -17,7 +17,7 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 import com.blackbear.flatworm.test.domain.Film;
 
@@ -55,7 +55,7 @@ public class EncodingTestCase extends TestCase {
     }
 
     protected void setContent(byte[] content) throws Exception {
-        ConfigurationReader parser = new DefaultConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReaderImpl();
         ff = getFileFormat(parser);
         reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content),
                 ff.getEncoding()));

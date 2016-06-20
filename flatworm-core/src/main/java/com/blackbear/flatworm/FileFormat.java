@@ -16,8 +16,8 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.config.Converter;
-import com.blackbear.flatworm.config.Record;
+import com.blackbear.flatworm.config.ConverterBO;
+import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.converters.ConversionHelper;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -43,10 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 public class FileFormat {
 
     @Getter
-    private ConversionHelper convHelper;
+    private ConversionHelper conversionHelper;
 
-    private Map<String, Record> records;
-    private List<Record> recordOrder;
+    private Map<String, RecordBO> records;
+    private List<RecordBO> recordOrder;
 
     @Getter
     private int lineNumber;
@@ -70,25 +70,25 @@ public class FileFormat {
         lineNumber = 0;
 
         // JBL
-        convHelper = new ConversionHelper();
+        conversionHelper = new ConversionHelper();
     }
 
-    public Collection<Record> getRecords() {
+    public Collection<RecordBO> getRecords() {
         return records.values();
     }
 
-    public void addRecord(Record r) {
+    public void addRecord(RecordBO r) {
         records.put(r.getName(), r);
         recordOrder.add(r);
     }
 
-    public Record getRecord(String name) {
+    public RecordBO getRecord(String name) {
         return records.get(name);
     }
 
-    private Record findMatchingRecord(String firstLine) throws FlatwormParserException {
-        Record result = null;
-        for (Record record : recordOrder) {
+    private RecordBO findMatchingRecord(String firstLine) throws FlatwormParserException {
+        RecordBO result = null;
+        for (RecordBO record : recordOrder) {
             if (record.matchesLine(this, firstLine)) {
                 result = record;
                 break;
@@ -98,9 +98,9 @@ public class FileFormat {
     }
 
     /**
-     * See if any of the {@code Record} instances collected thus far are "default" records in that they lack a
+     * See if any of the {@code RecordBO} instances collected thus far are "default" records in that they lack a
      * record identifier.
-     * @return {@code true} if there is a {@code Record} that lacks an identifier.
+     * @return {@code true} if there is a {@code RecordBO} that lacks an identifier.
      */
     public boolean hasDefaultRecord() {
         return records.values()
@@ -113,24 +113,16 @@ public class FileFormat {
     /**
      * Facilitates the storage of multiple converters. However, actual storage is delegated to the ConversionHelper class.
      *
-     * @param converter The Converter to store
+     * @param converter The ConverterBO to store
      */
-    public void addConverter(Converter converter) {
-        convHelper.addConverter(converter);
-    }
-
-    /**
-     * FileFormat is the keeper of ConversionHelper, but does not actually use it. This allows access.
-     *
-     * @return ConversionHelper
-     */
-    public ConversionHelper getConversionHelper() {
-        return convHelper;
+    public void addConverter(ConverterBO converter) {
+        conversionHelper.addConverter(converter);
     }
 
     /**
      * When called with a {@code BufferedReader}, reads sufficient lines to parse a record, and returns the beans created.
-     * @param in The stream to read from.
+     * @param in The stream to read from. Note that the reader is not closed by this method so the caller must perform the
+     *           {@code close()} operation on the reader.
      * @return The created beans in a MatchedRecord object.
      * @throws FlatwormParserException should an issue occur while parsing the data content.
      * @throws IOException Should an I/O issue occur.
@@ -142,9 +134,9 @@ public class FileFormat {
         lineNumber++;
 
         if (currentParsedLine != null) {
-            Record record = findMatchingRecord(currentParsedLine);
+            RecordBO record = findMatchingRecord(currentParsedLine);
             if (record != null) {
-                Map<String, Object> beans = record.parseRecord(currentParsedLine, in, convHelper);
+                Map<String, Object> beans = record.parseRecord(currentParsedLine, in, conversionHelper);
                 matchedRecord = new MatchedRecord(record.getName(), beans);
             }
             else if (!ignoreUnmappedRecords) {

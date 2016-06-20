@@ -14,28 +14,26 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations;
+package com.blackbear.flatworm.annotations.beans;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.blackbear.flatworm.annotations.Record;
+import com.blackbear.flatworm.annotations.ScriptIdentity;
+
+import lombok.Data;
 
 /**
- * Class description goes here.
+ * Basic bean for testing the ScriptIdentity annotation.
  *
  * @author Alan Henson
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-@interface AdditionalLine {
-    Class<?> recordClass();
-
-    int lineNumber() default 2;
-
-    String delimiter() default "";
-
-    char quoteCharacter() default '\0';
+@Data
+@Record(name = "ScriptIdentityBean",
+        scriptIdentity =
+        @ScriptIdentity(
+                scriptEngine = "nashorn",
+                script = "function myMethod(fileFormat, line) { return true; }",
+                scriptMethod = "myMethod",
+                apply = true
+        ))
+public class ScriptIdentityBean {
 }

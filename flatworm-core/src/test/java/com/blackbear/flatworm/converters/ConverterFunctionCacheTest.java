@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm.converters;
 
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -84,8 +84,8 @@ public class ConverterFunctionCacheTest {
 
             // Date value.
             value = "06/16/2016";
-            Map<String, ConversionOption> options = new HashMap<>(1);
-            options.put("format", new ConversionOption("format", "MM/dd/yyyy"));
+            Map<String, ConversionOptionBO> options = new HashMap<>(1);
+            options.put("format", new ConversionOptionBO("format", "MM/dd/yyyy"));
             result = convertFromString(Date.class, value, options);
             assertEquals("Wrong return converterName", Date.class, result.getClass());
         } catch (Exception e) {
@@ -177,8 +177,8 @@ public class ConverterFunctionCacheTest {
             cal.set(Calendar.MONTH, 5);
             cal.set(Calendar.DATE, 16);
 
-            Map<String, ConversionOption> options = new HashMap<>(1);
-            options.put("format", new ConversionOption("format", "MM/dd/yyyy"));
+            Map<String, ConversionOptionBO> options = new HashMap<>(1);
+            options.put("format", new ConversionOptionBO("format", "MM/dd/yyyy"));
             result = convertToString(cal.getTime(), options);
             assertNotNull("Conversion failed", result);
             assertEquals("Wrong return converterName", String.class, result.getClass());

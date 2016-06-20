@@ -23,14 +23,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure a Converter via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@interface StringMatch {
-    String matchString() default "";
-    boolean ignoreCase() default false;
+public @interface Converter {
+    String name();
+
+    Class<?> clazz();
+
+    String methodName();
+
+    Class<?> returnType();
 }

@@ -17,7 +17,7 @@
 package com.blackbear.flatworm;
 
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.test.domain.Dvd;
 import com.blackbear.flatworm.test.domain.Film;
 import com.blackbear.flatworm.test.domain.Header;
@@ -38,7 +38,7 @@ public class UnmappedRecords {
     @Test
     public void testFileRead() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-        ConfigurationReader parser = new DefaultConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReaderImpl();
         try {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("unmapped-records.xml"));
             InputStream in = getClass().getClassLoader().getResourceAsStream("unmapped_records.txt");

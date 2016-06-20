@@ -23,13 +23,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * Bean class used to represent information about a Converter. That is, a method
+ * BeanBO class used to represent information about a ConverterBO. That is, a method
  * from CoreConverters or one you implement.
  */
 @Builder
 @EqualsAndHashCode
 @AllArgsConstructor
-public class Converter {
+public class ConverterBO {
     @Getter
     private String converterClass;
 
@@ -42,6 +42,6 @@ public class Converter {
     @Getter
     private String method;
 
-    public Converter() {
+    public ConverterBO() {
     }
 }

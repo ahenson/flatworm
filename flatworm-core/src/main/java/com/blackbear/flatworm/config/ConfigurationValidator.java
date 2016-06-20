@@ -17,9 +17,9 @@
 package com.blackbear.flatworm.config;
 
 import com.blackbear.flatworm.FileFormat;
-import com.blackbear.flatworm.config.impl.FieldIdentity;
-import com.blackbear.flatworm.config.impl.LengthIdentity;
-import com.blackbear.flatworm.config.impl.ScriptIdentity;
+import com.blackbear.flatworm.config.impl.FieldIdentityImpl;
+import com.blackbear.flatworm.config.impl.LengthIdentityImpl;
+import com.blackbear.flatworm.config.impl.ScriptIdentityImpl;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -36,9 +36,10 @@ public class ConfigurationValidator {
 
     /**
      * Valdate the configuration captured in the {@link FileFormat} instance.
+     *
      * @param fileFormat The {@link FileFormat} instance to check.
-     * @return An empty {@link List} if no errors or found else all errors found will be in the return with
-     * each specific error being its own entry in the {@link List}.
+     * @return An empty {@link List} if no errors or found else all errors found will be in the return with each specific error being its
+     * own entry in the {@link List}.
      */
     public static List<String> validateFileFormat(FileFormat fileFormat) {
         List<String> errors = new ArrayList<>();
@@ -54,10 +55,10 @@ public class ConfigurationValidator {
     /**
      * Validate that the {@code record} tag and its children were properly populated.
      *
-     * @param record The {@link Record} instance containing the values to validate.
+     * @param record The {@link RecordBO} instance containing the values to validate.
      * @param errors A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateRecord(Record record, List<String> errors) {
+    public static void validateRecord(RecordBO record, List<String> errors) {
         if (StringUtils.isBlank(record.getName())) {
             errors.add("Must specify a name for the record.");
         }
@@ -69,52 +70,47 @@ public class ConfigurationValidator {
     /**
      * Validate that the {@code converter} tag was properly populated.
      *
-     * @param converter The {@link Converter} instance containing the values to validate.
-     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     * @param converter The {@link ConverterBO} instance containing the values to validate.
+     * @param errors    A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateConverter(Converter converter, List<String> errors) {
+    public static void validateConverter(ConverterBO converter, List<String> errors) {
         Class<?> clazz = null;
-        if(StringUtils.isBlank(converter.getName())) {
-            errors.add("Must specify the name of the Converter." +
+        if (StringUtils.isBlank(converter.getName())) {
+            errors.add("Must specify the name of the ConverterBO." +
                     "This is used to identify which converter to use in the record-element configuration.");
         }
 
-        if(StringUtils.isBlank(converter.getConverterClass())) {
-            errors.add("Must specify the class of the Converter." +
+        if (StringUtils.isBlank(converter.getConverterClass())) {
+            errors.add("Must specify the class of the ConverterBO." +
                     "This is used to identify which converter to use in the record-element configuration.");
-        }
-        else {
+        } else {
             try {
                 clazz = Class.forName(converter.getConverterClass());
-            } catch(Exception e) {
-                errors.add(String.format("Failed to locate Converter class: %s for Converter:%s." +
-                        "Please double check the fully qualified name for accuracy",
+            } catch (Exception e) {
+                errors.add(String.format("Failed to locate ConverterBO class: %s for ConverterBO:%s." +
+                                "Please double check the fully qualified name for accuracy",
                         converter.getName(), converter.getConverterClass()));
             }
         }
 
-        if(StringUtils.isBlank(converter.getReturnType())) {
-            errors.add(String.format("Must specify the return-type for Converter %s.", converter.getName()));
-        }
-        else {
+        if (StringUtils.isBlank(converter.getReturnType())) {
+            errors.add(String.format("Must specify the return-type for ConverterBO %s.", converter.getName()));
+        } else {
             try {
                 Class.forName(converter.getReturnType());
-            }
-            catch(Exception e) {
-                errors.add(String.format("Failed to find return-type %s for Converter %s.",
+            } catch (Exception e) {
+                errors.add(String.format("Failed to find return-type %s for ConverterBO %s.",
                         converter.getReturnType(), converter.getName()));
             }
         }
 
-        if(StringUtils.isBlank(converter.getMethod())) {
-            errors.add(String.format("Must specify the method for Converter %s.", converter.getName()));
-        }
-        else if(clazz != null) {
+        if (StringUtils.isBlank(converter.getMethod())) {
+            errors.add(String.format("Must specify the method for ConverterBO %s.", converter.getName()));
+        } else if (clazz != null) {
             try {
                 clazz.getMethod(converter.getMethod(), Object.class, Map.class);
-            }
-            catch(Exception e) {
-                errors.add(String.format("Failed to find method %s on Converter %s.",
+            } catch (Exception e) {
+                errors.add(String.format("Failed to find method %s on ConverterBO %s.",
                         converter.getMethod(), converter.getConverterClass()));
             }
         }
@@ -124,45 +120,43 @@ public class ConfigurationValidator {
      * If a known {@link Identity} has been used, attempt to validate it.
      *
      * @param identity The {@link Identity} instance containing the values to validate.
-     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     * @param errors   A non-null {@link List} that will be appended to if errors are found.
      */
     public static void validateIdentity(Identity identity, List<String> errors) {
-        if(identity instanceof LengthIdentity) {
-            validateLengthIdentity(LengthIdentity.class.cast(identity), errors);
-        }
-        else if(identity instanceof FieldIdentity) {
-            validateFieldIdentity(FieldIdentity.class.cast(identity), errors);
+        if (identity instanceof LengthIdentityImpl) {
+            validateLengthIdentity(LengthIdentityImpl.class.cast(identity), errors);
+        } else if (identity instanceof FieldIdentityImpl) {
+            validateFieldIdentity(FieldIdentityImpl.class.cast(identity), errors);
 
-        }
-        else if(identity instanceof ScriptIdentity) {
-            validateScriptIdentity(ScriptIdentity.class.cast(identity), errors);
+        } else if (identity instanceof ScriptIdentityImpl) {
+            validateScriptIdentity(ScriptIdentityImpl.class.cast(identity), errors);
         }
     }
 
     /**
      * Validate that the {@code length-ident} tag was properly populated.
      *
-     * @param lengthIdentity The {@link LengthIdentity} instance containing the values to validate.
-     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     * @param lengthIdentity The {@link LengthIdentityImpl} instance containing the values to validate.
+     * @param errors         A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateLengthIdentity(LengthIdentity lengthIdentity, List<String> errors) {
+    public static void validateLengthIdentity(LengthIdentityImpl lengthIdentity, List<String> errors) {
         if (lengthIdentity.getMinLength() == null) {
             errors.add("Must specify the min-length attribute when using length-ident. " +
-                    "This specifies that a line of data must be of a minimum length for it to be parsed by this Record.");
+                    "This specifies that a line of data must be of a minimum length for it to be parsed by this RecordBO.");
         }
         if (lengthIdentity.getMaxLength() == null) {
             errors.add("Must specify the max-length attribute when using length-ident. " +
-                    "This specifies that a line of data must not be more than a given length for it to be parsed by this Record.");
+                    "This specifies that a line of data must not be more than a given length for it to be parsed by this RecordBO.");
         }
     }
 
     /**
      * Validate that the {@code field-ident} tag was properly populated.
      *
-     * @param fieldIdentity The {@link FieldIdentity} instance containing the values to validate.
-     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     * @param fieldIdentity The {@link FieldIdentityImpl} instance containing the values to validate.
+     * @param errors        A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateFieldIdentity(FieldIdentity fieldIdentity, List<String> errors) {
+    public static void validateFieldIdentity(FieldIdentityImpl fieldIdentity, List<String> errors) {
         if (fieldIdentity.getStartPosition() == null) {
             errors.add("Must specify the field-start attribute when using field-ident. " +
                     "This indicates where the field identify value starts for the record.");
@@ -173,17 +167,17 @@ public class ConfigurationValidator {
         }
         if (fieldIdentity.getMatchingStrings().isEmpty()) {
             errors.add("Must specify at least one match-string element when using field-ident. " +
-                    "These are used to determine if a line of data should be parsed by this Record.");
+                    "These are used to determine if a line of data should be parsed by this RecordBO.");
         }
     }
 
     /**
      * Validate that the {@code script-ident} tag was properly populated.
      *
-     * @param scriptIdentity The {@link ScriptIdentity} instance containing the values to validate.
-     * @param errors A non-null {@link List} that will be appended to if errors are found.
+     * @param scriptIdentity The {@link ScriptIdentityImpl} instance containing the values to validate.
+     * @param errors         A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateScriptIdentity(ScriptIdentity scriptIdentity, List<String> errors) {
+    public static void validateScriptIdentity(ScriptIdentityImpl scriptIdentity, List<String> errors) {
         if (StringUtils.isBlank(scriptIdentity.getScript())) {
             errors.add("The script-ident node must include the script to be executed.");
         }
@@ -192,23 +186,21 @@ public class ConfigurationValidator {
     /**
      * Validate that the {@code record-definition} tag was properly populated.
      *
-     * @param recordDefinition The {@link RecordDefinition} instance containing the values to validate.
+     * @param recordDefinition The {@link RecordDefinitionBO} instance containing the values to validate.
      * @param errors           A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateRecordDefinition(RecordDefinition recordDefinition, List<String> errors) {
+    public static void validateRecordDefinition(RecordDefinitionBO recordDefinition, List<String> errors) {
         if (recordDefinition.getBeans().isEmpty()) {
             errors.add("Must specify at least 1 bean element for a record-definition. " +
                     "This indicates what Java object will be populated with the values parsed.");
-        }
-        else {
+        } else {
             recordDefinition.getBeans().forEach(bean -> validateBean(bean, errors));
         }
 
         if (recordDefinition.getLines().isEmpty()) {
             errors.add("Must specify at least 1 line element for a record-definition. " +
                     "This indicates how the line of data is to be parsed.");
-        }
-        else {
+        } else {
             recordDefinition.getLines().forEach(line -> validateLine(line, errors));
         }
     }
@@ -216,10 +208,10 @@ public class ConfigurationValidator {
     /**
      * Validate that the {@code bean} tag was properly populated.
      *
-     * @param bean   The {@link Bean} instance containing the values to validate.
+     * @param bean   The {@link BeanBO} instance containing the values to validate.
      * @param errors A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateBean(Bean bean, List<String> errors) {
+    public static void validateBean(BeanBO bean, List<String> errors) {
         if (StringUtils.isBlank(bean.getBeanName())) {
             errors.add("Must specify the name for a bean element. " +
                     "This is how the bean will be referenced within the record-element configuration.");
@@ -235,20 +227,20 @@ public class ConfigurationValidator {
     /**
      * Validate that the {@code line} tag was properly populated.
      *
-     * @param line   The {@link Line} instance containing the values to validate.
+     * @param line   The {@link LineBO} instance containing the values to validate.
      * @param errors A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateLine(Line line, List<String> errors) {
-        line.getElements()
+    public static void validateLine(LineBO line, List<String> errors) {
+        line.getLineElements()
                 .stream()
-                .filter(lineElement -> lineElement instanceof RecordElement)
-                .map(RecordElement.class::cast)
+                .filter(lineElement -> lineElement instanceof RecordElementBO)
+                .map(RecordElementBO.class::cast)
                 .forEach(recordElement -> validateRecordElement(line, recordElement, errors));
 
-        line.getElements()
+        line.getLineElements()
                 .stream()
-                .filter(lineElement -> lineElement instanceof SegmentElement)
-                .map(SegmentElement.class::cast)
+                .filter(lineElement -> lineElement instanceof SegmentElementBO)
+                .map(SegmentElementBO.class::cast)
                 .forEach(segmentElement -> validateSegmentElement(segmentElement, errors));
     }
 
@@ -258,50 +250,50 @@ public class ConfigurationValidator {
      * @param segment The segment instance to validate.
      * @param errors  A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateSegmentElement(SegmentElement segment, List<String> errors) {
+    public static void validateSegmentElement(SegmentElementBO segment, List<String> errors) {
         if (StringUtils.isBlank(segment.getParentBeanRef())) {
             errors.add("Must specify the parent-beanref attribute for segment-elements.");
         }
         if (StringUtils.isBlank(segment.getBeanRef())) {
             errors.add("Must specify the beanref attribute for segment-elements.");
         }
-        if (StringUtils.isBlank(segment.getCollectionPropertyName()) && StringUtils.isBlank(segment.getAddMethod())) {
-            errors.add("Must specify either the collection-property-name attribute or add-method attribute for segment-elements.");
+        if (StringUtils.isBlank(segment.getPropertyName()) && StringUtils.isBlank(segment.getAddMethod())) {
+            errors.add("Must specify either the property-name attribute or add-method attribute for segment-elements.");
         }
-        if(segment.getCardinalityMode() == null) {
-            errors.add("Must specify the cardinality mode to indicate if the collection size should be controlled.");
+        if (segment.getCardinalityMode() == null) {
+            errors.add("Must specify a valid cardinality-mode or leave the attribute out of the configuration to default to LOOSE.");
         }
-        if(segment.getFieldIdentity() != null) {
+        if (segment.getFieldIdentity() != null) {
             validateFieldIdentity(segment.getFieldIdentity(), errors);
-        }
-        else {
-            errors.add("Must specify the field-ident configuration to use so that the lines can be correctly subdivided during parsing.");
+        } else {
+            errors.add("Must specify the Field Identity configuration to use so that the lines can be correctly subdivided " +
+                    "during parsing.");
         }
     }
 
     /**
      * Validate that the {@code record-element} configuration contains all of the required components.
      *
-     * @param parentLine The parent {@link Line} instance - used for checking to see if a delimiter is present.
-     * @param recordElement The {@link RecordElement} instance to validate.
-     * @param errors  A non-null {@link List} that will be appended to if errors are found.
+     * @param parentLine    The parent {@link LineBO} instance - used for checking to see if a delimiter is present.
+     * @param recordElement The {@link RecordElementBO} instance to validate.
+     * @param errors        A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateRecordElement(Line parentLine, RecordElement recordElement, List<String> errors) {
+    public static void validateRecordElement(LineBO parentLine, RecordElementBO recordElement, List<String> errors) {
         if (recordElement.getIgnoreField() == null || !recordElement.getIgnoreField()) {
-            if(StringUtils.isBlank(recordElement.getBeanRef())) {
+            if (StringUtils.isBlank(recordElement.getBeanRef())) {
                 errors.add("Must specify a beanref attribute for a record-element.");
             }
 
-            if(StringUtils.isBlank(parentLine.getDelimiter())) {
-                if(recordElement.getFieldEnd() == null && recordElement.getFieldLength() == null) {
+            if (StringUtils.isBlank(parentLine.getDelimiter())) {
+                if (recordElement.getFieldEnd() == null && recordElement.getFieldLength() == null) {
                     errors.add("Must set either the 'end' or 'length' properties for a record-element.");
                 }
-                if(recordElement.getFieldEnd() != null && recordElement.getFieldLength() != null) {
+                if (recordElement.getFieldEnd() != null && recordElement.getFieldLength() != null) {
                     errors.add("Can't specify both the 'end' or 'length' properties for a record-element.");
                 }
             }
 
-            for(ConversionOption option : recordElement.getConversionOptions().values()) {
+            for (ConversionOptionBO option : recordElement.getConversionOptions().values()) {
                 validateConversionOption(option, errors);
             }
         }
@@ -310,15 +302,15 @@ public class ConfigurationValidator {
     /**
      * Validate that the {@code conversion-option} configuration contains all of the required components.
      *
-     * @param conversionOption The {@link ConversionOption} instance to validate.
-     * @param errors  A non-null {@link List} that will be appended to if errors are found.
+     * @param conversionOption The {@link ConversionOptionBO} instance to validate.
+     * @param errors           A non-null {@link List} that will be appended to if errors are found.
      */
-    public static void validateConversionOption(ConversionOption conversionOption, List<String> errors) {
-        if(StringUtils.isBlank(conversionOption.getName())) {
+    public static void validateConversionOption(ConversionOptionBO conversionOption, List<String> errors) {
+        if (StringUtils.isBlank(conversionOption.getName())) {
             errors.add("Must specify the name attribute for a conversion-option element.");
         }
-        if(StringUtils.isBlank(conversionOption.getValue())) {
+        if (StringUtils.isBlank(conversionOption.getValue())) {
             errors.add("Must specify the value attribute for a conversion-option element.");
         }
-    }    
+    }
 }

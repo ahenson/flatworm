@@ -27,46 +27,51 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Bean class used to store the values from the Record-Definition XML tag
+ * BeanBO class used to store the values from the RecordBO-Definition XML tag
  */
-public class RecordDefinition {
+public class RecordDefinitionBO {
     @Setter
-    private Map<String, Bean> beans;
+    private Map<String, BeanBO> beans;
 
     @Getter
     @Setter
-    private List<Line> lines;
+    private List<LineBO> lines;
 
     @Getter
     @Setter
-    private Record parentRecord;
+    private RecordBO parentRecord;
 
-    public RecordDefinition() {
+    public RecordDefinitionBO() {
         this.beans = new HashMap<>();
         this.lines = new ArrayList<>();
     }
 
-    public void addBean(Bean bean) {
+    public RecordDefinitionBO(RecordBO parentRecord) {
+        this();
+        this.parentRecord = parentRecord;
+    }
+
+    public void addBean(BeanBO bean) {
         bean.setParentRecordDefinition(this);
         this.beans.put(bean.getBeanName(), bean);
     }
 
-    public Collection<Bean> getBeans() {
+    public Collection<BeanBO> getBeans() {
         return beans.values();
     }
 
-    public Map<String, Bean> getBeanMap() {
+    public Map<String, BeanBO> getBeanMap() {
         return Collections.unmodifiableMap(beans);
     }
 
-    public void addLine(Line line) {
+    public void addLine(LineBO line) {
         line.setParentRecordDefinition(this);
         lines.add(line);
     }
 
     @Override
     public String toString() {
-        return "RecordDefinition{" +
+        return "RecordDefinitionBO{" +
                 "parentRecord=" + parentRecord +
                 '}';
     }

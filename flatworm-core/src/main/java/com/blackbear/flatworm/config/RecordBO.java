@@ -30,12 +30,11 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Class used to store the values from the Record XML tag. Also aids in parsing and matching lines in the input file.
+ * Class used to store the values from the RecordBO XML tag. Also aids in parsing and matching lines in the input file.
  */
 @Data
 @Slf4j
-@ToString
-public class Record {
+public class RecordBO {
 
     /**
      * Default code for a record's identity configuration.
@@ -61,31 +60,31 @@ public class Record {
 
     private Identity recordIdentity;
 
-    private RecordDefinition recordDefinition;
+    private RecordDefinitionBO recordDefinition;
 
-    public Record() {
+    public RecordBO() {
     }
 
     /**
-     * Determine if this {@code Record} instance is capable of parsing the given line.
+     * Determine if this {@code RecordBO} instance is capable of parsing the given line.
      *
      * @param fileFormat not used at this time, for later expansion?
      * @param line       the input line from the file being parsed.
      * @return boolean does this line match according to the defined criteria?
      * @throws FlatwormParserException should the script function lack the {@code DEFAULT_SCRIPT_METHOD_NAME} function, which should take
      *                                 one parameter, the {@link FileFormat} instance - the method should return {@code true} if the line
-     *                                 should be parsed by this {@code Record} instance and {@code false} if not.
+     *                                 should be parsed by this {@code RecordBO} instance and {@code false} if not.
      */
     public boolean matchesLine(FileFormat fileFormat, String line) throws FlatwormParserException {
         boolean matchesLine = true;
         if (recordIdentity != null) {
-            matchesLine = recordIdentity.doesMatch(this, fileFormat, line);
+            matchesLine = recordIdentity.matchesIdentity(this, fileFormat, line);
         }
         return matchesLine;
     }
 
     /**
-     * If the Record's {@link Identity} is an implementation of the {@link LineTokenIdentity} then pass it the {@code lineToken} instance to
+     * If the RecordBO's {@link Identity} is an implementation of the {@link LineTokenIdentity} then pass it the {@code lineToken} instance to
      * see if it matches with the configured identity.
      *
      * @param lineToken The {@link LineToken} to test.
@@ -115,15 +114,15 @@ public class Record {
         try {
 
             Object beanObj;
-            for (Bean bean : recordDefinition.getBeans()) {
+            for (BeanBO bean : recordDefinition.getBeans()) {
                 beanObj = bean.getBeanObjectClass().newInstance();
                 beans.put(bean.getBeanName(), beanObj);
             }
 
-            List<Line> lines = recordDefinition.getLines();
+            List<LineBO> lines = recordDefinition.getLines();
             String inputLine = firstLine;
             for (int i = 0; i < lines.size(); i++) {
-                Line line = lines.get(i);
+                LineBO line = lines.get(i);
                 line.parseInput(inputLine, beans, conversionHelper);
                 if (i + 1 < lines.size()) {
                     inputLine = in.readLine();
@@ -134,5 +133,13 @@ public class Record {
             throw new FlatwormParserException(e.getMessage(), e);
         }
         return beans;
+    }
+
+    @Override
+    public String toString() {
+        return "RecordBO{" +
+                "name='" + name + '\'' +
+                ", recordIdentity=" + recordIdentity +
+                '}';
     }
 }

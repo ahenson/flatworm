@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Test the ScriptIdentity class's capabilities around script parsing and line identification.
+ * Test the ScriptIdentityImpl class's capabilities around script parsing and line identification.
  *
  * @author Alan Henson
  */
@@ -43,10 +43,10 @@ public class ScriptIdentityTest extends AbstractBaseIdentityTest {
                     "function %s(fileFormat, line) { " +
                     "   return fileFormat.getLineNumber() == 0; " +
                     "}",
-                    ScriptIdentity.DEFAULT_SCRIPT_METHOD_NAME);
-            ScriptIdentity scriptIdentity = new ScriptIdentity(script);
+                    ScriptIdentityImpl.DEFAULT_SCRIPT_METHOD_NAME);
+            ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(script);
             String line = "";
-            assertTrue(scriptIdentity.doesMatch(record, fileFormat, line));
+            assertTrue(scriptIdentity.matchesIdentity(record, fileFormat, line));
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -57,9 +57,9 @@ public class ScriptIdentityTest extends AbstractBaseIdentityTest {
     public void invalidScript() throws FlatwormParserException, FlatwormConfigurationException {
         thrown.expect(FlatwormParserException.class);
         String script = "";
-        ScriptIdentity scriptIdentity = new ScriptIdentity(script);
+        ScriptIdentityImpl scriptIdentity = new ScriptIdentityImpl(script);
 
         String line = "";
-        scriptIdentity.doesMatch(record, fileFormat, line);
+        scriptIdentity.matchesIdentity(record, fileFormat, line);
     }
 }

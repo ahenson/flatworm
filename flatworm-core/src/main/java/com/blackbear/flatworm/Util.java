@@ -18,13 +18,16 @@ package com.blackbear.flatworm;
 
 import com.google.common.primitives.Ints;
 
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 import com.blackbear.flatworm.config.LineToken;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +91,7 @@ public final class Util {
      * @throws Exception - if date format is not specified in the XML file or given to FileCreator. At least one must be specified.
      */
     public static String formatDate(Date date, String defaultDateFormat,
-                                    Map<String, ConversionOption> options) throws Exception {
+                                    Map<String, ConversionOptionBO> options) throws Exception {
         String format = getValue(options, "format");
 
         // Default format, if none is supplied
@@ -116,7 +119,7 @@ public final class Util {
      * @param length  used in file creation to ensure string is padded to the proper length
      * @return padded string
      */
-    public static String justify(String str, String value, Map<String, ConversionOption> options,
+    public static String justify(String str, String value, Map<String, ConversionOptionBO> options,
                                  int length) {
 
         if (value == null) {
@@ -202,7 +205,7 @@ public final class Util {
      * @param options collection of ConversionOptions, for future enhancement
      * @return the string stripped of the specified character types
      */
-    public static String strip(String str, String value, Map<String, ConversionOption> options) {
+    public static String strip(String str, String value, Map<String, ConversionOptionBO> options) {
 
         if (value.equalsIgnoreCase("non-numeric")) {
             str = numbersOnly.matcher(str).replaceAll("");
@@ -225,7 +228,7 @@ public final class Util {
      * @param options collection of ConversionOptions, for future enhancement
      * @return The specified substring
      */
-    public static String substring(String str, String value, Map<String, ConversionOption> options) {
+    public static String substring(String str, String value, Map<String, ConversionOptionBO> options) {
 
         String[] args = value.split(",");
         str = str.substring(new Integer(args[0]), new Integer(args[1]));
@@ -242,7 +245,7 @@ public final class Util {
      * @param options collection of ConversionOptions, for future enhancement
      * @return The string passed in, or the default value if the string is blank
      */
-    public static String defaultValue(String str, String value, Map<String, ConversionOption> options) {
+    public static String defaultValue(String str, String value, Map<String, ConversionOptionBO> options) {
         return StringUtils.isBlank(str) ? value : str;
     }
 
@@ -250,10 +253,10 @@ public final class Util {
      * Conversion-Option now stored in class, more than a simple Hashmap lookup
      *
      * @param options The conversion-option values for the field
-     * @param key     The key to lookup appropriate ConversionOption
-     * @return The string that contains value of the ConversionOption
+     * @param key     The key to lookup appropriate ConversionOptionBO
+     * @return The string that contains value of the ConversionOptionBO
      */
-    public static String getValue(Map<String, ConversionOption> options, String key) {
+    public static String getValue(Map<String, ConversionOptionBO> options, String key) {
 
         if (options.containsKey(key)) {
             return options.get(key).getValue();
@@ -305,6 +308,26 @@ public final class Util {
             result = defaultValue;
         }
         return result;
+    }
+
+    /**
+     * See if the field is based upon generics and if so, get the underlying type, else return the declared type of the field.
+     * @param field The field to interrogate.
+     * @return the type of the field if there are no generics or collections at play or the declared type.
+     */
+    public static Class<?> getActualFieldType(Field field) {
+        Class<?> fieldType = null;
+        ParameterizedType paramType;
+        if(field.getGenericType() instanceof ParameterizedType) {
+            paramType = ParameterizedType.class.cast(field.getGenericType());
+            if(paramType.getActualTypeArguments().length > 0) {
+                fieldType = (Class<?>) paramType.getActualTypeArguments()[0];
+            }
+        }
+        else {
+            fieldType = field.getType();
+        }
+        return fieldType;
     }
 
 }

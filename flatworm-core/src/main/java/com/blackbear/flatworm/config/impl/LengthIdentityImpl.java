@@ -17,9 +17,7 @@
 package com.blackbear.flatworm.config.impl;
 
 import com.blackbear.flatworm.FileFormat;
-import com.blackbear.flatworm.config.Record;
-import com.blackbear.flatworm.config.impl.AbstractIdentity;
-import com.blackbear.flatworm.config.impl.FieldIdentity;
+import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import lombok.Getter;
@@ -30,7 +28,7 @@ import lombok.Setter;
  *
  * @author Alan Henson
  */
-public class LengthIdentity extends AbstractIdentity {
+public class LengthIdentityImpl extends AbstractIdentity {
     @Getter
     @Setter
     private Integer minLength;
@@ -40,19 +38,19 @@ public class LengthIdentity extends AbstractIdentity {
     private Integer maxLength;
 
     /**
-     * Determine if the given {@link Record} instance should be used to parse the line.
+     * Determine if the given {@link RecordBO} instance should be used to parse the line.
      *
-     * @param record     The {@link Record} instance.
+     * @param record     The {@link RecordBO} instance.
      * @param fileFormat The {@link FileFormat} instance representing the configuration that is driving the parsing and the last line that
      *                   was read.
      * @param line       The line of data to be evaluated.
      * @return {@code true} the {@code line} of data fits within the {@code minLength} and {@code maxLength} ranges provided for this {@link
-     * FieldIdentity} instance.
+     * FieldIdentityImpl} instance.
      * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script not be a
      *                                 {@code boolean} value.
      */
     @Override
-    public boolean doesMatch(Record record, FileFormat fileFormat, String line) throws FlatwormParserException {
+    public boolean matchesIdentity(RecordBO record, FileFormat fileFormat, String line) throws FlatwormParserException {
         return line.length() >= minLength && line.length() <= maxLength;
     }
 }

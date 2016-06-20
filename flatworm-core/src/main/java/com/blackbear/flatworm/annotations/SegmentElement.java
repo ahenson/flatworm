@@ -25,18 +25,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure a Segment Element via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-@interface SegmentElement {
+@Target({ElementType.FIELD})
+public @interface SegmentElement {
+
+    int order() default 1;
+
+    String lineId() default "default";
+
     CardinalityMode cardinalityMode() default CardinalityMode.LOOSE;
 
-    int mintCount() default 0;
-    int maxCount() default 0;
+    int mintCount() default Integer.MIN_VALUE;
+    int maxCount() default Integer.MAX_VALUE;
 
-    FieldIdentity fieldIdentity() default @FieldIdentity(fieldStartPosition = 0, fieldLength = 0, apply = false, stringMatchIdentities = {});
+    FieldIdentity fieldIdentity() default @FieldIdentity(startPosition = -1, fieldLength = -1, apply = false, matchIdentities = {});
 }

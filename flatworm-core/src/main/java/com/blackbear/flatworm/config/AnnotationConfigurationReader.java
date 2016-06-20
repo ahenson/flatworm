@@ -17,31 +17,37 @@
 package com.blackbear.flatworm.config;
 
 import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
 import java.util.Collection;
 
 /**
- * The {@code AnnotationConfigurationReaderConfigurationReader} interface sets the contract for reading
- * the flatworm configuration via annotated classes.
+ * The {@code AnnotationConfigurationReaderConfigurationReader} interface sets the contract for reading the flatworm configuration via
+ * annotated classes.
  *
  * @author Alan Henson
  */
 public interface AnnotationConfigurationReader {
 
     /**
-     * Given the {@code classes}, parse through them looking for annotated configuration for the flatworm {@link FileFormat}
-     * configuration.
-     * @param classes The classes to use in building the {@link FileFormat} configuration.
-     * @return The constructed {@link FileFormat} instance based upon the configuration found in the annotations within the classes. If
-     * the {@code classes} parameter is {@code null} then {@code null} should be returned.
+     * Given the {@code classes}, parse through them looking for annotated configuration for the flatworm {@link FileFormat} configuration.
+     *
+     * @param classes The classes to use in building the {@link FileFormat} configuration. Any class that doesn't have an annotation
+     *                supported by the configuration annotations should just be ignored - no error should be generated. Only
+     *                those classes that have the {@code @Record} annotation need be passed in as the others will be derivable.
+     * @return The constructed {@link FileFormat} instance based upon the configuration found in the annotations within the classes. If the
+     * {@code classes} parameter is {@code null} then {@code null} should be returned.
+     * @throws FlatwormConfigurationException should any issues occur with parsing the configuration elements within the annotations.
      */
-    FileFormat loadConfiguration(Class<?> ... classes);
+    FileFormat loadConfiguration(Class<?>... classes) throws FlatwormConfigurationException;
 
     /**
-     * Given the {@code classes}, parse through them looking for annotated configuration for the flatworm {@link FileFormat}
-     * configuration.
-     * @param classes The classes to use in building the {@link FileFormat} configuration.
+     * Given the {@code classes}, parse through them looking for annotated configuration for the flatworm {@link FileFormat} configuration.
+     *
+     * @param classes The classes to use in building the {@link FileFormat} configuration. Any class that doesn't have an annotation
+     *                supported by the configuration annotations should just be ignored - no error should be generated.
      * @return The constructed {@link FileFormat} instance based upon the configuration found in the annotations within the classes.
+     * @throws FlatwormConfigurationException should any issues occur with parsing the configuration elements within the annotations.
      */
-    FileFormat loadConfiguration(Collection<Class<?>> classes);
+    FileFormat loadConfiguration(Collection<Class<?>> classes) throws FlatwormConfigurationException;
 }

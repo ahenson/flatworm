@@ -23,8 +23,8 @@ import com.google.common.collect.ListMultimap;
 import com.blackbear.flatworm.callbacks.ExceptionCallback;
 import com.blackbear.flatworm.callbacks.RecordCallback;
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.Record;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.RecordBO;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
@@ -125,7 +125,7 @@ public class FileParser implements Closeable {
     /**
      * Remove a {@link RecordCallback} that has been registered.
      *
-     * @param recordName The name of the {@link Record} for which the {@link RecordCallback} was registered.
+     * @param recordName The name of the {@link RecordBO} for which the {@link RecordCallback} was registered.
      * @param callback   The {@link RecordCallback} instance to remove.
      * @return {@code true} if the {@link RecordCallback} instance was found and removed and {@code false} if it was not found and therefore
      * note removed.
@@ -191,7 +191,7 @@ public class FileParser implements Closeable {
      */
     protected void loadConfiguration() throws FlatwormConfigurationException {
         try {
-            ConfigurationReader parser = new DefaultConfigurationReader();
+            ConfigurationReader parser = new DefaultConfigurationReaderImpl();
             if (configFile != null) {
                 fileFormat = parser.loadConfigurationFile(configFile);
             } else {
@@ -247,7 +247,7 @@ public class FileParser implements Closeable {
      * Execute all {@link RecordCallback}s for the given record name if any are registered. Exceptions are dumped to the logger vs. causing
      * a disruption and are also sent to the {@code doExceptionCallback} method.
      *
-     * @param recordName The name of the {@link Record} - this comes from the configuration file.
+     * @param recordName The name of the {@link RecordBO} - this comes from the configuration file.
      * @param record     The {@link MatchedRecord} instance that was loaded.
      */
     private void doCallback(String recordName, MatchedRecord record) {
@@ -257,7 +257,7 @@ public class FileParser implements Closeable {
                 try {
                     recordCallback.processRecord(record);
                 } catch (Exception e) {
-                    String errMsg = String.format("Failed to invoke callback %s for Record %s: %s",
+                    String errMsg = String.format("Failed to invoke callback %s for RecordBO %s: %s",
                             recordCallback.getClass().getName(), recordName, e.getMessage());
                     log.error(errMsg, e);
                     doExceptionCallback(e, errMsg, null);

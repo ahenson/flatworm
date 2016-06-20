@@ -23,16 +23,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure a Field Identity via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@interface FieldIdentity {
-    int fieldStartPosition();
+public @interface FieldIdentity {
+    int startPosition();
     int fieldLength();
+    boolean ignoreCase() default false;
     boolean apply();
-    StringMatch[] stringMatchIdentities();
+    String[] matchIdentities();
 }

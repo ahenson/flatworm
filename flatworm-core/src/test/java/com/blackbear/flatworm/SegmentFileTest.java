@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.test.domain.segment.Account;
 import com.blackbear.flatworm.test.domain.segment.Address;
 import com.blackbear.flatworm.test.domain.segment.Consumer;
@@ -38,7 +38,7 @@ import static org.junit.Assert.fail;
 public class SegmentFileTest {
     @Test
     public void testFileRead() {
-        ConfigurationReader parser = new DefaultConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReaderImpl();
         BufferedReader bufIn = null;
         try {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("segment-example.xml"));

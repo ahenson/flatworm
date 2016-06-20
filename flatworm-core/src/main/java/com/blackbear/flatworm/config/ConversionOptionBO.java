@@ -14,21 +14,19 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm;
+package com.blackbear.flatworm.config;
 
-import com.blackbear.flatworm.config.ConversionOptionBO;
-import com.blackbear.flatworm.errors.FlatwormParserException;
-
-import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * Provides the ability to specify how the raw data parsed from the input file
- * is to be mapped into the beans.
- *
- * @author Dave Derry
- *
+ * BeanBO class used to store the values from the Conversion-Option XML tag
  */
-public interface BeanMappingStrategy {
-    void mapBean(Object bean, String beanName, String property, Object value,
-                 Map<String, ConversionOptionBO> conv) throws FlatwormParserException;
+@Data
+@EqualsAndHashCode
+@AllArgsConstructor
+public class ConversionOptionBO {
+    private String name;
+    private String value;
 }

@@ -17,11 +17,14 @@
 package com.blackbear.flatworm.config;
 
 /*
- * A interface used for elements that can be parts of a Line element. Since a SegmentElement can also
+ * A interface used for elements that can be parts of a LineBO element. Since a SegmentElementBO can also
  * be made up of the same components, they server the same purpose there
  */
 public interface LineElement {
     String getBeanRef();
 
-    void setParentLine(Line line);
+    void setParentLine(LineBO line);
+
+    Integer getOrder();
+    void setOrder(Integer order);
 }

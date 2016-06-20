@@ -30,5 +30,10 @@ public enum CardinalityMode {
     /**
      * All entities read will be captured even if the limit is exceeded.
      */
-    LOOSE
+    LOOSE,
+
+    /**
+     * If the bean isn't a collection but is instead a single child object.
+     */
+    SINGLE
 }

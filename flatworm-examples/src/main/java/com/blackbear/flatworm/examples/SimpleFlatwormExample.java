@@ -19,7 +19,7 @@ package com.blackbear.flatworm.examples;
 import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.MatchedRecord;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 
 public class SimpleFlatwormExample {
     public static void main(String[] args) {
-        ConfigurationReader parser = new DefaultConfigurationReader();
+        ConfigurationReader parser = new DefaultConfigurationReaderImpl();
         try {
             FileFormat ff = parser.loadConfigurationFile(args[0]);
             InputStream in = new FileInputStream(args[1]);

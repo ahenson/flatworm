@@ -17,65 +17,50 @@
 package com.blackbear.flatworm.config;
 
 import com.blackbear.flatworm.CardinalityMode;
-import com.blackbear.flatworm.config.impl.FieldIdentity;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.blackbear.flatworm.config.impl.FieldIdentityImpl;
 
 import lombok.Data;
-import lombok.ToString;
+import lombok.EqualsAndHashCode;
 
 @Data
-@ToString
-public class SegmentElement implements LineElement {
-    private FieldIdentity fieldIdentity;
+@EqualsAndHashCode(callSuper = false)
+public class SegmentElementBO extends AbstractLineElementCollection implements LineElement {
+    private FieldIdentityImpl fieldIdentity;
 
     private int minCount;
     private int maxCount;
-    private String collectionPropertyName;
+    private String propertyName;
     private String beanRef;
     private String parentBeanRef;
     private String addMethod;
+
+    private Integer order;
+
     private CardinalityMode cardinalityMode;
-    private List<LineElement> elements = new ArrayList<>();
 
-    private Line parentLine;
-
-    @Override
-    public String getBeanRef() {
-        return beanRef;
-    }
+    private LineBO parentLine;
 
     public void setBeanRef(String beanRef) {
         this.beanRef = beanRef;
     }
 
-    public List<LineElement> getElements() {
-        return Collections.unmodifiableList(elements);
-    }
-
-    public void addElement(LineElement re) {
-        elements.add(re);
-    }
-
     public boolean matchesIdentity(LineToken lineToken) {
         boolean matchesId = false;
         if(fieldIdentity != null) {
-            // We aren't using the FieldIdentity::matchesIdentity because it looks at absolutely positioning
-            // and SegmentElement Field Identifiers are positioned relatively.
-            matchesId = fieldIdentity.getMatchingStrings().contains(lineToken.getToken());
+            // We aren't using the FieldIdentityImpl::matchesIdentity(LineToken) because it looks at absolutely positioning
+            // and SegmentElementBO Field Identifiers are positioned relatively.
+            matchesId = fieldIdentity.matchesIdentity(lineToken.getToken());
         }
         return matchesId;
     }
 
     @Override
     public String toString() {
-        return "SegmentElement{" +
+        return "SegmentElementBO{" +
                 "fieldIdentity=" + fieldIdentity +
                 ", minCount=" + minCount +
                 ", maxCount=" + maxCount +
-                ", collectionPropertyName='" + collectionPropertyName + '\'' +
+                ", propertyName='" + propertyName + '\'' +
                 ", beanRef='" + beanRef + '\'' +
                 ", parentBeanRef='" + parentBeanRef + '\'' +
                 ", addMethod='" + addMethod + '\'' +

@@ -23,22 +23,25 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure a Record Element via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
-@interface RecordElement {
+public @interface RecordElement {
     int order() default 1;
 
-    int length() default 0;
+    int length() default -1;
 
-    int startPosition() default 0;
-    int endPosition() default 0;
+    int startPosition() default -1;
+    int endPosition() default -1;
 
-    String converterTypeName() default "";
+    String converterName() default "";
+
+    String lineId() default "default";
+
 
     ConversionOption[] conversionOptions() default {};
 }

@@ -14,28 +14,25 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations;
+package com.blackbear.flatworm.annotations.beans;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.blackbear.flatworm.annotations.LengthIdentity;
+import com.blackbear.flatworm.annotations.Record;
+
+import lombok.Data;
 
 /**
- * Class description goes here.
+ * Basic bean for testing the LengthIdentity annotation.
  *
  * @author Alan Henson
  */
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-@interface ConverterType {
-    String name();
-
-    String classname();
-
-    String methodName();
-
-    String returnType();
+@Data
+@Record(name = "LengthIdentityBean",
+        lengthIdentity =
+        @LengthIdentity(
+                minLength = 0,
+                maxLength = 3,
+                apply = true
+        ))
+public class LengthIdentityBean {
 }

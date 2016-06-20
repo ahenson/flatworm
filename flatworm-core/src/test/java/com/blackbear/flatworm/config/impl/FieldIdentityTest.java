@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Test that the FieldIdentity class works as expected.
+ * Test that the FieldIdentityImpl class works as expected.
  *
  * @author Alan Henson
  */
@@ -35,17 +35,17 @@ public class FieldIdentityTest extends AbstractBaseIdentityTest {
     public void singleFieldTest() {
         try {
             String line = "DVDFrozen Disney";
-            FieldIdentity identity = new FieldIdentity();
+            FieldIdentityImpl identity = new FieldIdentityImpl();
             identity.addMatchingString("DVD");
             identity.setStartPosition(0);
             identity.setFieldLength(3);
-            boolean matches = identity.doesMatch(record, fileFormat, line);
+            boolean matches = identity.matchesIdentity(record, fileFormat, line);
 
             assertTrue("Failed to correctly match the line.", matches);
 
             // Negative test
             line = "VHSFrozen Disney";
-            matches = identity.doesMatch(record, fileFormat, line);
+            matches = identity.matchesIdentity(record, fileFormat, line);
             assertFalse("Incorrectly matched a field identity.", matches);
         } catch (FlatwormParserException e) {
             e.printStackTrace();
@@ -57,27 +57,27 @@ public class FieldIdentityTest extends AbstractBaseIdentityTest {
     public void multiFieldTest() {
         try {
             String line = "BETAFrozen Disney";
-            FieldIdentity identity = new FieldIdentity(true);
+            FieldIdentityImpl identity = new FieldIdentityImpl(true);
             identity.addMatchingString("DVD ");
             identity.addMatchingString("vhs ");
             identity.addMatchingString("BETA");
             identity.setStartPosition(0);
             identity.setFieldLength(4);
 
-            boolean matches = identity.doesMatch(record, fileFormat, line);
+            boolean matches = identity.matchesIdentity(record, fileFormat, line);
             assertTrue("Failed to correctly match the line.", matches);
 
             line = "DVD Frozen Disney";
-            matches = identity.doesMatch(record, fileFormat, line);
+            matches = identity.matchesIdentity(record, fileFormat, line);
             assertTrue("Failed to correctly match the line.", matches);
 
             line = "VHS Frozen Disney";
-            matches = identity.doesMatch(record, fileFormat, line);
+            matches = identity.matchesIdentity(record, fileFormat, line);
             assertTrue("Failed to correctly match the line.", matches);
 
             // Negative test.
             line = "CD  Frozen Disney";
-            matches = identity.doesMatch(record, fileFormat, line);
+            matches = identity.matchesIdentity(record, fileFormat, line);
             assertFalse("Incorrectly matched a field identity.", matches);
         } catch (FlatwormParserException e) {
             e.printStackTrace();
@@ -89,14 +89,14 @@ public class FieldIdentityTest extends AbstractBaseIdentityTest {
     public void invalidConditionTest() {
         try {
             String line = "";
-            FieldIdentity identity = new FieldIdentity();
+            FieldIdentityImpl identity = new FieldIdentityImpl();
             identity.addMatchingString("DVD");
             identity.setStartPosition(0);
             identity.setFieldLength(3);
-            boolean matches = identity.doesMatch(record, fileFormat, line);
+            boolean matches = identity.matchesIdentity(record, fileFormat, line);
             assertFalse("Failed to correctly match the line.", matches);
 
-            matches = identity.doesMatch(record, fileFormat, null);
+            matches = identity.matchesIdentity(record, fileFormat, null);
             assertFalse("Failed to correctly match the line.", matches);
         } catch (FlatwormParserException e) {
             e.printStackTrace();

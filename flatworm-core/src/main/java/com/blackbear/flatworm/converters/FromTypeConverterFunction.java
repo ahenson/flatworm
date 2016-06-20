@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm.converters;
 
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 
 import java.util.Map;
 
@@ -31,9 +31,9 @@ public interface FromTypeConverterFunction {
     /**
      * Convert the given {@code value} into a ({@code String}.
      * @param value The {@code value} to convert to a {@link String}.
-     * @param options Any {@link ConversionOption}s that were configured to go along with the converter.
+     * @param options Any {@link ConversionOptionBO}s that were configured to go along with the converter.
      * @return The {@code value} value converted to a {@link String}.
      * @throws Exception should anything unexpected occur.
      */
-    String convert(Object value, Map<String, ConversionOption> options) throws Exception;
+    String convert(Object value, Map<String, ConversionOptionBO> options) throws Exception;
 }

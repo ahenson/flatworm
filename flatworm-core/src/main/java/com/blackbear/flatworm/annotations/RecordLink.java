@@ -32,18 +32,11 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-public @interface Record {
-    String name();
+public @interface RecordLink {
 
-    String encoding() default "UTF-8";
-
-    LengthIdentity lengthIdentity() default @LengthIdentity(minLength = -1, maxLength = -1, apply = false);
-
-    FieldIdentity fieldIdentity() default @FieldIdentity(startPosition = -1, fieldLength = -1, apply = false, matchIdentities = {});
-
-    ScriptIdentity scriptIdentity() default @ScriptIdentity(script = "", apply = false);
-
-    Converter[] converters() default {};
-
-    Line[] lines() default { @Line() };
+    /**
+     * Specify the {@link Class} that holds the {@link Record} definition that this class is linked to.
+     * @return The class that contains the full {@link Record} definition.
+     */
+    Class recordClass();
 }

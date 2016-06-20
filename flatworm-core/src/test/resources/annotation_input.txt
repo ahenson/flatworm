@@ -1,3 +1,3 @@
-DVDDIAL J FOR JAVA               RUN ANYWHERE STUDIO           2004011555512121   49.95Y
-DVDWHEN A STRANGER IMPLEMENTS    NULL POINTER PRODUCTIONS      2003-03-12
-DVDDATA AND DATATYPES            PRETENTIOUS FILMS LTD                   .
+TEST|valueOne|valueTwo|RB2|valueOne2A|valueTwo2A|RB4|valueOne4A|valueTwo4A|RB2|valueOne2B|valueTwo2B|RB3|valueOne3B|valueTwo3B
+valueOne5      valueTwo5      
+valueOne6      valueTwo6      

@@ -16,33 +16,22 @@
 
 package com.blackbear.flatworm.annotations;
 
-import lombok.Data;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Class description goes here.
+ * Provides the ability to configure a Field Identity via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
-@Data
-@Record(fieldIdentity =
-    @FieldIdentity(
-        fieldStartPosition = 0,
-        fieldLength = 3,
-        apply = true,
-        stringMatchIdentities = { @
-                StringMatch(matchString = "DVD", ignoreCase = true) }))
-public class AnnontatedDvd {
-
-    @RecordElement(order = 1, length = 30)
-    private String sku;
-
-    @RecordElement(order = 2, length = 30)
-    private String dualLayer;
-
-    @RecordElement(order = 3, length = 30)
-    private double price;
-
-    public String toString() {
-        return super.toString() + "[" + sku + ", " + price + ", " + dualLayer + "]";
-    }
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface Line {
+    String id() default "default";
+    String delimiter() default "";
+    char quoteCharacter() default '\0';
 }

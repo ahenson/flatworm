@@ -23,7 +23,7 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
 import com.blackbear.flatworm.config.ConfigurationReader;
-import com.blackbear.flatworm.config.impl.DefaultConfigurationReader;
+import com.blackbear.flatworm.config.impl.DefaultConfigurationReaderImpl;
 import com.blackbear.flatworm.test.domain.Book;
 import com.blackbear.flatworm.test.domain.Dvd;
 import com.blackbear.flatworm.test.domain.Film;
@@ -38,10 +38,9 @@ public class ComplexFileTest {
     @Test
     public void testFileRead() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-        ConfigurationReader parser = new DefaultConfigurationReader();
-        try {
+        ConfigurationReader parser = new DefaultConfigurationReaderImpl();
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream("complex_input.txt")) {
             FileFormat ff = parser.loadConfigurationFile(getClass().getClassLoader().getResourceAsStream("complex-example.xml"));
-            InputStream in = getClass().getClassLoader().getResourceAsStream("complex_input.txt");
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
             MatchedRecord results;
 

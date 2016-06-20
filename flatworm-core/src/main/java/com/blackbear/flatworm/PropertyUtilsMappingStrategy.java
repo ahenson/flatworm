@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.config.ConversionOption;
+import com.blackbear.flatworm.config.ConversionOptionBO;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -36,9 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
     @Override
     public void mapBean(Object bean, String beanName, String property, Object value,
-                        Map<String, ConversionOption> conv) throws FlatwormParserException {
+                        Map<String, ConversionOptionBO> conv) throws FlatwormParserException {
         try {
-            ConversionOption option = conv.get("append");
+            ConversionOptionBO option = conv.get("append");
             if (option != null && "true".equalsIgnoreCase(option.getValue())) {
                 Object currentValue = PropertyUtils.getProperty(bean, property);
                 if (currentValue != null)
