@@ -58,6 +58,10 @@ public class RecordElementBO implements LineElement {
     @Setter
     private Integer order;
 
+    @Getter
+    @Setter
+    private boolean trimValue;
+    
     // The elements are queried, there are just multiple layers of abstraction that the compiler can't see.
     @Getter
     @Setter

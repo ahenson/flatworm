@@ -535,6 +535,8 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                 LineBO line = loadLine(annotatedLine);
                 loadForProperty(annotatedLine.forProperty(), line);
                 
+                addBeanToRecord(clazz, record);
+                
                 Class<?> fieldType = Util.getActualFieldType(field);
                 line.getCardinality().setParentBeanRef(clazz.getName());
                 line.getCardinality().setBeanRef(fieldType.getName());
@@ -572,21 +574,16 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
 
         try {
             // See if the bean has been registered.
-            if (!record.getRecordDefinition().getBeanMap().containsKey(clazz.getName())) {
-                BeanBO bean = new BeanBO();
-                bean.setBeanName(clazz.getName());
-                bean.setBeanClass(clazz.getName());
-                bean.setBeanObjectClass(clazz);
-                record.getRecordDefinition().addBean(bean);
-            }
+            addBeanToRecord(clazz, record);
 
             CardinalityBO cardinality = new CardinalityBO();
             cardinality.setBeanRef(clazz.getName());
             cardinality.setPropertyName(field.getName());
             cardinality.setCardinalityMode(CardinalityMode.SINGLE);
             recordElement.setCardinality(cardinality);
-            recordElement.setConverterName(annotatedElement.converterName());
             
+            recordElement.setConverterName(annotatedElement.converterName());
+            recordElement.setTrimValue(annotatedElement.trimValue());
             recordElement.setOrder(annotatedElement.order());
 
             if (annotatedElement.length() != -1) {
@@ -616,6 +613,21 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         }
 
         return recordElement;
+    }
+
+    /**
+     * Create a {@link BeanBO} entry for the given {@code clazz}.
+     * @param clazz the class from which to construct a new {@link BeanBO} instance.
+     * @param record the {@link RecordBO} instance to which a new {@link BeanBO} instance will be added.
+     */
+    public void addBeanToRecord(Class<?> clazz, RecordBO record) {
+        if (!record.getRecordDefinition().getBeanMap().containsKey(clazz.getName())) {
+            BeanBO bean = new BeanBO();
+            bean.setBeanName(clazz.getName());
+            bean.setBeanClass(clazz.getName());
+            bean.setBeanObjectClass(clazz);
+            record.getRecordDefinition().addBean(bean);
+        }
     }
 
     /**

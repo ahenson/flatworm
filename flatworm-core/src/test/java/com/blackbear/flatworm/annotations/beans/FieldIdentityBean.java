@@ -18,6 +18,7 @@ package com.blackbear.flatworm.annotations.beans;
 
 import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
 
 import lombok.Data;
@@ -29,6 +30,7 @@ import lombok.Data;
  */
 @Data
 @Record(name = "FieldIdentityBean",
+        lines = {@Line},
         identity = @DataIdentity(fieldIdentity =
         @FieldIdentity(
                 ignoreCase = true,

@@ -21,13 +21,14 @@ import com.blackbear.flatworm.config.ConversionOptionBO;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
 public class UtilTest {
     @Test
     public void testRemoveBlanks() {
-        HashMap options = new HashMap();
+        Map<String, ConversionOptionBO> options = new HashMap<>();
         assertEquals("foo", Util.justify("foo  ", "both", options, 0));
         assertEquals("foo", Util.justify("foo ", "both", options, 0));
         assertEquals("foo", Util.justify(" foo", "both", options, 0));
@@ -38,7 +39,7 @@ public class UtilTest {
 
     @Test
     public void testMultiplePadCharacters() {
-        HashMap options = new HashMap();
+        Map<String, ConversionOptionBO> options = new HashMap<>();
         options.put("pad-character", new ConversionOptionBO("pad-character", "0Oo"));
         assertEquals("f", Util.justify("foo", "both", options, 0));
         assertEquals("f", Util.justify("fooOO00", "both", options, 0));

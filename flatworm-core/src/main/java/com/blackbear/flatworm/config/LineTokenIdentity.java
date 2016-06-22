@@ -38,4 +38,11 @@ public interface LineTokenIdentity extends Identity {
      * @return {@code true} if it matches and {@code false} if not.
      */
     boolean matchesIdentity(String token);
+
+    /**
+     * Return the start position within a line of data that parsing should begin once the line has been identified by this
+     * {@link LineTokenIdentity} implementation.
+     * @return The starting position of where parsing should begin on a data line.
+     */
+    int getLineParsingStartingPosition();
 }

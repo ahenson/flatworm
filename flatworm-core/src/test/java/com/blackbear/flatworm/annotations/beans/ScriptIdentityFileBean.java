@@ -17,6 +17,7 @@
 package com.blackbear.flatworm.annotations.beans;
 
 import com.blackbear.flatworm.annotations.DataIdentity;
+import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.annotations.Scriptlet;
 
@@ -29,6 +30,7 @@ import lombok.Data;
  */
 @Data
 @Record(name = "ScriptIdentityFileBean",
+        lines = {@Line},
         identity = @DataIdentity(scriptIdentity =
         @Scriptlet(
                 scriptEngine = "nashorn",

@@ -16,8 +16,6 @@
 
 package com.blackbear.flatworm.annotations;
 
-import com.blackbear.flatworm.CardinalityMode;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -40,19 +38,21 @@ public @interface Record {
     String encoding() default "UTF-8";
 
     DataIdentity identity() default @DataIdentity;
-    
+
     Converter[] converters() default {};
 
-    Line[] lines() default { @Line() };
-    
+    Line[] lines() default {};
+
     /**
      * A scriptlet to execute prior to reading/parsing the next record.
+     *
      * @return the {@link Scriptlet} configuration.
      */
     Scriptlet beforeReadRecordScript() default @Scriptlet;
 
     /**
      * A scriptlet to execute after reading/parsing a record.
+     *
      * @return the {@link Scriptlet} configuration.
      */
     Scriptlet afterReadRecordScript() default @Scriptlet;

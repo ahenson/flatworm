@@ -21,16 +21,23 @@ import com.blackbear.flatworm.annotations.RecordElement;
 import lombok.Data;
 
 /**
- * A more complex bean used to test the DefaultAnnotationConfigurationReaderImpl instance.
+ * Simple bean to help with testing annotations and flatworm configuration.
  *
  * @author Alan Henson
  */
 @Data
-public class RecordBeanSevenChildToOne {
+public class Pet {
+    private String type;
+    
+    @RecordElement(order = 1, length = 8)
+    private String name;
 
-    @RecordElement(order = 1, length = 15)
-    private String valueOne;
-
-    @RecordElement(order = 2, length = 15)
-    private String valueTwo;
+    @RecordElement(order = 2, length = 2)
+    private Integer age;
+    
+    @RecordElement(order = 3, length = 11)
+    private String favoriteToy;
+    
+    @RecordElement(order = 4, length = 7)
+    private String allergies;
 }

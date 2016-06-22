@@ -69,7 +69,7 @@ public class FieldIdentityImpl extends AbstractLineTokenIdentity {
         if (ignoreCase) {
             valueToAdd = valueToAdd.toLowerCase();
         }
-
+        
         matchingStrings.add(valueToAdd);
     }
 
@@ -184,6 +184,11 @@ public class FieldIdentityImpl extends AbstractLineTokenIdentity {
             tokenToTest = tokenToTest.toLowerCase();
         }
         return matchingStrings.contains(tokenToTest);
+    }
+
+    @Override
+    public int getLineParsingStartingPosition() {
+        return fieldLength;
     }
 
     @Override

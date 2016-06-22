@@ -34,9 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PropertyUtilsMappingStrategy implements BeanMappingStrategy {
     @Override
     public void mapBean(Object bean, String beanName, String property, Object value,
-                        Map<String, ConversionOptionBO> conv) throws FlatwormParserException {
+                        Map<String, ConversionOptionBO> conversionOption) throws FlatwormParserException {
         try {
-            ConversionOptionBO option = conv.get("append");
+            ConversionOptionBO option = conversionOption.get("append");
             if (option != null && "true".equalsIgnoreCase(option.getValue())) {
                 Object currentValue = PropertyUtils.getProperty(bean, property);
                 if (currentValue != null)

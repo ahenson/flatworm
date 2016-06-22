@@ -17,11 +17,14 @@
 package com.blackbear.flatworm.annotations;
 
 import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.MatchedRecord;
 import com.blackbear.flatworm.annotations.beans.ConverterBean;
 import com.blackbear.flatworm.annotations.beans.FieldIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LengthIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LineBean;
+import com.blackbear.flatworm.annotations.beans.Pet;
 import com.blackbear.flatworm.annotations.beans.RecordBeanWithChildLine;
+import com.blackbear.flatworm.annotations.beans.RecordBeanWithPropertiesOfSameType;
 import com.blackbear.flatworm.annotations.beans.ScriptIdentityBean;
 import com.blackbear.flatworm.annotations.beans.ScriptIdentityFileBean;
 import com.blackbear.flatworm.config.ConverterBO;
@@ -38,6 +41,10 @@ import com.blackbear.flatworm.converters.CoreConverters;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -88,7 +95,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             validateFileFormat(fileFormat, 1, false);
             
             RecordBO record = fileFormat.getRecord("LineBean");
-            validateRecord(record, LineBean.class);
+            validateRecord(record, LineBean.class, true);
 
             RecordDefinitionBO definition = record.getRecordDefinition();
             validateRecordDefinition(record, 1, 0);
@@ -110,7 +117,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             validateFileFormat(fileFormat, 1, false);
             
             RecordBO record = fileFormat.getRecord(RecordBeanWithChildLine.class.getSimpleName());
-            validateRecord(record, RecordBeanWithChildLine.class);
+            validateRecord(record, RecordBeanWithChildLine.class, true);
             
             validateRecordDefinition(record, 1, 2);
             
@@ -145,7 +152,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
             RecordBO record = configLoader.loadRecord(LengthIdentityBean.class.getAnnotation(Record.class));
 
-            validateRecord(record, LengthIdentityBean.class);
+            validateRecord(record, LengthIdentityBean.class, true);
             validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
@@ -170,7 +177,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
             RecordBO record = configLoader.loadRecord(FieldIdentityBean.class.getAnnotation(Record.class));
 
-            validateRecord(record, FieldIdentityBean.class);
+            validateRecord(record, FieldIdentityBean.class, true);
             validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
@@ -200,7 +207,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
             RecordBO record = configLoader.loadRecord(ScriptIdentityBean.class.getAnnotation(Record.class));
 
-            validateRecord(record, ScriptIdentityBean.class);
+            validateRecord(record, ScriptIdentityBean.class, true);
             validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
@@ -230,7 +237,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
             RecordBO record = configLoader.loadRecord(ScriptIdentityFileBean.class.getAnnotation(Record.class));
 
-            validateRecord(record, ScriptIdentityFileBean.class);
+            validateRecord(record, ScriptIdentityFileBean.class, true);
             validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
@@ -245,6 +252,61 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
         catch(Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse configuration from object with RecordBO annotation: " + e.getMessage());
+        }
+    }
+    
+    @Test
+    public void contaminationTest() {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream("same_property_types.txt")) {
+            configLoader.setPerformValidation(true);
+
+            assertTrue("No Record annotation present.", RecordBeanWithPropertiesOfSameType.class.isAnnotationPresent(Record.class));
+            FileFormat fileFormat = configLoader.loadConfiguration(RecordBeanWithPropertiesOfSameType.class);
+            
+            validateFileFormat(fileFormat, 1, false);
+            
+            RecordBO record = fileFormat.getRecord(RecordBeanWithPropertiesOfSameType.class.getSimpleName());
+            
+            validateRecord(record, RecordBeanWithPropertiesOfSameType.class, false);
+            validateLines(record.getRecordDefinition(), 0, 2);
+            
+            validateLine(record.getRecordDefinition().getLinesWithIdentities().get(0), "", '\0');
+            validateLine(record.getRecordDefinition().getLinesWithIdentities().get(1), "", '\0');
+            
+            // ---------------------------------------------------------
+            // Load the first record
+            // ---------------------------------------------------------
+            BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
+            MatchedRecord matchedRecord = fileFormat.nextRecord(bufIn);
+            assertNotNull("Null MatchedRecord returned when not expected.", matchedRecord);
+            assertEquals("Incorrect record name.", RecordBeanWithPropertiesOfSameType.class.getSimpleName(), matchedRecord.getRecordName());
+
+            Object bean = matchedRecord.getBean(RecordBeanWithPropertiesOfSameType.class.getName());
+            assertNotNull("Failed to load RecordBeanWithPropertiesOfSameType.", bean);
+            assertTrue("Loaded RecordBeanWithPropertiesOfSameType, but wrong Class.", bean instanceof RecordBeanWithPropertiesOfSameType);
+
+            RecordBeanWithPropertiesOfSameType testBean = RecordBeanWithPropertiesOfSameType.class.cast(bean);
+
+            assertTrue("Null or empty dogs list.", testBean.getDogs() != null && !testBean.getDogs().isEmpty());
+            assertEquals("Incorrect number of dogs loaded.", 1, testBean.getDogs().size());
+            Pet dog = testBean.getDogs().get(0);
+            assertEquals("Dog has wrong name.", "spot", dog.getName());
+            assertEquals("Dog has wrong age.", 6, dog.getAge().intValue());
+            assertEquals("Dog has wrong favorite toy.", "tennis ball", dog.getFavoriteToy());
+            assertEquals("Dog has wrong allergies.", "chicken", dog.getAllergies());
+            
+            assertTrue("Null or empty cats list.", testBean.getCats() != null && !testBean.getCats().isEmpty());
+            assertEquals("Incorrect number of cats loaded.", 1, testBean.getCats().size());
+
+            Pet cat = testBean.getCats().get(0);
+            assertEquals("Cat has wrong name.", "whiskers", cat.getName());
+            assertEquals("Cat has wrong age.", 3, cat.getAge().intValue());
+            assertEquals("Cat has wrong favorite toy.", "yarn", cat.getFavoriteToy());
+            assertEquals("Cat has wrong allergies.", "", cat.getAllergies());
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            fail("Failed to correctly parse RecordBeanWithPropertiesOfSameType: " + e.getMessage());
         }
     }
 }

@@ -45,7 +45,7 @@ import static org.junit.Assert.fail;
  *
  * @author Alan Henson
  */
-public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
+public class MultiRecordAnnotationTest extends AbstractBaseAnnotationTest {
 
     @Test
     public void singleRecordAnnotationValueTest() {
@@ -56,15 +56,13 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
 
             validateFileFormat(fileFormat, 2, false);
             RecordBO recordOne = fileFormat.getRecords().get(0);
-            validateRecord(recordOne, RecordBeanOne.class);
+            validateRecord(recordOne, RecordBeanOne.class, true);
             validateRecordDefinition(recordOne, 2, 4);
             
             RecordBO recordTwo = fileFormat.getRecords().get(1);
-            validateRecord(recordTwo, RecordBeanSix.class);
+            validateRecord(recordTwo, RecordBeanSix.class, true);
             validateRecordDefinition(recordTwo, 1, 0);
             
-            assertNotNull("FileFormat returned as null.", fileFormat);
-
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
 
             // ---------------------------------------------------------
@@ -120,9 +118,9 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
             
             for(int i = 0; i < beanOne.getBeanSevens().size(); i++) {
                 RecordBeanSevenChildToOne beanSeven = beanOne.getBeanSevens().get(i);
-                assertEquals("RecordBeanSevenChildToOne.valueOne value is incorrect", String.format("valueOne7%d     ", (i + 1)), 
+                assertEquals("RecordBeanSevenChildToOne.valueOne value is incorrect", String.format("valueOne7%d", (i + 1)), 
                         beanSeven.getValueOne());
-                assertEquals("RecordBeanSevenChildToOne.valueTwo value is incorrect", String.format("valueTwo7%d     ", (i + 1)), 
+                assertEquals("RecordBeanSevenChildToOne.valueTwo value is incorrect", String.format("valueTwo7%d", (i + 1)), 
                         beanSeven.getValueTwo());
             }
             
@@ -142,8 +140,8 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
             bean = matchedRecord.getBean(RecordBeanSix.class.getName());
             assertTrue("RecordBeanSix read, but is of the wrong type.", bean instanceof RecordBeanSix);
             RecordBeanSix beanSix = RecordBeanSix.class.cast(bean);
-            assertEquals("RecordBeanSix.valueOne value is incorrect", "valueOne6     ", beanSix.getValueOne());
-            assertEquals("RecordBeanSix.valueTwo value is incorrect", "valueTwo6     ", beanSix.getValueTwo());
+            assertEquals("RecordBeanSix.valueOne value is incorrect", "valueOne6", beanSix.getValueOne());
+            assertEquals("RecordBeanSix.valueTwo value is incorrect", "valueTwo6", beanSix.getValueTwo());
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -58,12 +58,20 @@ public class AbstractBaseAnnotationTest {
             assertFalse("Empty RecordDefinition.lines.", recordDefinition.getLines().isEmpty());
             assertEquals("RecordDefinition.lines size is incorrect.", expectedLinesCount, recordDefinition.getLines().size());
         }
+        else {
+            assertFalse("RecordDefinition.lines has entries when it's not supposed to.", 
+                    recordDefinition.getLines() != null && !recordDefinition.getLines().isEmpty());
+        }
 
         if (expectedLinesWithIdentitiesCount > 0) {
             assertNotNull("Null RecordDefinition.linesWithIdentities.", recordDefinition.getLinesWithIdentities());
             assertFalse("Empty RecordDefinition.linesWithIdentities.", recordDefinition.getLinesWithIdentities().isEmpty());
             assertEquals("RecordDefinition.linesWithIdentities size is incorrect.", expectedLinesWithIdentitiesCount, 
                     recordDefinition.getLinesWithIdentities().size());
+        }
+        else {
+            assertFalse("RecordDefinition.linesWithIdentities has entries when it's not supposed to.",
+                    recordDefinition.getLinesWithIdentities() != null && !recordDefinition.getLinesWithIdentities().isEmpty());
         }
     }
     
@@ -73,15 +81,18 @@ public class AbstractBaseAnnotationTest {
         assertEquals("Wrong delimiter", expectedDelimiter, line.getDelimiter());
     }
     
-    public void validateRecord(RecordBO record, Class<?> expectedClass) {
-        validateRecord(record, expectedClass.getSimpleName());
+    public void validateRecord(RecordBO record, Class<?> expectedClass, boolean expectRecordIdentity) {
+        validateRecord(record, expectedClass.getSimpleName(), expectRecordIdentity);
     }
     
-    public void validateRecord(RecordBO record, String expectedName) {
+    public void validateRecord(RecordBO record, String expectedName, boolean expectRecordIdentity) {
         assertNotNull(String.format("%s bean is null.", expectedName), record);
         assertFalse(String.format("%s.name was not loaded.", expectedName), StringUtils.isBlank(record.getName()));
-        assertNotNull(String.format("%s.recordIdentity was not loaded.", record.getName()), record.getRecordIdentity());
         assertNotNull(String.format("%s.recordDefinition was not loaded.", record.getName()), record.getRecordDefinition());
+
+        if (expectRecordIdentity) {
+            assertNotNull(String.format("%s.recordIdentity was not loaded.", record.getName()), record.getRecordIdentity());
+        }
     }
 
     public void validateRecordDefinition(RecordBO record, int expectedLinesCount, int expectedLinesWithIdentitiesCount) {

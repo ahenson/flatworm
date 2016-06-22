@@ -42,6 +42,7 @@ public @interface RecordElement {
 
     int lineIndex() default -1;
 
+    boolean trimValue() default true;
 
     ConversionOption[] conversionOptions() default {};
 }

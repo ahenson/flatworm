@@ -153,7 +153,7 @@ public class RecordBO {
             if (!linesWithIdentities.isEmpty()) {
                 boolean continueParsing = true;
                 do {
-                    lastReadLine = in.readLine();
+                    lastReadLine = parsedLastReadLine ? in.readLine() : lastReadLine;
                     Optional<LineBO> matchingLine = linesWithIdentities
                             .stream()
                             .filter(line -> {

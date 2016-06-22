@@ -44,19 +44,19 @@ Work Completed
 * Added use of the foreach construct `for(String item : collection)`
 * Added use of `Streams` and `Lambdas` where it mae code cleaners
 * Cleaned up some comments
-* Removed com.blackbear.flatworm.Callback - use ExceptionCallback or RecordCallback instead (moved to new callbacks package).
+* Removed com.blackbear.flatworm.Callback - use ExceptionCallback or RecordCallback instead (moved to new callbacks package)
 * Added ability to use a JavaScript snippet to see if a line should be processed by a given Record (can also specify a script file and method name to keep scripts external to code)
-* Added ability to specify ignore-field on a record-element to explicitly ignore it.
-* Changed the record-element "type" attribute to "converter-name" as that's what it's really linked to.
-* Changed the minlength/maxlength attributes for the length-ident element to min-length/max-length for consistency.
-* On Field Identity (field-ident) - added ignore-case tag to indicate whether or not case should play a factor in comparison.
+* Added ability to specify ignore-field on a record-element to explicitly ignore it
+* Changed the record-element "type" attribute to "converter-name" as that's what it's really linked to
+* Changed the minlength/maxlength attributes for the length-ident element to min-length/max-length for consistency
+* On Field Identity (field-ident) - added ignore-case tag to indicate whether or not case should play a factor in comparison
 * Added support for single segment-element configurations where the child doesn't have to be a collection
 * Added support for non-delimited segment-elements - a "child" line can be a non-delimited line
 * Added line identifiers
 * Added annotation support
 * Added ability to auto-resolve the converter type based upon the field's type (given that it's a common type in String, Double, Float, Long, or Integer).
-* Added more constants where appropriate. There is likely more that can be done here.
-* Added support for scripts to be executed before a record is read and after a record is read - which allows for dynamic reconfiguration of a FileFile during parsing - some files specify their parsing rules within the file so static configuration must be updated at run time.
+* Added more constants where appropriate. There is likely more that can be done here
+* Added support for scripts to be executed before a record is read and after a record is read - which allows for dynamic reconfiguration of a FileFile during parsing - some files specify their parsing rules within the file so static configuration must be updated at run time
 	* Record
 		* Before record is read:
 			* Parameters: `(FileFormat fileFormat, String line)`
@@ -71,10 +71,11 @@ Work Completed
 		* After line is read:
 			* Parameters: `(LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)`
 			* Return: `ignored`
-* Added ability to specify multiple configuration options and then specify the preferred one at run time.
+* Added ability to specify multiple configuration options and then specify the preferred one at run time
 * Added ability to create Line identifiers (vs. them inheriting purely from the record along). The Script Identity script will take three parameters:
 	* Parameters: `(FileFormat fileFormat, LineBO line, String line)`
 * Added support to "optional" lines. Meaning, the parser doesn't "skip" a line if a LineBO has an Identity set for lineIdentity but the line has no data present for a given record.
+* When using the Field Identity, start position is no longer required for Record Elements as it can be auto-derived from the Field Identity's fieldLength property
 
 TODOs
 -------
@@ -86,7 +87,7 @@ TODOs
 * Add missing JavaDocs
 * Add ability for folks to write their own Identity implementations and make them annotation enabled. Right now they would have to build their own annotation configuration loader and extend the relevant parts - which is fine, but this can be done more cleanly I think.
 * Add more verbose logging
-* Is the field-length attribute really needed on Field Identity? We know the length by the matching strings. They should all be the same length else the match will always fail.
+* Is the field-length attribute really needed on Field Identity? We know the length by the matching strings. They should all be the same length else the match will always fail
 
 [flatworm 3.0.2]: https://github.com/trx/flatworm
 [flatworm 4.0.0-SNAPSHOT]: https://github.com/ahenson/flatworm

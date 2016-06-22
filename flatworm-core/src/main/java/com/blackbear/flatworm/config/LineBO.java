@@ -31,6 +31,7 @@ import org.apache.commons.lang.StringUtils;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -138,8 +139,10 @@ public class LineBO extends AbstractLineElementCollection {
                 parseInputDelimited(inputLine, identity);
             }
         } else {
-            int charPos = 0;
-            parseInput(inputLine, elements, charPos, identity);
+            // This is to help keep the configuration shorter in terms of what fields are required.
+            int charPos = getStartingPosition(elements, identity);
+
+            parseInput(inputLine, elements, charPos);
         }
 
         if (afterScriptlet != null) {
@@ -148,16 +151,40 @@ public class LineBO extends AbstractLineElementCollection {
     }
 
     /**
+     * Determine the starting position for parsing the line using a non-delimited approach.
+     *
+     * @param elements The {@link LineBO} elements.
+     * @param identity The {@link Identity} instance that was used to identify the line.
+     * @return the starting position for parsing the line.
+     */
+    private int getStartingPosition(List<LineElement> elements, Identity identity) {
+        int startPosition = 0;
+        if (identity instanceof LineTokenIdentity) {
+            Optional<RecordElementBO> recordElement = elements.stream()
+                    .filter(element -> element instanceof RecordElementBO)
+                    .map(RecordElementBO.class::cast)
+                    .findFirst();
+
+            if (recordElement.isPresent()
+                    && (!recordElement.get().isFieldStartSet() || recordElement.get().getFieldStart() < 0)) {
+                LineTokenIdentity lineTokenIdentity = LineTokenIdentity.class.cast(identity);
+                startPosition = lineTokenIdentity.getLineParsingStartingPosition();
+            }
+        }
+
+        return startPosition;
+    }
+
+    /**
      * Parse out the content of the line based upon the configured {@link RecordElementBO} and {@link SegmentElementBO} instances.
      *
      * @param inputLine    The line of data to parse.
      * @param lineElements The {@link LineElement} instances that drive how the line of data will be parsed.
      * @param charPos      The character position of the line to begin at.
-     * @param identity     The {@link Identity} instance used to determine that this {@link LineBO} instance should parse this line.
-     * @return The last characater position of the line that was processed.
+     * @return The last character position of the line that was processed.
      * @throws FlatwormParserException should the parsing fail for any reason.
      */
-    private int parseInput(String inputLine, List<LineElement> lineElements, int charPos, Identity identity)
+    private int parseInput(String inputLine, List<LineElement> lineElements, int charPos)
             throws FlatwormParserException {
         for (LineElement lineElement : lineElements) {
             if (lineElement instanceof RecordElementBO) {
@@ -186,7 +213,7 @@ public class LineBO extends AbstractLineElementCollection {
                 }
             } else if (lineElement instanceof SegmentElementBO) {
                 SegmentElementBO segmentElement = (SegmentElementBO) lineElement;
-                charPos = parseInput(inputLine, segmentElement.getLineElements(), charPos, identity);
+                charPos = parseInput(inputLine, segmentElement.getLineElements(), charPos);
                 captureSegmentBean(segmentElement);
             }
         }
@@ -205,6 +232,10 @@ public class LineBO extends AbstractLineElementCollection {
         String beanRef = cardinality.getBeanRef();
         String property = cardinality.getPropertyName();
         Object bean = beans.get(beanRef);
+
+        if (recordElement.isTrimValue()) {
+            fieldChars = fieldChars.trim();
+        }
 
         Object value;
         if (!StringUtils.isBlank(recordElement.getConverterName())) {

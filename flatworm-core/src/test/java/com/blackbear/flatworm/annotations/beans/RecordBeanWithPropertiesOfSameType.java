@@ -21,43 +21,33 @@ import com.blackbear.flatworm.annotations.FieldIdentity;
 import com.blackbear.flatworm.annotations.ForProperty;
 import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
-import com.blackbear.flatworm.annotations.RecordElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Data;
 
 /**
- * A bean for testing the Line annotation as a field annotation.
+ * Parent bean that has two properties with the same type to make sure there isn't cross pollination.
  *
  * @author Alan Henson
  */
 @Data
-@Record(
-        name = "RecordBeanWithChildLine",
-        lines = {@Line},
-        identity = @DataIdentity(
-                fieldIdentity = @FieldIdentity(
-                        matchIdentities = {"LB1"},
-                        enabled = true
-                )
-        )
-)
-public class RecordBeanWithChildLine {
+@Record(name = "RecordBeanWithPropertiesOfSameType")
+public class RecordBeanWithPropertiesOfSameType {
 
-    @RecordElement
-    private String valueOne;
+    @Line(forProperty = @ForProperty(
+            enabled = true,
+            identity = @DataIdentity(fieldIdentity = @FieldIdentity(enabled = true, matchIdentities = {"DOG"}))))
+    private List<Pet> dogs;
 
-    @RecordElement
-    private String valueTwo;
+    @Line(forProperty = @ForProperty(
+            enabled = true,
+            identity = @DataIdentity(fieldIdentity = @FieldIdentity(enabled = true, matchIdentities = {"CAT"}))))
+    private List<Pet> cats;
 
-    @Line(
-            forProperty = @ForProperty(
-                    enabled = true,
-                    identity = @DataIdentity(
-                            fieldIdentity = @FieldIdentity(
-                                    matchIdentities = "LBC",
-                                    enabled = true
-                            )
-                    ))
-    )
-    private RecordBeanTheChildLine childLine;
+    public RecordBeanWithPropertiesOfSameType() {
+        dogs = new ArrayList<>();
+        cats = new ArrayList<>();
+    }
 }

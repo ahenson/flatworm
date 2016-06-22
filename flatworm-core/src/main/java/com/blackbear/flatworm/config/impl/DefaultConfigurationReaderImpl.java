@@ -675,6 +675,8 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         Node beanref = getAttributeNamed(node, "beanref");
         Node converterName = getAttributeNamed(node, "converter-name");
         Node ignoreField = getAttributeNamed(node, "ignore-field");
+        
+        Node trimValue = getAttributeNamed(node, "trim-value");
 
         if (start != null) {
             recordElement.setFieldStart(Util.tryParseInt(start.getNodeValue()));
@@ -701,6 +703,9 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         }
         if(ignoreField != null) {
             recordElement.setIgnoreField(Util.tryParseBoolean(ignoreField.getNodeValue()));
+        }
+        if(trimValue != null) {
+            recordElement.setTrimValue(Util.tryParseBoolean(trimValue.getNodeValue()));
         }
 
         readConversionOptions(node, recordElement);
