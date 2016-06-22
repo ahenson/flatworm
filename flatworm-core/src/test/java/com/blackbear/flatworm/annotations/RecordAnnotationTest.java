@@ -309,4 +309,15 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             fail("Failed to correctly parse RecordBeanWithPropertiesOfSameType: " + e.getMessage());
         }
     }
+    
+    @Test
+    public void endRecordTest() {
+        try {
+            
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            fail("Failed to correctly parse data with end-record flags set: " + e.getMessage());
+        }
+    }
 }

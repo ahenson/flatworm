@@ -38,4 +38,6 @@ public @interface Cardinality {
 
     int mintCount() default Integer.MIN_VALUE;
     int maxCount() default Integer.MAX_VALUE;
+    
+    String addMethod() default "";
 }

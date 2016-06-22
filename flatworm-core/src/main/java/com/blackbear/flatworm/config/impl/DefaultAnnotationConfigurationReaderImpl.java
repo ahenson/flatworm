@@ -700,6 +700,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         cardinality.setCardinalityMode(annotatedCardinality.cardinalityMode());
         cardinality.setMinCount(annotatedCardinality.mintCount());
         cardinality.setMaxCount(annotatedCardinality.maxCount());
+        cardinality.setAddMethod(annotatedCardinality.addMethod());
         return cardinality;
     }
 
