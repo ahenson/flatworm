@@ -1,0 +1,9 @@
+Jane                Smith               New York            
+DOGspot     6tennis ballchicken
+CATwhiskers 3yarn              
+CATfluffy   1rat toy    veggies
+END
+Piere               Bordeaux            Paris               
+DOGmax      5tug rope   cats   
+DOGsir bob  4frisbee    beef   
+END

@@ -535,13 +535,14 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                 LineBO line = loadLine(annotatedLine);
                 loadForProperty(annotatedLine.forProperty(), line);
                 
-                addBeanToRecord(clazz, record);
-                
                 Class<?> fieldType = Util.getActualFieldType(field);
                 line.getCardinality().setParentBeanRef(clazz.getName());
                 line.getCardinality().setBeanRef(fieldType.getName());
                 line.getCardinality().setPropertyName(field.getName());
 
+                addBeanToRecord(clazz, record);
+                addBeanToRecord(fieldType, record);
+                
                 if(line.getCardinality().getCardinalityMode() == CardinalityMode.AUTO_RESOLVE) {
                     line.getCardinality().setCardinalityMode(ParseUtils.resolveCardinality(field.getType()));
                 }

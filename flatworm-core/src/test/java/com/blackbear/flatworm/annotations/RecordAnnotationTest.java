@@ -23,6 +23,7 @@ import com.blackbear.flatworm.annotations.beans.FieldIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LengthIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LineBean;
 import com.blackbear.flatworm.annotations.beans.Pet;
+import com.blackbear.flatworm.annotations.beans.PetOwner;
 import com.blackbear.flatworm.annotations.beans.RecordBeanWithChildLine;
 import com.blackbear.flatworm.annotations.beans.RecordBeanWithPropertiesOfSameType;
 import com.blackbear.flatworm.annotations.beans.ScriptIdentityBean;
@@ -64,7 +65,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
         super.setup();
         configLoader.setPerformValidation(false);
     }
-    
+
     @Test
     public void converterTest() {
         try {
@@ -75,25 +76,24 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             ConversionHelper helper = fileFormat.getConversionHelper();
             assertNotNull("Null collection of converters.", helper.getConverters());
             assertEquals("Invalid number of converters loaded.", 1, helper.getConverters().size());
-            
+
             ConverterBO converter = helper.getConverter("test");
             assertNotNull("Converter not resolved by name.", converter);
             assertEquals("Invalid converter classname.", CoreConverters.class.getName(), converter.getConverterClass());
             assertEquals("Invalid converter method.", "convertChar", converter.getMethod());
             assertEquals("Invalid converter return-type.", String.class.getName(), converter.getReturnType());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to parse out configured Converters: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void lineTest() {
         try {
             FileFormat fileFormat = configLoader.loadConfiguration(LineBean.class);
             validateFileFormat(fileFormat, 1, false);
-            
+
             RecordBO record = fileFormat.getRecord("LineBean");
             validateRecord(record, LineBean.class, true);
 
@@ -109,46 +109,45 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             fail("Failed to parse out configured Lines: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void lineIdentityTest() {
         try {
             FileFormat fileFormat = configLoader.loadConfiguration(RecordBeanWithChildLine.class);
             validateFileFormat(fileFormat, 1, false);
-            
+
             RecordBO record = fileFormat.getRecord(RecordBeanWithChildLine.class.getSimpleName());
             validateRecord(record, RecordBeanWithChildLine.class, true);
-            
+
             validateRecordDefinition(record, 1, 2);
-            
+
             // Test RecordBeanWithChildLine.class.
             LineBO line = record.getRecordDefinition().getLines().get(0);
             assertEquals("Invalid number of RecordElements loaded for Line 0.", 2, line.getLineElements().size());
-            assertEquals("Invalid number of RecordElements loaded for Line 0.", 2L, 
+            assertEquals("Invalid number of RecordElements loaded for Line 0.", 2L,
                     line.getLineElements().stream().filter(value -> value instanceof RecordElementBO).count());
-            
+
             // Test RecordBeanTheChildLine.class.
             line = record.getRecordDefinition().getLinesWithIdentities().get(1);
             assertEquals("Invalid number of RecordElements loaded for Line 1.", 2, line.getLineElements().size());
-            assertEquals("Invalid number of RecordElements loaded for Line 1.", 2L, 
+            assertEquals("Invalid number of RecordElements loaded for Line 1.", 2L,
                     line.getLineElements().stream().filter(value -> value instanceof RecordElementBO).count());
 
             // Test RecordBeanTheChildOfChildLine.class.
             line = record.getRecordDefinition().getLinesWithIdentities().get(1);
             assertEquals("Invalid number of RecordElements loaded for Line 2.", 2, line.getLineElements().size());
-            assertEquals("Invalid number of RecordElements loaded for Line 2.", 2L, 
+            assertEquals("Invalid number of RecordElements loaded for Line 2.", 2L,
                     line.getLineElements().stream().filter(value -> value instanceof RecordElementBO).count());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed on Line Identity Test: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void lengthIdentityTest() {
         try {
-            
+
             assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
             RecordBO record = configLoader.loadRecord(LengthIdentityBean.class.getAnnotation(Record.class));
 
@@ -164,8 +163,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
 
             assertNotNull("Null max length", identity.getMaxLength());
             assertEquals("Wrong max length value", 3, identity.getMaxLength().intValue());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse configuration from object with RecordBO annotation: " + e.getMessage());
         }
@@ -194,8 +192,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
 
             assertFalse("No match identities were loaded.", identity.getMatchingStrings().isEmpty());
             assertTrue("Match strings were not loaded.", identity.matchesIdentity("FLD"));
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse configuration from object with RecordBO annotation: " + e.getMessage());
         }
@@ -218,14 +215,13 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
 
             ScriptletBO scriptlet = identity.getScriptlet();
             validateScriptlet(scriptlet, "nashorn", "function myFunction(fileFormat, line) { return true; }", "myFunction", null);
-            
+
             scriptlet = record.getBeforeScriptlet();
             validateScriptlet(scriptlet, "nashorn", "function myFunction(fileFormat, line) { return true; }", "myFunction", null);
-            
+
             scriptlet = record.getAfterScriptlet();
             validateScriptlet(scriptlet, "nashorn", "function myFunction(fileFormat) { return true; }", "myFunction", null);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse configuration from object with RecordBO annotation: " + e.getMessage());
         }
@@ -246,15 +242,14 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertTrue("Failed to match identifier", identity.matchesIdentity(record, new FileFormat(), ""));
 
             ScriptletBO scriptlet = identity.getScriptlet();
-            validateScriptlet(scriptlet, "nashorn", "var myFunction = function (fileFormat, line) { return true; };", "myFunction", 
+            validateScriptlet(scriptlet, "nashorn", "var myFunction = function (fileFormat, line) { return true; };", "myFunction",
                     "script_identity_script_file.js");
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse configuration from object with RecordBO annotation: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void contaminationTest() {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream("same_property_types.txt")) {
@@ -262,17 +257,17 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
 
             assertTrue("No Record annotation present.", RecordBeanWithPropertiesOfSameType.class.isAnnotationPresent(Record.class));
             FileFormat fileFormat = configLoader.loadConfiguration(RecordBeanWithPropertiesOfSameType.class);
-            
+
             validateFileFormat(fileFormat, 1, false);
-            
+
             RecordBO record = fileFormat.getRecord(RecordBeanWithPropertiesOfSameType.class.getSimpleName());
-            
+
             validateRecord(record, RecordBeanWithPropertiesOfSameType.class, false);
             validateLines(record.getRecordDefinition(), 0, 2);
-            
+
             validateLine(record.getRecordDefinition().getLinesWithIdentities().get(0), "", '\0');
             validateLine(record.getRecordDefinition().getLinesWithIdentities().get(1), "", '\0');
-            
+
             // ---------------------------------------------------------
             // Load the first record
             // ---------------------------------------------------------
@@ -294,7 +289,7 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertEquals("Dog has wrong age.", 6, dog.getAge().intValue());
             assertEquals("Dog has wrong favorite toy.", "tennis ball", dog.getFavoriteToy());
             assertEquals("Dog has wrong allergies.", "chicken", dog.getAllergies());
-            
+
             assertTrue("Null or empty cats list.", testBean.getCats() != null && !testBean.getCats().isEmpty());
             assertEquals("Incorrect number of cats loaded.", 1, testBean.getCats().size());
 
@@ -303,19 +298,104 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertEquals("Cat has wrong age.", 3, cat.getAge().intValue());
             assertEquals("Cat has wrong favorite toy.", "yarn", cat.getFavoriteToy());
             assertEquals("Cat has wrong allergies.", "", cat.getAllergies());
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse RecordBeanWithPropertiesOfSameType: " + e.getMessage());
         }
     }
-    
+
     @Test
     public void endRecordTest() {
-        try {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream("end_record_test.txt")) {
+            configLoader.setPerformValidation(true);
+
+            assertTrue("No Record annotation present.", PetOwner.class.isAnnotationPresent(Record.class));
+            FileFormat fileFormat = configLoader.loadConfiguration(PetOwner.class);
+
+            validateFileFormat(fileFormat, 1, false);
+
+            RecordBO record = fileFormat.getRecord(PetOwner.class.getSimpleName());
+
+            validateRecord(record, PetOwner.class, false);
+            validateLines(record.getRecordDefinition(), 1, 3);
+
+            validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
+            validateLine(record.getRecordDefinition().getLinesWithIdentities().get(0), "", '\0');
+            validateLine(record.getRecordDefinition().getLinesWithIdentities().get(1), "", '\0');
+            validateLine(record.getRecordDefinition().getLinesWithIdentities().get(2), "", '\0');
+
+            // ---------------------------------------------------------
+            // Load the first record
+            // ---------------------------------------------------------
+            BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
+            MatchedRecord matchedRecord = fileFormat.nextRecord(bufIn);
+            assertNotNull("Null MatchedRecord returned when not expected.", matchedRecord);
+            assertEquals("Incorrect record name.", PetOwner.class.getSimpleName(), matchedRecord.getRecordName());
+
+            Object bean = matchedRecord.getBean(PetOwner.class.getName());
+            assertNotNull("Failed to load PetOwner.", bean);
+            assertTrue("Loaded PetOwner, but wrong Class.", bean instanceof PetOwner);
+
+            PetOwner petOwner = PetOwner.class.cast(bean);
+            assertEquals("Pet Owner 1 -> Wrong first name.", "Jane", petOwner.getFirstName());
+            assertEquals("Pet Owner 1 -> Wrong last name.", "Smith", petOwner.getLastName());
+            assertEquals("Pet Owner 1 -> Wrong city.", "New York", petOwner.getCity());
+
+            assertTrue("Pet Owner 1 -> Null or empty dogs list.", petOwner.getDogs() != null && !petOwner.getDogs().isEmpty());
+            assertEquals("Pet Owner 1 -> Incorrect number of dogs loaded.", 1, petOwner.getDogs().size());
             
-        }
-        catch(Exception e) {
+            Pet dog = petOwner.getDogs().get(0);
+            assertEquals("Pet Owner 1 -> Dog has wrong name.", "spot", dog.getName());
+            assertEquals("Pet Owner 1 -> Dog has wrong age.", 6, dog.getAge().intValue());
+            assertEquals("Pet Owner 1 -> Dog has wrong favorite toy.", "tennis ball", dog.getFavoriteToy());
+            assertEquals("Pet Owner 1 -> Dog has wrong allergies.", "chicken", dog.getAllergies());
+
+            assertTrue("Pet Owner 1 -> Null or empty cats list.", petOwner.getCats() != null && !petOwner.getCats().isEmpty());
+            assertEquals("Pet Owner 1 -> Incorrect number of cats loaded.", 2, petOwner.getCats().size());
+
+            Pet cat = petOwner.getCats().get(0);
+            assertEquals("Pet Owner 1 -> Cat 1 has wrong name.", "whiskers", cat.getName());
+            assertEquals("Pet Owner 1 -> Cat 1 has wrong age.", 3, cat.getAge().intValue());
+            assertEquals("Pet Owner 1 -> Cat 1 has wrong favorite toy.", "yarn", cat.getFavoriteToy());
+            assertEquals("Pet Owner 1 -> Cat 1 has wrong allergies.", "", cat.getAllergies());
+
+            cat = petOwner.getCats().get(1);
+            assertEquals("Pet Owner 1 -> Cat 2 has wrong name.", "fluffy", cat.getName());
+            assertEquals("Pet Owner 1 -> Cat 2 has wrong age.", 1, cat.getAge().intValue());
+            assertEquals("Pet Owner 1 -> Cat 2 has wrong favorite toy.", "rat toy", cat.getFavoriteToy());
+            assertEquals("Pet Owner 1 -> Cat 2 has wrong allergies.", "veggies", cat.getAllergies());
+
+            matchedRecord = fileFormat.nextRecord(bufIn);
+            assertNotNull("Pet Owner 2 -> Null MatchedRecord returned when not expected.", matchedRecord);
+            assertEquals("Pet Owner 2 -> Incorrect record name.", PetOwner.class.getSimpleName(), matchedRecord.getRecordName());
+
+            bean = matchedRecord.getBean(PetOwner.class.getName());
+            assertNotNull("Pet Owner 2 -> Failed to load PetOwner.", bean);
+            assertTrue("Pet Owner 2 -> Loaded PetOwner, but wrong Class.", bean instanceof PetOwner);
+
+            petOwner = PetOwner.class.cast(bean);
+            assertEquals("Pet Owner 2 -> Wrong first name.", "Piere", petOwner.getFirstName());
+            assertEquals("Pet Owner 2 -> Wrong last name.", "Bordeaux", petOwner.getLastName());
+            assertEquals("Pet Owner 2 -> Wrong city.", "Paris", petOwner.getCity());
+
+            assertTrue("Pet Owner 2 -> Null or empty dogs list.", petOwner.getDogs() != null && !petOwner.getDogs().isEmpty());
+            assertEquals("Pet Owner 2 -> Incorrect number of dogs loaded.", 2, petOwner.getDogs().size());
+            
+            dog = petOwner.getDogs().get(0);
+            assertEquals("Pet Owner 2 -> Dog 1 has wrong name.", "max", dog.getName());
+            assertEquals("Pet Owner 2 -> Dog 1 has wrong age.", 5, dog.getAge().intValue());
+            assertEquals("Pet Owner 2 -> Dog 1 has wrong favorite toy.", "tug rope", dog.getFavoriteToy());
+            assertEquals("Pet Owner 2 -> Dog 1 has wrong allergies.", "cats", dog.getAllergies());
+
+            dog = petOwner.getDogs().get(1);
+            assertEquals("Pet Owner 2 -> Dog 2 has wrong name.", "sir bob", dog.getName());
+            assertEquals("Pet Owner 2 -> Dog 2 has wrong age.", 4, dog.getAge().intValue());
+            assertEquals("Pet Owner 2 -> Dog 2 has wrong favorite toy.", "frisbee", dog.getFavoriteToy());
+            assertEquals("Pet Owner 2 -> Dog 2 has wrong allergies.", "beef", dog.getAllergies());
+
+            assertTrue("Pet Owner 2 -> Should not have cats.", petOwner.getCats() == null || petOwner.getCats().isEmpty());
+            
+        } catch (Exception e) {
             e.printStackTrace();
             fail("Failed to correctly parse data with end-record flags set: " + e.getMessage());
         }
