@@ -91,11 +91,23 @@ public class ParseUtils {
         if (cardinality.getCardinalityMode() != CardinalityMode.SINGLE) {
 
             boolean addToCollection = true;
+            PropertyDescriptor propDesc;
+            
+            try {
+                propDesc = PropertyUtils.getPropertyDescriptor(target, cardinality.getPropertyName());
+            }
+            catch(Exception e) {
+                // This should only happen via the XML configuration as the annotation configuration uses reflection to 
+                // determine the property name. 
+                throw new FlatwormParserException(String.format("Failed to read property %s on bean %s. Make sure the specified " +
+                        "property-name is correct in the configuration for the record-element.", 
+                        cardinality.getPropertyName(), target.getClass().getName()), e);
+            }
+            
             if (cardinality.getCardinalityMode() == CardinalityMode.STRICT
                     || cardinality.getCardinalityMode() == CardinalityMode.RESTRICTED) {
 
                 try {
-                    PropertyDescriptor propDesc = PropertyUtils.getPropertyDescriptor(target, cardinality.getPropertyName());
                     Object currentValue = PropertyUtils.getProperty(target, cardinality.getPropertyName());
                     int currentSize;
                     
@@ -130,6 +142,15 @@ public class ParseUtils {
 
             // Add it if we have determined that's allowed.
             if (addToCollection) {
+                
+                // Need to make sure we have an add method for Arrays.
+                // TODO - add ability to automatically expand an array - for now, use an addMethod or collections.
+                if(StringUtils.isBlank(cardinality.getAddMethod()) && propDesc.getPropertyType().isArray()) {
+                    throw new FlatwormParserException(String.format("Bean %s with property %s is an Array and therefore an Add Method " +
+                            "must be specified in the configuration so that an element can be properly added to the array. " +
+                            "Auto-expanding an array is not yet supported.", target.getClass().getName(), cardinality.getPropertyName()));
+                }
+                
                 if (!StringUtils.isBlank(cardinality.getAddMethod())) {
                     invokeAddMethod(target, cardinality.getAddMethod(), toAdd);
                 } else if (!StringUtils.isBlank(cardinality.getPropertyName())) {
