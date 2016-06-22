@@ -14,26 +14,35 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations.beans;
+package com.blackbear.flatworm.config;
 
-import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
-import com.blackbear.flatworm.annotations.Record;
+import com.blackbear.flatworm.CardinalityMode;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Basic bean for testing the LengthIdentity annotation.
+ * Used to capture the cardinality configuration of a property within a bean that will be loaded.
  *
  * @author Alan Henson
  */
 @Data
-@Record(name = "LengthIdentityBean",
-        identity = @DataIdentity(lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                enabled = true
-        )))
-public class LengthIdentityBean {
+@AllArgsConstructor
+public class CardinalityBO {
+    private String propertyName;
+    private String beanRef;
+    private String parentBeanRef;
+    private String addMethod;
+
+    private Integer minCount;
+    private Integer maxCount;
+    private CardinalityMode cardinalityMode;
+    
+    public CardinalityBO() {
+        cardinalityMode = CardinalityMode.LOOSE;
+        minCount = Integer.MIN_VALUE;
+        maxCount = Integer.MAX_VALUE;
+    }
+    
+    
 }

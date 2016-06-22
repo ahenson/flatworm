@@ -207,7 +207,7 @@ public class ConfigurationValidator {
             recordDefinition.getBeans().forEach(bean -> validateBean(bean, errors));
         }
 
-        if (recordDefinition.getLines().isEmpty()) {
+        if (recordDefinition.getLines().isEmpty() && recordDefinition.getLinesWithIdentities().isEmpty()) {
             errors.add("Must specify at least 1 line element for a record-definition. " +
                     "This indicates how the line of data is to be parsed.");
         } else {
@@ -241,6 +241,21 @@ public class ConfigurationValidator {
      * @param errors A non-null {@link List} that will be appended to if errors are found.
      */
     public static void validateLine(LineBO line, List<String> errors) {
+        
+        if(line.getLineIdentity() != null) {
+            validateIdentity(line.getLineIdentity(), errors);
+            
+            if(line.getIndex() != -1) {
+                errors.add("Lines with Identities defined should not be given an index - use -1 to indicate no index specified.");
+            }
+        }
+        else {
+            if(line.getRecordEndLine() != null && line.getRecordEndLine()) {
+                errors.add("Only Lines with an Identity defined should have the Record End Line set to true." +
+                        "These types of Lines are configured on the Field of a bean vs. in the Record header.");
+            }
+        }
+        
         line.getLineElements()
                 .stream()
                 .filter(lineElement -> lineElement instanceof RecordElementBO)
@@ -261,23 +276,35 @@ public class ConfigurationValidator {
      * @param errors  A non-null {@link List} that will be appended to if errors are found.
      */
     public static void validateSegmentElement(SegmentElementBO segment, List<String> errors) {
-        if (StringUtils.isBlank(segment.getParentBeanRef())) {
-            errors.add("Must specify the parent-beanref attribute for segment-elements.");
-        }
-        if (StringUtils.isBlank(segment.getBeanRef())) {
-            errors.add("Must specify the beanref attribute for segment-elements.");
-        }
-        if (StringUtils.isBlank(segment.getPropertyName()) && StringUtils.isBlank(segment.getAddMethod())) {
-            errors.add("Must specify either the property-name attribute or add-method attribute for segment-elements.");
-        }
-        if (segment.getCardinalityMode() == null) {
-            errors.add("Must specify a valid cardinality-mode or leave the attribute out of the configuration to default to LOOSE.");
-        }
         if (segment.getFieldIdentity() != null) {
             validateFieldIdentity(segment.getFieldIdentity(), errors);
         } else {
             errors.add("Must specify the Field Identity configuration to use so that the lines can be correctly subdivided " +
                     "during parsing.");
+        }
+        
+        validateCardinality(segment.getCardinality(), errors);
+    }
+
+    /**
+     * Validate that a {@link CardinalityBO} instance has been correctly parsed.
+     * @param cardinality The {@link CardinalityBO} instance to validate.
+     * @param errors  A non-null {@link List} that will be appended to if errors are found.
+     */
+    public static void validateCardinality(CardinalityBO cardinality, List<String> errors) {
+        if (cardinality == null) {
+            errors.add("Must specify a valid Cardinality Mode or leave the attribute out of the configuration to default to LOOSE.");
+        }
+        else {
+            if (cardinality.getCardinalityMode() == null) {
+                errors.add("Must specify a valid Cardinality Mode or leave the attribute out of the configuration to default to LOOSE.");
+            }
+            if (StringUtils.isBlank(cardinality.getBeanRef())) {
+                errors.add("Must specify the beanref attribute for segment and record elements.");
+            }
+            if (StringUtils.isBlank(cardinality.getPropertyName()) && StringUtils.isBlank(cardinality.getAddMethod())) {
+                errors.add("Must specify either the property-name attribute or add-method attribute for segment-elements.");
+            }
         }
     }
 
@@ -290,7 +317,7 @@ public class ConfigurationValidator {
      */
     public static void validateRecordElement(LineBO parentLine, RecordElementBO recordElement, List<String> errors) {
         if (recordElement.getIgnoreField() == null || !recordElement.getIgnoreField()) {
-            if (StringUtils.isBlank(recordElement.getBeanRef())) {
+            if (recordElement.getCardinality() == null || StringUtils.isBlank(recordElement.getCardinality().getBeanRef())) {
                 errors.add("Must specify a beanref attribute for a record-element.");
             }
 

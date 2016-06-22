@@ -21,12 +21,14 @@ import com.blackbear.flatworm.annotations.beans.ConverterBean;
 import com.blackbear.flatworm.annotations.beans.FieldIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LengthIdentityBean;
 import com.blackbear.flatworm.annotations.beans.LineBean;
+import com.blackbear.flatworm.annotations.beans.RecordBeanWithChildLine;
 import com.blackbear.flatworm.annotations.beans.ScriptIdentityBean;
 import com.blackbear.flatworm.annotations.beans.ScriptIdentityFileBean;
 import com.blackbear.flatworm.config.ConverterBO;
 import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.config.RecordDefinitionBO;
+import com.blackbear.flatworm.config.RecordElementBO;
 import com.blackbear.flatworm.config.ScriptletBO;
 import com.blackbear.flatworm.config.impl.FieldIdentityImpl;
 import com.blackbear.flatworm.config.impl.LengthIdentityImpl;
@@ -83,17 +85,16 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
     public void lineTest() {
         try {
             FileFormat fileFormat = configLoader.loadConfiguration(LineBean.class);
-            assertNotNull("Failed to load FileFormat instance from annotation configuration.", fileFormat);
-            assertNotNull("Null fileFormat.records", fileFormat.getRecords());
+            validateFileFormat(fileFormat, 1, false);
             
             RecordBO record = fileFormat.getRecord("LineBean");
             validateRecord(record, LineBean.class);
 
             RecordDefinitionBO definition = record.getRecordDefinition();
-            validateRecordDefinition(record, definition, 1);
+            validateRecordDefinition(record, 1, 0);
 
             LineBO line = definition.getLines().get(0);
-            assertEquals("Invalid line ID.", "line", line.getId());
+            assertEquals("Invalid line index.", 1, line.getIndex());
             assertEquals("Invalid line delimiter.", "|", line.getDelimiter());
             assertEquals("Invalid line quote char.", '"', line.getQuoteChar());
         } catch (Exception e) {
@@ -103,12 +104,49 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
     }
     
     @Test
+    public void lineIdentityTest() {
+        try {
+            FileFormat fileFormat = configLoader.loadConfiguration(RecordBeanWithChildLine.class);
+            validateFileFormat(fileFormat, 1, false);
+            
+            RecordBO record = fileFormat.getRecord(RecordBeanWithChildLine.class.getSimpleName());
+            validateRecord(record, RecordBeanWithChildLine.class);
+            
+            validateRecordDefinition(record, 1, 2);
+            
+            // Test RecordBeanWithChildLine.class.
+            LineBO line = record.getRecordDefinition().getLines().get(0);
+            assertEquals("Invalid number of RecordElements loaded for Line 0.", 2, line.getLineElements().size());
+            assertEquals("Invalid number of RecordElements loaded for Line 0.", 2L, 
+                    line.getLineElements().stream().filter(value -> value instanceof RecordElementBO).count());
+            
+            // Test RecordBeanTheChildLine.class.
+            line = record.getRecordDefinition().getLinesWithIdentities().get(1);
+            assertEquals("Invalid number of RecordElements loaded for Line 1.", 2, line.getLineElements().size());
+            assertEquals("Invalid number of RecordElements loaded for Line 1.", 2L, 
+                    line.getLineElements().stream().filter(value -> value instanceof RecordElementBO).count());
+
+            // Test RecordBeanTheChildOfChildLine.class.
+            line = record.getRecordDefinition().getLinesWithIdentities().get(1);
+            assertEquals("Invalid number of RecordElements loaded for Line 2.", 2, line.getLineElements().size());
+            assertEquals("Invalid number of RecordElements loaded for Line 2.", 2L, 
+                    line.getLineElements().stream().filter(value -> value instanceof RecordElementBO).count());
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            fail("Failed on Line Identity Test: " + e.getMessage());
+        }
+    }
+    
+    @Test
     public void lengthIdentityTest() {
         try {
-            RecordBO record = configLoader.loadRecord(LengthIdentityBean.class);
+            
+            assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
+            RecordBO record = configLoader.loadRecord(LengthIdentityBean.class.getAnnotation(Record.class));
 
             validateRecord(record, LengthIdentityBean.class);
-            validateLines(record, 1);
+            validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
             assertTrue("The Length Identity information was not loaded.", record.getRecordIdentity() instanceof LengthIdentityImpl);
@@ -129,10 +167,11 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
     @Test
     public void fieldIdentityTest() {
         try {
-            RecordBO record = configLoader.loadRecord(FieldIdentityBean.class);
+            assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
+            RecordBO record = configLoader.loadRecord(FieldIdentityBean.class.getAnnotation(Record.class));
 
             validateRecord(record, FieldIdentityBean.class);
-            validateLines(record, 1);
+            validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
             assertTrue("The Field Identity information was not loaded.", record.getRecordIdentity() instanceof FieldIdentityImpl);
@@ -158,10 +197,11 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
     @Test
     public void scriptIdentityTest() {
         try {
-            RecordBO record = configLoader.loadRecord(ScriptIdentityBean.class);
+            assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
+            RecordBO record = configLoader.loadRecord(ScriptIdentityBean.class.getAnnotation(Record.class));
 
             validateRecord(record, ScriptIdentityBean.class);
-            validateLines(record, 1);
+            validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
             assertTrue("The Length Identity information was not loaded.", record.getRecordIdentity() instanceof ScriptIdentityImpl);
@@ -187,10 +227,11 @@ public class RecordAnnotationTest extends AbstractBaseAnnotationTest {
     @Test
     public void scriptIdentityScriptFileTest() {
         try {
-            RecordBO record = configLoader.loadRecord(ScriptIdentityFileBean.class);
+            assertTrue("No Record annotation present.", LengthIdentityBean.class.isAnnotationPresent(Record.class));
+            RecordBO record = configLoader.loadRecord(ScriptIdentityFileBean.class.getAnnotation(Record.class));
 
             validateRecord(record, ScriptIdentityFileBean.class);
-            validateLines(record, 1);
+            validateLines(record.getRecordDefinition(), 1, 0);
             validateLine(record.getRecordDefinition().getLines().get(0), "", '\0');
 
             assertTrue("The Length Identity information was not loaded.", record.getRecordIdentity() instanceof ScriptIdentityImpl);

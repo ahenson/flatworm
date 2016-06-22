@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm.annotations.beans;
 
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.annotations.Scriptlet;
 
@@ -28,24 +29,24 @@ import lombok.Data;
  */
 @Data
 @Record(name = "ScriptIdentityBean",
-        scriptIdentity =
+        identity = @DataIdentity(scriptIdentity =
         @Scriptlet(
                 scriptEngine = "nashorn",
                 script = "function myFunction(fileFormat, line) { return true; }",
                 functionName = "myFunction",
-                apply = true
-        ),
-        beforeReadRecordScript = @Scriptlet (
+                enabled = true
+        )),
+        beforeReadRecordScript = @Scriptlet(
                 scriptEngine = "nashorn",
                 script = "function myFunction(fileFormat, line) { return true; }",
                 functionName = "myFunction",
-                apply = true
+                enabled = true
         ),
-        afterReadRecordScript = @Scriptlet (
+        afterReadRecordScript = @Scriptlet(
                 scriptEngine = "nashorn",
                 script = "function myFunction(fileFormat) { return true; }",
                 functionName = "myFunction",
-                apply = true
+                enabled = true
         )
 )
 public class ScriptIdentityBean {

@@ -72,6 +72,9 @@ Work Completed
 			* Parameters: `(LineBO line, String inputLine, Map<String, Object> beans, ConversionHelper conversionHelper)`
 			* Return: `ignored`
 * Added ability to specify multiple configuration options and then specify the preferred one at run time.
+* Added ability to create Line identifiers (vs. them inheriting purely from the record along). The Script Identity script will take three parameters:
+	* Parameters: `(FileFormat fileFormat, LineBO line, String line)`
+* Added support to "optional" lines. Meaning, the parser doesn't "skip" a line if a LineBO has an Identity set for lineIdentity but the line has no data present for a given record.
 
 TODOs
 -------

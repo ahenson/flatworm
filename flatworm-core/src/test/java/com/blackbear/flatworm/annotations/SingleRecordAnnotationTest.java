@@ -20,10 +20,13 @@ import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.MatchedRecord;
 import com.blackbear.flatworm.annotations.beans.RecordBeanFiveChildToOne;
 import com.blackbear.flatworm.annotations.beans.RecordBeanFourChildToTwo;
+import com.blackbear.flatworm.annotations.beans.RecordBeanNineChildToOne;
 import com.blackbear.flatworm.annotations.beans.RecordBeanOne;
+import com.blackbear.flatworm.annotations.beans.RecordBeanSevenChildToOne;
 import com.blackbear.flatworm.annotations.beans.RecordBeanSix;
 import com.blackbear.flatworm.annotations.beans.RecordBeanThreeChildToTwo;
 import com.blackbear.flatworm.annotations.beans.RecordBeanTwoChildToOne;
+import com.blackbear.flatworm.config.RecordBO;
 
 import org.junit.Test;
 
@@ -32,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -47,12 +51,25 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
     public void singleRecordAnnotationValueTest() {
 
         try (InputStream in = getClass().getClassLoader().getResourceAsStream("annotation_input.txt")) {
+            configLoader.setPerformValidation(true);
             FileFormat fileFormat = configLoader.loadConfiguration(RecordBeanOne.class, RecordBeanSix.class);
 
+            validateFileFormat(fileFormat, 2, false);
+            RecordBO recordOne = fileFormat.getRecords().get(0);
+            validateRecord(recordOne, RecordBeanOne.class);
+            validateRecordDefinition(recordOne, 2, 4);
+            
+            RecordBO recordTwo = fileFormat.getRecords().get(1);
+            validateRecord(recordTwo, RecordBeanSix.class);
+            validateRecordDefinition(recordTwo, 1, 0);
+            
             assertNotNull("FileFormat returned as null.", fileFormat);
 
             BufferedReader bufIn = new BufferedReader(new InputStreamReader(in));
 
+            // ---------------------------------------------------------
+            // Load the first record
+            // ---------------------------------------------------------
             MatchedRecord matchedRecord = fileFormat.nextRecord(bufIn);
             assertNotNull("Null MatchedRecord returned when not expected.", matchedRecord);
             assertEquals("RecordBeanOne", matchedRecord.getRecordName());
@@ -65,14 +82,14 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertEquals("RecordBeanOne.valueOne value is incorrect", "valueOne", beanOne.getValueOne());
             assertEquals("RecordBeanOne.valueTwo value is incorrect", "valueTwo", beanOne.getValueTwo());
 
-            // Child Two
+            // Child 2
             assertNotNull("Failed to load RecordBeanTwoChildToOne instances.", beanOne.getBeanTwoList());
             assertEquals("Failed to load correct number of RecordBeanTwoChildToOne instances", 2, beanOne.getBeanTwoList().size());
             RecordBeanTwoChildToOne beanTwo = beanOne.getBeanTwoList().get(0);
             assertEquals("RecordBeanTwoChildToOne.valueOne value is incorrect", "valueOne2A", beanTwo.getValueOne());
             assertEquals("RecordBeanTwoChildToOne.valueTwo value is incorrect", "valueTwo2A", beanTwo.getValueTwo());
 
-            // Child Four (beanTwo - instance 0)
+            // Child 4 (beanTwo - instance 0)
             assertNotNull("Failed to load RecordBeanFourChildToTwo instances.", beanTwo.getBeanFourList());
             assertEquals("Failed to load correct number of RecordBeanFourChildToTwo instances", 1, beanTwo.getBeanFourList().size());
             RecordBeanFourChildToTwo beanFour = beanTwo.getBeanFourList().get(0);
@@ -83,7 +100,7 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
             assertEquals("RecordBeanTwoChildToOne.valueOne value is incorrect", "valueOne2B", beanTwo.getValueOne());
             assertEquals("RecordBeanTwoChildToOne.valueTwo value is incorrect", "valueTwo2B", beanTwo.getValueTwo());
 
-            // Child Three (of beanTwo - instance 1)
+            // Child 3 (of beanTwo - instance 1)
             assertNotNull("Failed to load RecordBeanThreeChildToTwo instances.", beanTwo.getBeanThreeList());
             assertEquals("Failed to load correct number of RecordBeanThreeChildToTwo instances", 1, beanTwo.getBeanThreeList().size());
             RecordBeanThreeChildToTwo beanThree = beanTwo.getBeanThreeList().get(0);
@@ -93,10 +110,31 @@ public class SingleRecordAnnotationTest extends AbstractBaseAnnotationTest {
             // Child 5 (of beanOne - this is a single instance).
             assertNotNull("Null RecordBeanFiveChildToOne", beanOne.getBeanFive());
             RecordBeanFiveChildToOne beanFive = beanOne.getBeanFive();
-            assertEquals("RecordBeanFiveChildToOne.valueOne value is incorrect", "valueOne5      ", beanFive.getValueOne());
-            assertEquals("RecordBeanFiveChildToOne.valueTwo value is incorrect", "valueTwo5      ", beanFive.getValueTwo());
+            assertEquals("RecordBeanFiveChildToOne.valueOne value is incorrect", "valueOne5", beanFive.getValueOne());
+            assertEquals("RecordBeanFiveChildToOne.valueTwo value is incorrect", "valueTwo5", beanFive.getValueTwo());
 
+            // Child 7 (of beanOne - this is a collection).
+            assertNotNull("Null RecordBeanSevenChildToOne collection", beanOne.getBeanSevens());
+            assertFalse("Empty RecordBeanSevenChildToOne collection", beanOne.getBeanSevens().isEmpty());
+            assertEquals("Incorrect number of RecordBeanSevenChildToOne instances loaded", 3, beanOne.getBeanSevens().size());
+            
+            for(int i = 0; i < beanOne.getBeanSevens().size(); i++) {
+                RecordBeanSevenChildToOne beanSeven = beanOne.getBeanSevens().get(i);
+                assertEquals("RecordBeanSevenChildToOne.valueOne value is incorrect", String.format("valueOne7%d     ", (i + 1)), 
+                        beanSeven.getValueOne());
+                assertEquals("RecordBeanSevenChildToOne.valueTwo value is incorrect", String.format("valueTwo7%d     ", (i + 1)), 
+                        beanSeven.getValueTwo());
+            }
+            
+            // Child 9 (of beanOne - this is a single instance).
+            assertNotNull("Null RecordBeanNineChildToOne", beanOne.getBeanNine());
+            RecordBeanNineChildToOne beanNine = beanOne.getBeanNine();
+            assertEquals("RecordBeanNineChildToOne.valueOne value is incorrect", "valueOne9", beanNine.getValueOne());
+            assertEquals("RecordBeanNineChildToOne.valueTwo value is incorrect", "valueTwo9", beanNine.getValueTwo());
+            
+            // ---------------------------------------------------------
             // Load the next record - which should be RecordBeanSix.
+            // ---------------------------------------------------------
             matchedRecord = fileFormat.nextRecord(bufIn);
             assertNotNull("Null MatchedRecord returned when not expected.", matchedRecord);
             assertEquals("RecordBeanSix", matchedRecord.getRecordName());

@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm.annotations.otherbean;
 
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.LengthIdentity;
 import com.blackbear.flatworm.annotations.Record;
 
@@ -28,12 +29,12 @@ import lombok.Data;
  */
 @Data
 @Record(name = "RecordBeanOther",
-        lengthIdentity =
+        identity = @DataIdentity(lengthIdentity =
         @LengthIdentity(
                 minLength = 0,
                 maxLength = 3,
-                apply = true
-        ))
+                enabled = true
+        )))
 public class RecordBeanOther {
-    
+
 }

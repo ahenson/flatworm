@@ -17,8 +17,12 @@
 package com.blackbear.flatworm.config.impl;
 
 import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.config.LineBO;
 import com.blackbear.flatworm.config.RecordBO;
 import com.blackbear.flatworm.errors.FlatwormParserException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -46,11 +50,52 @@ public class LengthIdentityImpl extends AbstractIdentity {
      * @param line       The line of data to be evaluated.
      * @return {@code true} the {@code line} of data fits within the {@code minLength} and {@code maxLength} ranges provided for this {@link
      * FieldIdentityImpl} instance.
-     * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script not be a
-     *                                 {@code boolean} value.
+     * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script
+     *                                 not be a {@code boolean} value.
      */
     @Override
     public boolean matchesIdentity(RecordBO record, FileFormat fileFormat, String line) throws FlatwormParserException {
+        return doesMatchIdentity(line);
+    }
+
+    @Override
+    public void write(BufferedWriter writer, RecordBO record, LineBO line) throws IOException {
+        super.write(writer, record, line);
+    }
+
+    /**
+     * Determine if the given LineBO should be used to parse the line.
+     *
+     * @param line       The {@link LineBO} instance that is a candidate for performing the parsing.
+     * @param fileFormat The {@link FileFormat} instance representing the configuration that is driving the parsing and the last line that
+     *                   was read.
+     * @param dataLine   The line of data to be evaluated.
+     * @return {@code true} the {@code line} of data fits within the {@code minLength} and {@code maxLength} ranges provided for this {@link
+     * FieldIdentityImpl} instance.
+     * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script
+     *                                 not be a {@code boolean} value.
+     */
+    @Override
+    public boolean matchesIdentity(LineBO line, FileFormat fileFormat, String dataLine) throws FlatwormParserException {
+        return doesMatchIdentity(dataLine);
+    }
+
+    /**
+     * Perform the matching logic using the full configuration.
+     *
+     * @param line The data line to test.
+     * @return {@code true} the {@code line} of data fits within the {@code minLength} and {@code maxLength} ranges provided for this {@link
+     * FieldIdentityImpl} instance.
+     */
+    private boolean doesMatchIdentity(String line) {
         return line.length() >= minLength && line.length() <= maxLength;
+    }
+
+    @Override
+    public String toString() {
+        return "LengthIdentityImpl{" +
+                "minLength=" + minLength +
+                ", maxLength=" + maxLength +
+                '}';
     }
 }

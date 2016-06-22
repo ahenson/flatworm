@@ -16,7 +16,6 @@
 
 package com.blackbear.flatworm.config;
 
-import com.blackbear.flatworm.CardinalityMode;
 import com.blackbear.flatworm.config.impl.FieldIdentityImpl;
 
 import lombok.Data;
@@ -27,22 +26,11 @@ import lombok.EqualsAndHashCode;
 public class SegmentElementBO extends AbstractLineElementCollection implements LineElement {
     private FieldIdentityImpl fieldIdentity;
 
-    private int minCount;
-    private int maxCount;
-    private String propertyName;
-    private String beanRef;
-    private String parentBeanRef;
-    private String addMethod;
-
     private Integer order;
 
-    private CardinalityMode cardinalityMode;
+    private CardinalityBO cardinality;
 
     private LineBO parentLine;
-
-    public void setBeanRef(String beanRef) {
-        this.beanRef = beanRef;
-    }
 
     public boolean matchesIdentity(LineToken lineToken) {
         boolean matchesId = false;
@@ -58,13 +46,7 @@ public class SegmentElementBO extends AbstractLineElementCollection implements L
     public String toString() {
         return "SegmentElementBO{" +
                 "fieldIdentity=" + fieldIdentity +
-                ", minCount=" + minCount +
-                ", maxCount=" + maxCount +
-                ", propertyName='" + propertyName + '\'' +
-                ", beanRef='" + beanRef + '\'' +
-                ", parentBeanRef='" + parentBeanRef + '\'' +
-                ", addMethod='" + addMethod + '\'' +
-                ", cardinalityMode=" + cardinalityMode +
+                ", cardinality=" + cardinality +
                 '}';
     }
 }

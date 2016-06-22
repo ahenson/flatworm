@@ -17,15 +17,20 @@
 package com.blackbear.flatworm.config;
 
 import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.ParseUtils;
 import com.blackbear.flatworm.converters.ConversionHelper;
 import com.blackbear.flatworm.errors.FlatwormParserException;
+import com.blackbear.flatworm.errors.UncheckedFlatwormParserException;
 
 import java.io.BufferedReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -55,29 +60,50 @@ public class RecordBO {
      */
     public static final char SCRIPT_IDENTITY_CODE = 'S';
 
+    @Getter
+    @Setter
     private String name;
 
+    @Getter
+    @Setter
     private Identity recordIdentity;
 
+    @Getter
+    @Setter
     private RecordDefinitionBO recordDefinition;
 
+    @Getter
+    @Setter
+    private CardinalityBO cardinality;
+
+    @Getter
+    @Setter
     private ScriptletBO beforeScriptlet;
+
+    @Getter
+    @Setter
     private ScriptletBO afterScriptlet;
-    
+
+    @Getter
+    @Setter
     private FileFormat parentFileFormat;
 
+    @Getter
+    private boolean parsedLastReadLine;
+    
+    @Getter
+    private String lastReadLine;
+    
     public RecordBO() {
     }
 
     /**
      * Determine if this {@code RecordBO} instance is capable of parsing the given line.
      *
-     * @param fileFormat not used at this time, for later expansion?
+     * @param fileFormat the parent {@link FileFormat} instance that contains the master configuration.
      * @param line       the input line from the file being parsed.
-     * @return boolean does this line match according to the defined criteria?
-     * @throws FlatwormParserException should the script function lack the {@code DEFAULT_SCRIPT_IDENTITY_FUNCTION_NAME} function, which should take
-     *                                 one parameter, the {@link FileFormat} instance - the method should return {@code true} if the line
-     *                                 should be parsed by this {@code RecordBO} instance and {@code false} if not.
+     * @return {@code true} if the {@link RecordBO} instance identifies the line and can parse it and {@code false} if not.
+     * @throws FlatwormParserException should the matching logic fail for any reason.
      */
     public boolean matchesLine(FileFormat fileFormat, String line) throws FlatwormParserException {
         boolean matchesLine = true;
@@ -85,22 +111,6 @@ public class RecordBO {
             matchesLine = recordIdentity.matchesIdentity(this, fileFormat, line);
         }
         return matchesLine;
-    }
-
-    /**
-     * If the RecordBO's {@link Identity} is an implementation of the {@link LineTokenIdentity} then pass it the {@code lineToken} instance
-     * to see if it matches with the configured identity.
-     *
-     * @param lineToken The {@link LineToken} to test.
-     * @return {@code true} if the {@code recordIdentity} property is set to an instance of {@link LineTokenIdentity} and its {@code
-     * matchesIdentity} return {@code true}. All other cases return {@code false}.
-     */
-    public boolean matchesIdentifier(LineToken lineToken) {
-        boolean matches = false;
-        if (recordIdentity instanceof LineTokenIdentity) {
-            matches = LineTokenIdentity.class.cast(recordIdentity).matchesIdentity(lineToken);
-        }
-        return matches;
     }
 
     /**
@@ -117,6 +127,7 @@ public class RecordBO {
         Map<String, Object> beans = new HashMap<>();
         try {
 
+            // TODO - Reconsider this approach.
             Object beanObj;
             for (BeanBO bean : recordDefinition.getBeans()) {
                 beanObj = bean.getBeanObjectClass().newInstance();
@@ -124,13 +135,51 @@ public class RecordBO {
             }
 
             List<LineBO> lines = recordDefinition.getLines();
-            String inputLine = firstLine;
+            List<LineBO> linesWithIdentities = recordDefinition.getLinesWithIdentities();
+            lastReadLine = firstLine;
+            
+            // Process all of the sequential lines first - for a record there will always be at least one sequential line..
             for (int i = 0; i < lines.size(); i++) {
                 LineBO line = lines.get(i);
-                line.parseInput(inputLine, beans, conversionHelper);
+                line.parseInput(lastReadLine, beans, conversionHelper, recordIdentity);
+                addBeanToBean(line, beans);
+                
+                parsedLastReadLine = true;
                 if (i + 1 < lines.size()) {
-                    inputLine = in.readLine();
+                    lastReadLine = in.readLine();
                 }
+            }
+
+            if (!linesWithIdentities.isEmpty()) {
+                boolean continueParsing = true;
+                do {
+                    lastReadLine = in.readLine();
+                    Optional<LineBO> matchingLine = linesWithIdentities
+                            .stream()
+                            .filter(line -> {
+                                try {
+                                    return line.getLineIdentity().matchesIdentity(line, parentFileFormat, lastReadLine);
+                                }
+                                catch(FlatwormParserException e) {
+                                    throw new UncheckedFlatwormParserException("Failed to run matchesIdentity on line: " + line, e);
+                                }
+                            })
+                            .findFirst();
+                    if(matchingLine.isPresent()) {
+                        matchingLine.get().parseInput(lastReadLine, beans, conversionHelper, matchingLine.get().getLineIdentity());
+                        addBeanToBean(matchingLine.get(), beans);
+                        parsedLastReadLine = true;
+                        
+                        if(matchingLine.get().getRecordEndLine()) {
+                            continueParsing = false;
+                        }
+                    }
+                    else {
+                        continueParsing = false;
+                        parsedLastReadLine = false;
+                    }
+                }
+                while(continueParsing);
             }
 
         } catch (Exception e) {
@@ -139,11 +188,31 @@ public class RecordBO {
         return beans;
     }
 
+    /**
+     * If the {@link LineBO} configuration results in the need to add a built out bean to another bean, do it here.
+     * @param line The {@link LineBO} instance whose configuration information will be inspected to see if we need to add a bean to a bean.
+     * @param beans The {@link Map} of loaded beans thus far.
+     * @throws FlatwormParserException should invoking the reflective properties fail for any reason.
+     */
+    private void addBeanToBean(LineBO line, Map<String, Object> beans) throws FlatwormParserException {
+        // See if this is a Field-defined line - meaning we need to update a bean.
+        if(line.isPropertyLine()) {
+            Object parentBean = beans.get(line.getCardinality().getParentBeanRef());
+            Object toAdd = beans.get(line.getCardinality().getBeanRef());
+            
+            ParseUtils.addObjectToProperty(parentBean, toAdd, line.getCardinality());
+            
+            // Refresh in case we have to build another one.
+            beans.put(line.getCardinality().getBeanRef(), ParseUtils.newBeanInstance(toAdd));
+        }
+    }
+    
     @Override
     public String toString() {
         return "RecordBO{" +
                 "name='" + name + '\'' +
                 ", recordIdentity=" + recordIdentity +
+                ", recordDefinition=" + recordDefinition +
                 '}';
     }
 }

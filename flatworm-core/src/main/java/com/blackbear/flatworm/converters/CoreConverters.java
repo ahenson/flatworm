@@ -104,7 +104,7 @@ public class CoreConverters {
     /**
      * Date to String conversion function.
      *
-     * @param obj     source object of converterName {@link Date}.
+     * @param obj     source object of type {@link Date}.
      * @param options The conversion-option values for the field
      * @return the string result
      */

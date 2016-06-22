@@ -17,31 +17,46 @@
 package com.blackbear.flatworm.annotations.beans;
 
 import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
+import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.ForProperty;
+import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.annotations.RecordElement;
 
 import lombok.Data;
 
 /**
- * A more complex bean used to test the DefaultAnnotationConfigurationReaderImpl instance.
+ * A bean for testing the Line annotation as a field annotation.
  *
  * @author Alan Henson
  */
 @Data
 @Record(
-        name = "RecordBeanSix",
-        identity = @DataIdentity(lengthIdentity = @LengthIdentity(
-                minLength = 30,
-                maxLength = 30,
-                enabled = true
-        ))
+        name = "RecordBeanWithChildLine",
+        identity = @DataIdentity(
+                fieldIdentity = @FieldIdentity(
+                        matchIdentities = {"LB1"},
+                        enabled = true
+                )
+        )
 )
-public class RecordBeanSix {
+public class RecordBeanWithChildLine {
 
-    @RecordElement(order = 1, length = 15)
+    @RecordElement
     private String valueOne;
 
-    @RecordElement(order = 2, length = 15)
+    @RecordElement
     private String valueTwo;
+
+    @Line(
+            forProperty = @ForProperty(
+                    enabled = true,
+                    identity = @DataIdentity(
+                            fieldIdentity = @FieldIdentity(
+                                    matchIdentities = "LBC",
+                                    enabled = true
+                            )
+                    ))
+    )
+    private RecordBeanTheChildLine childLine;
 }

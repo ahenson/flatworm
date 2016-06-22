@@ -25,7 +25,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +64,9 @@ public class FileFormat {
 
     @Getter
     private MatchedRecord lastRecordRead;
+    
+    @Getter
+    private RecordBO lastParsingRecord;
 
     public FileFormat() {
         records = new HashMap<>();
@@ -98,6 +100,7 @@ public class FileFormat {
                 break;
             }
         }
+        
         return result;
     }
 
@@ -135,13 +138,17 @@ public class FileFormat {
     public MatchedRecord nextRecord(BufferedReader in) throws FlatwormParserException, IOException {
 
         MatchedRecord matchedRecord = null;
-        currentParsedLine = in.readLine();
-        lineNumber++;
+        if (lastParsingRecord == null || lastParsingRecord.isParsedLastReadLine()) {
+            currentParsedLine = in.readLine();
+            lineNumber++;
+        } else if(lastParsingRecord != null) {
+            currentParsedLine = lastParsingRecord.getLastReadLine();
+        }
 
         if (currentParsedLine != null) {
             RecordBO record = findMatchingRecord(currentParsedLine);
             if (record != null) {
-
+                lastParsingRecord = record;
                 if (record.getBeforeScriptlet() != null) {
                     record.getBeforeScriptlet().invokeFunction(this, currentParsedLine);
                 }

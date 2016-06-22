@@ -14,26 +14,23 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations.beans;
+package com.blackbear.flatworm.annotations;
 
-import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
-import com.blackbear.flatworm.annotations.Record;
-
-import lombok.Data;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Basic bean for testing the LengthIdentity annotation.
- *
+ * Encapsulates the possible {@link com.blackbear.flatworm.config.Identity} configuration options.
  * @author Alan Henson
  */
-@Data
-@Record(name = "LengthIdentityBean",
-        identity = @DataIdentity(lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                enabled = true
-        )))
-public class LengthIdentityBean {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
+public @interface DataIdentity {
+    LengthIdentity lengthIdentity() default @LengthIdentity(minLength = -1, maxLength = -1, enabled = false);
+    FieldIdentity fieldIdentity() default @FieldIdentity(startPosition = -1, enabled = false, matchIdentities = {});
+    Scriptlet scriptIdentity() default @Scriptlet;
 }

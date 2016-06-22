@@ -52,11 +52,19 @@ public class AbstractBaseAnnotationTest {
         assertEquals("Incorrect number of Records loaded to FileFormat.", expectedRecordCount, fileFormat.getRecords().size());
     }
     
-    public void validateLines(RecordBO recordBO, int expectedLineCount) {
-        assertNotNull("Null RecordDefinition instance.", recordBO.getRecordDefinition());
-        assertNotNull("Null RecordDefinition.Lines.", recordBO.getRecordDefinition().getLines());
-        assertFalse("Empty RecordDefinition.Lines.", recordBO.getRecordDefinition().getLines().isEmpty());
-        assertEquals("RecordDefinition.line size is incorrect.", expectedLineCount, recordBO.getRecordDefinition().getLines().size());
+    public void validateLines(RecordDefinitionBO recordDefinition, int expectedLinesCount, int expectedLinesWithIdentitiesCount) {
+        if (expectedLinesCount > 0) {
+            assertNotNull("Null RecordDefinition.lines.", recordDefinition.getLines());
+            assertFalse("Empty RecordDefinition.lines.", recordDefinition.getLines().isEmpty());
+            assertEquals("RecordDefinition.lines size is incorrect.", expectedLinesCount, recordDefinition.getLines().size());
+        }
+
+        if (expectedLinesWithIdentitiesCount > 0) {
+            assertNotNull("Null RecordDefinition.linesWithIdentities.", recordDefinition.getLinesWithIdentities());
+            assertFalse("Empty RecordDefinition.linesWithIdentities.", recordDefinition.getLinesWithIdentities().isEmpty());
+            assertEquals("RecordDefinition.linesWithIdentities size is incorrect.", expectedLinesWithIdentitiesCount, 
+                    recordDefinition.getLinesWithIdentities().size());
+        }
     }
     
     public void validateLine(LineBO line, String expectedDelimiter, char expectedQuotChar) {
@@ -76,12 +84,13 @@ public class AbstractBaseAnnotationTest {
         assertNotNull(String.format("%s.recordDefinition was not loaded.", record.getName()), record.getRecordDefinition());
     }
 
-    public void validateRecordDefinition(RecordBO record, RecordDefinitionBO definition, int expectedLineCount) {
-        assertNotNull(String.format("Null line collection for %s.recordDefinition.", record.getName()), definition.getLines());
-        assertEquals(String.format("Incorrect number of lines loaded for %s.recordDefinition", record.getName()), 
-                expectedLineCount, definition.getLines().size());
+    public void validateRecordDefinition(RecordBO record, int expectedLinesCount, int expectedLinesWithIdentitiesCount) {
+        RecordDefinitionBO definition = record.getRecordDefinition();
+        assertNotNull("Null RecordDefinition instance", record.getRecordDefinition());
         assertNotNull(String.format("Null %s.parentRecord", record.getName()), definition.getParentRecord());
         assertTrue(String.format("Incorrect %s.parentRecord", record.getName()), record == definition.getParentRecord());
+        
+        validateLines(definition, expectedLinesCount, expectedLinesWithIdentitiesCount);
     }
     
     public void validateScriptlet(ScriptletBO scriptlet, String expectedEngineName, 

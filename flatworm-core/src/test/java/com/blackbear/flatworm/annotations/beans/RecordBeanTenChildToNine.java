@@ -16,24 +16,21 @@
 
 package com.blackbear.flatworm.annotations.beans;
 
-import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
-import com.blackbear.flatworm.annotations.Record;
+import com.blackbear.flatworm.annotations.RecordElement;
 
 import lombok.Data;
 
 /**
- * Basic bean for testing the LengthIdentity annotation.
+ * A more complex bean used to test the DefaultAnnotationConfigurationReaderImpl instance.
  *
  * @author Alan Henson
  */
 @Data
-@Record(name = "LengthIdentityBean",
-        identity = @DataIdentity(lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                enabled = true
-        )))
-public class LengthIdentityBean {
+public class RecordBeanTenChildToNine {
+
+    @RecordElement
+    private String valueOne;
+
+    @RecordElement
+    private String valueTwo;
 }

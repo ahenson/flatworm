@@ -31,9 +31,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface FieldIdentity {
-    int startPosition();
-    int fieldLength();
+    int startPosition() default 0;
+    int fieldLength() default -1;
     boolean ignoreCase() default false;
-    boolean apply();
+    boolean enabled();
     String[] matchIdentities();
 }

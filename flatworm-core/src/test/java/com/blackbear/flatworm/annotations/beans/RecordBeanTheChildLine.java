@@ -17,23 +17,38 @@
 package com.blackbear.flatworm.annotations.beans;
 
 import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
-import com.blackbear.flatworm.annotations.Record;
+import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.ForProperty;
+import com.blackbear.flatworm.annotations.Line;
+import com.blackbear.flatworm.annotations.RecordElement;
+
+import java.util.List;
 
 import lombok.Data;
 
 /**
- * Basic bean for testing the LengthIdentity annotation.
+ * A child bean for testing the Line annotation as a field annotation.
  *
  * @author Alan Henson
  */
 @Data
-@Record(name = "LengthIdentityBean",
-        identity = @DataIdentity(lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                enabled = true
-        )))
-public class LengthIdentityBean {
+public class RecordBeanTheChildLine {
+
+    @RecordElement
+    private String valueOne;
+
+    @RecordElement
+    private String valueTwo;
+
+    @Line(
+            forProperty = @ForProperty(
+                    enabled = true,
+                    identity = @DataIdentity(
+                            fieldIdentity = @FieldIdentity(
+                                    matchIdentities = "LCC",
+                                    enabled = true
+                            )
+                    ))
+    )
+    private List<RecordBeanTheChildOfChildLine> childChildLines;
 }

@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 
 /**
  * Mimics a {@code record} configuration within the XML flatworm configuration file. Note that if more than one {@link
- * com.blackbear.flatworm.config.Identity} record is specified with the {@code apply} flag set to {@code true}, the first one read will be
+ * com.blackbear.flatworm.config.Identity} record is specified with the {@code enabled} flag set to {@code true}, the first one read will be
  * the one that is used. Presently, the order is {@link LengthIdentity} then {@link FieldIdentity}, and then {@link Scriptlet}.
  *
  * @author Alan Henson

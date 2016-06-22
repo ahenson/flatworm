@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm.annotations.beans;
 
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.LengthIdentity;
 import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
@@ -29,13 +30,14 @@ import lombok.Data;
  */
 @Data
 @Record(name = "LineBean",
-        lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                apply = true
-        ),
-        lines = {@Line(delimiter = "|", id = "line", quoteCharacter = '"')}
+        identity = @DataIdentity(
+                lengthIdentity =
+                @LengthIdentity(
+                        minLength = 0,
+                        maxLength = 3,
+                        enabled = true
+                )),
+        lines = {@Line(delimiter = "|", quoteCharacter = '"')}
 )
 public class LineBean {
 }

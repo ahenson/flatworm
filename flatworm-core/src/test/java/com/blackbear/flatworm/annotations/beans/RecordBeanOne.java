@@ -16,7 +16,9 @@
 
 package com.blackbear.flatworm.annotations.beans;
 
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.ForProperty;
 import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.annotations.RecordElement;
@@ -36,44 +38,56 @@ import lombok.Data;
 @Data
 @Record(
         name = "RecordBeanOne",
-        fieldIdentity = @FieldIdentity(
-                startPosition = 0,
-                fieldLength = 4,
+        identity = @DataIdentity(fieldIdentity = @FieldIdentity(
                 ignoreCase = true,
-                apply = true,
+                enabled = true,
                 matchIdentities = {"TEST"}
+        )),
+        lines = @Line(
+                delimiter = "|"
         ),
-        lines = {
-                @Line(delimiter = "|"),
-                @Line(id = "line2")
-        },
         afterReadRecordScript = @Scriptlet(
                 scriptEngine = "nashorn",
                 scriptFile = "before_after_script_test.js",
                 functionName = "modifyRecord",
-                apply = true
+                enabled = true
         )
 )
 public class RecordBeanOne {
-
     @RecordElement(order = 1)
     private String valueOne;
 
     @RecordElement(order = 2)
     private String valueTwo;
 
+    public RecordBeanOne() {
+        this.beanSevens = new ArrayList<>();
+    }
+    
     @SegmentElement(
             order = 3,
-            fieldIdentity = @FieldIdentity(startPosition = 0, fieldLength = 3, ignoreCase = true, apply = true, matchIdentities = {"RB2"}))
+            fieldIdentity = @FieldIdentity(ignoreCase = true, enabled = true, matchIdentities = {"RB2"}))
     private List<RecordBeanTwoChildToOne> beanTwoList = new ArrayList<>();
 
-    public void addBeanTwo(RecordBeanTwoChildToOne beanTwo) {
-        beanTwoList.add(beanTwo);
-    }
-
-    @SegmentElement(
-            order = 4,
-            lineId = "line2"
-    )
+    @Line(delimiter = ",", forProperty = @ForProperty(enabled = true))
     private RecordBeanFiveChildToOne beanFive;
+
+    @Line(
+            forProperty = @ForProperty(
+                    enabled = true,
+                    identity = @DataIdentity(
+                            fieldIdentity = @FieldIdentity(matchIdentities = {"RB7"}, enabled = true)
+                    ))
+    )
+    private List<RecordBeanSevenChildToOne> beanSevens;
+
+    @Line(
+            delimiter = "|",
+            forProperty = @ForProperty(
+                    enabled = true,
+                    identity = @DataIdentity(
+                            fieldIdentity = @FieldIdentity(matchIdentities = {"RB9"}, enabled = true)
+                    ))
+    )
+    private RecordBeanNineChildToOne beanNine;
 }

@@ -21,8 +21,9 @@ package com.blackbear.flatworm.config;
  * be made up of the same components, they server the same purpose there
  */
 public interface LineElement {
-    String getBeanRef();
-
+    
+    CardinalityBO getCardinality();
+    
     void setParentLine(LineBO line);
 
     Integer getOrder();

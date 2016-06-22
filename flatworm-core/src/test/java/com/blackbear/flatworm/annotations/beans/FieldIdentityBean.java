@@ -16,6 +16,7 @@
 
 package com.blackbear.flatworm.annotations.beans;
 
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.FieldIdentity;
 import com.blackbear.flatworm.annotations.Record;
 
@@ -28,13 +29,11 @@ import lombok.Data;
  */
 @Data
 @Record(name = "FieldIdentityBean",
-        fieldIdentity =
+        identity = @DataIdentity(fieldIdentity =
         @FieldIdentity(
-                startPosition = 0,
-                fieldLength = 3,
                 ignoreCase = true,
                 matchIdentities = {"FLD"},
-                apply = true
-        ))
+                enabled = true
+        )))
 public class FieldIdentityBean {
 }

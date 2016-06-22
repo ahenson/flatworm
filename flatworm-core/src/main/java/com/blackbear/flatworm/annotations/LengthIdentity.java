@@ -34,5 +34,5 @@ public @interface LengthIdentity {
 
     int minLength();
     int maxLength();
-    boolean apply();
+    boolean enabled();
 }

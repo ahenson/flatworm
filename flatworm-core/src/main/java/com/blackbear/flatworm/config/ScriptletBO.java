@@ -176,4 +176,14 @@ public class ScriptletBO {
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ScriptletBO{" +
+                "scriptEngineName='" + scriptEngineName + '\'' +
+                ", functionName='" + functionName + '\'' +
+                ", scriptFile='" + scriptFile + '\'' +
+                ", script='" + script + '\'' +
+                '}';
+    }
 }

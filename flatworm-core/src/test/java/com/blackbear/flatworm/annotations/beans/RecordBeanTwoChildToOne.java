@@ -38,16 +38,16 @@ public class RecordBeanTwoChildToOne {
     @RecordElement(order = 2)
     private String valueTwo;
 
-    @RecordElement (order = 1)
+    @RecordElement(order = 1)
     private String valueOne;
 
     @SegmentElement(
             order = 3,
-            fieldIdentity = @FieldIdentity(startPosition = 0, fieldLength = 3, ignoreCase = true, apply = true, matchIdentities = {"RB3"}))
+            fieldIdentity = @FieldIdentity(startPosition = 0, ignoreCase = true, enabled = true, matchIdentities = {"RB3"}))
     private List<RecordBeanThreeChildToTwo> beanThreeList = new ArrayList<>();
 
     @SegmentElement(
             order = 4,
-            fieldIdentity = @FieldIdentity(startPosition = 0, fieldLength = 3, ignoreCase = true, apply = true, matchIdentities = {"RB4"}))
+            fieldIdentity = @FieldIdentity(startPosition = 0, ignoreCase = true, enabled = true, matchIdentities = {"RB4"}))
     private List<RecordBeanFourChildToTwo> beanFourList = new ArrayList<>();
 }

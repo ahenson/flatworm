@@ -72,5 +72,5 @@ public @interface Scriptlet {
      *
      * @return {@code true} if the {@code Scriptlet} is to be processed and executed and {@code false} if not.
      */
-    boolean apply() default false;
+    boolean enabled() default false;
 }

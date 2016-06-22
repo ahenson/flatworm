@@ -16,7 +16,7 @@
 
 package com.blackbear.flatworm;
 
-import com.blackbear.flatworm.config.SegmentElementBO;
+import com.blackbear.flatworm.config.CardinalityBO;
 import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import com.blackbear.flatworm.errors.FlatwormParserException;
 
@@ -24,7 +24,9 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 public class ParseUtils {
     /**
@@ -39,6 +41,23 @@ public class ParseUtils {
             return beanType.getClass().newInstance();
         } catch (Exception e) {
             throw new FlatwormParserException("Unable to create new instance of bean '" + beanType.getClass() + "'", e);
+        }
+    }
+
+    /**
+     * Determine how best to add an object to another object based upon the {@link CardinalityBO} configuration.
+     *
+     * @param target      The object to be updated.
+     * @param toAdd       The object to add to the {@code target} object.
+     * @param cardinality The {@link CardinalityBO} instance that defines how the updates are to occur.
+     * @throws FlatwormParserException should updating the object fail for any reason or if the cardinality rules are violated.
+     */
+    public static void addObjectToProperty(Object target, Object toAdd, CardinalityBO cardinality)
+            throws FlatwormParserException {
+        if (cardinality.getCardinalityMode() == CardinalityMode.SINGLE) {
+            setProperty(target, cardinality.getPropertyName(), toAdd);
+        } else {
+            addValueToCollection(cardinality, target, toAdd);
         }
     }
 
@@ -62,17 +81,65 @@ public class ParseUtils {
      * Determine how best to add the {@code toAdd} instance to the collection found in {@code target} by seeing if either the {@code
      * Segment.addMethod} has a value or if {@code Segment.propertyName} has a value. If neither values exist then no action is taken.
      *
-     * @param segment The {@link SegmentElementBO} instance containing the configuration information.
-     * @param target  The instance with the collection to which the {@code toAdd} instance is to be added.
-     * @param toAdd   The instance to be added to the specified collection.
+     * @param cardinality The {@link CardinalityBO} instance containing the configuration information.
+     * @param target      The instance with the collection to which the {@code toAdd} instance is to be added.
+     * @param toAdd       The instance to be added to the specified collection.
      * @throws FlatwormParserException should the attempt to add the {@code toAdd} instance to the specified collection fail for any
      *                                 reason.
      */
-    public static void addValueToCollection(SegmentElementBO segment, Object target, Object toAdd) throws FlatwormParserException {
-        if (!StringUtils.isBlank(segment.getPropertyName())) {
-            addValueToCollection(target, segment.getPropertyName(), toAdd);
-        } else if (!StringUtils.isBlank(segment.getAddMethod())) {
-            invokeAddMethod(target, segment.getAddMethod(), toAdd);
+    public static void addValueToCollection(CardinalityBO cardinality, Object target, Object toAdd) throws FlatwormParserException {
+        if (cardinality.getCardinalityMode() != CardinalityMode.SINGLE) {
+
+            boolean addToCollection = true;
+            if (cardinality.getCardinalityMode() == CardinalityMode.STRICT
+                    || cardinality.getCardinalityMode() == CardinalityMode.RESTRICTED) {
+
+                try {
+                    PropertyDescriptor propDesc = PropertyUtils.getPropertyDescriptor(target, cardinality.getPropertyName());
+                    Object currentValue = PropertyUtils.getProperty(target, cardinality.getPropertyName());
+                    int currentSize;
+                    
+                    if(Collection.class.isAssignableFrom(propDesc.getPropertyType())) {
+                        currentSize = Collection.class.cast(currentValue).size();
+                    }
+                    else if(propDesc.getPropertyType().isArray()) {
+                        currentSize = Array.getLength(currentValue);
+                    }
+                    else {
+                        throw new FlatwormParserException(String.format("Bean %s has a Cardinality Mode of %s for property %s, " +
+                                "suggesting that it is an Array or some instance of java.util.Collection. However, the property type " +
+                                "is %s, which is not currently supported.",
+                                target.getClass().getName(), cardinality.getCardinalityMode().name(), 
+                                cardinality.getPropertyName(), propDesc.getPropertyType().getName()));
+                    }
+                    
+                    addToCollection = currentSize < cardinality.getMaxCount() || cardinality.getMaxCount() < 0;
+                    
+                } catch (Exception e) {
+                    throw new FlatwormParserException(String.format("Failed to load property %s on bean %s when determining if a " +
+                            "value could be added to the collection.", cardinality.getPropertyName(), target.getClass().getName()), e);
+                }
+
+                if (!addToCollection && cardinality.getCardinalityMode() == CardinalityMode.STRICT) {
+                    throw new FlatwormParserException(String.format("Cardinality limit of %d exceeded for property %s of bean %s " +
+                                    "with Cardinality Mode set to %s.",
+                            cardinality.getMaxCount(), cardinality.getPropertyName(), target.getClass().getName(),
+                            cardinality.getCardinalityMode().name()));
+                }
+            }
+
+            // Add it if we have determined that's allowed.
+            if (addToCollection) {
+                if (!StringUtils.isBlank(cardinality.getAddMethod())) {
+                    invokeAddMethod(target, cardinality.getAddMethod(), toAdd);
+                } else if (!StringUtils.isBlank(cardinality.getPropertyName())) {
+                    addValueToCollection(target, cardinality.getPropertyName(), toAdd);
+                }
+            }
+        } else {
+            throw new FlatwormParserException(String.format("Object %s attempted to be added to Object %s as part of a collection," +
+                            " but the configuration has it configured as a %s Cardinality Mode.",
+                    toAdd.getClass().getName(), target.getClass().getName(), cardinality.getCardinalityMode().name()));
         }
     }
 
@@ -142,5 +209,23 @@ public class ParseUtils {
                     collectionPropertyName, target.getClass().getName(), toAdd.getClass().getName()),
                     e);
         }
+    }
+
+    /**
+     * Attempt to determine the {@link CardinalityMode} based upon the {@code fieldType}. {@code Collection} based classes
+     * and {@code Arrays} will return {@code CardinalityMode.LOOSE} - everything else will return {@code CardinalityMode.SINGLE}.
+     * @param fieldType The field type to evaluate.
+     * @return {@code CardinalityMode.LOOSE} when the {@code fieldType} is a implementation of a {@link Collection} interface or if
+     * {@code fieldType} is an {@code Array}. {@code CardinalityMode.SINGLE} will be returned for all other cases.
+     */
+    public static CardinalityMode resolveCardinality(Class<?> fieldType) {
+        CardinalityMode mode = CardinalityMode.SINGLE;
+        
+        if(fieldType != null && 
+                (Collection.class.isAssignableFrom(fieldType) || fieldType.isArray())) {
+            mode = CardinalityMode.LOOSE;
+        }
+        
+        return mode;
     }
 }

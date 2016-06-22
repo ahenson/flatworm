@@ -14,26 +14,20 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations.beans;
-
-import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
-import com.blackbear.flatworm.annotations.Record;
-
-import lombok.Data;
+package com.blackbear.flatworm.errors;
 
 /**
- * Basic bean for testing the LengthIdentity annotation.
- *
- * @author Alan Henson
+ * The exception thrown when a value is missing or inconsistent values are given
+ * in the configuration file.
  */
-@Data
-@Record(name = "LengthIdentityBean",
-        identity = @DataIdentity(lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                enabled = true
-        )))
-public class LengthIdentityBean {
+
+public class UncheckedFlatwormParserException extends RuntimeException {
+
+    public UncheckedFlatwormParserException(String s) {
+        super(s);
+    }
+
+    public UncheckedFlatwormParserException(String s, Exception e) {
+        super(s, e);
+    }
 }

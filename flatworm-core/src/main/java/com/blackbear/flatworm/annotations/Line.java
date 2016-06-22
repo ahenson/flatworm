@@ -29,11 +29,16 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.FIELD})
 public @interface Line {
-    String id() default "default";
+    int index() default -1;
     String delimiter() default "";
     char quoteCharacter() default '\0';
+    
+    ForProperty forProperty() default @ForProperty(
+            isRecordEndLine = false,
+            identity = @DataIdentity
+    );
     
     Scriptlet beforeParseLine() default @Scriptlet;
     Scriptlet afterParseLine() default @Scriptlet;

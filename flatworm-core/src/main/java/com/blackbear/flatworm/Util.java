@@ -25,17 +25,21 @@ import com.blackbear.flatworm.errors.FlatwormConfigurationException;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -353,27 +357,17 @@ public final class Util {
     }
 
     /**
-     * Load all classes within a given package (recursive) that are annotated by the given {@code annotationClass} parameter.
+     * Load all classes within a given package (recursively searched).
      *
-     * @param packageName     The package name to search - it will be recursively searched.
-     * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
-     * @return The list of classes found annotated by the {@code annotatedClass} parameter.
+     * @param packageName The name of the package to search.
      * @throws FlatwormConfigurationException should parsing the classpath fail.
      */
-    public static List<Class<?>> findRecordAnnotatedClasses(String packageName, Class<? extends Annotation> annotationClass)
-            throws FlatwormConfigurationException {
+    public static List<Class<?>> findClassesInPackage(String packageName) throws FlatwormConfigurationException {
         List<Class<?>> discoveredClasses = new ArrayList<>();
         try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            String path = packageName.replace('.', '/');
-            Enumeration<URL> resources = classLoader.getResources(path);
-            List<File> dirs = new ArrayList<>();
-            while (resources.hasMoreElements()) {
-                URL resource = resources.nextElement();
-                dirs.add(new File(resource.getFile()));
-            }
+            List<File> dirs = findSubpackages(packageName);
             for (File directory : dirs) {
-                findRecordAnnotatedClasses(directory, packageName, annotationClass, discoveredClasses);
+                findRecordAnnotatedClasses(directory, packageName, discoveredClasses, null);
             }
         } catch (FlatwormConfigurationException e) {
             throw e;
@@ -385,27 +379,115 @@ public final class Util {
     }
 
     /**
+     * Load all classes within a given package (recursive) that are annotated by the given {@code annotationClass} parameter.
+     *
+     * @param packageName     The package name to search - it will be recursively searched.
+     * @param annotationClass The {@link Annotation} that a class must be annotated by to be included in the results.
+     * @return The list of classes found annotated by the {@code annotatedClass} parameter.
+     * @throws FlatwormConfigurationException should parsing the classpath fail.
+     */
+    public static List<Class<?>> findRecordAnnotatedClasses(String packageName, Class<? extends Annotation> annotationClass)
+            throws FlatwormConfigurationException {
+        List<Class<?>> discoveredClasses = new ArrayList<>();
+        try {
+            List<File> dirs = findSubpackages(packageName);
+            for (File directory : dirs) {
+                findRecordAnnotatedClasses(directory, packageName, discoveredClasses,
+                        (clazz) -> clazz.isAnnotationPresent(annotationClass));
+            }
+        } catch (FlatwormConfigurationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new FlatwormConfigurationException(e.getMessage(), e);
+        }
+
+        return discoveredClasses;
+    }
+
+    /**
+     * Search to see if the {@code clazz} contains any of the specified annotations.
+     *
+     * @param clazz             The class to search.
+     * @param annotationClasses The {@link Annotation}s to search for.
+     * @return {@code true} if any of the annotations were found and {@code false} if not.
+     */
+    protected static boolean hasAnnotation(Class<?> clazz, List<Class<? extends Annotation>> annotationClasses) {
+        boolean isAnnotated = false;
+        for (Class<? extends Annotation> annotation : annotationClasses) {
+            if (clazz.isAnnotationPresent(annotation)) {
+                isAnnotated = true;
+                break;
+            }
+        }
+        return isAnnotated;
+    }
+
+    /**
+     * Search all {@link Field}s in the given {@code clazz} and see if any are annotated by the specified {@code annotationClasses}.
+     *
+     * @param clazz             The class to search.
+     * @param annotationClasses The {@link Annotation}s to search for.
+     * @return {@code true} if any of the annotations were found and {@code false} if not.
+     */
+    protected static boolean hasAnnotatedField(Class<?> clazz, List<Class<? extends Annotation>> annotationClasses) {
+        boolean isAnnotated = false;
+
+        Field[] fields = clazz.getFields();
+        if (fields != null) {
+            for (Field field : fields) {
+                for (Class<? extends Annotation> annotation : annotationClasses) {
+                    if (field.isAnnotationPresent(annotation)) {
+                        isAnnotated = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return isAnnotated;
+    }
+
+    /**
+     * Find all first-level packages under the given package name.
+     *
+     * @param packageName The root package name.
+     * @return The list of {@link File} instances representing the subpackages found.
+     * @throws IOException should iterating through classloader resources fail for any reason.
+     */
+    protected static List<File> findSubpackages(String packageName) throws IOException {
+        List<File> dirs = new ArrayList<>();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            dirs.add(new File(resource.getFile()));
+        }
+        return dirs;
+    }
+
+    /**
      * For a given {@code directory}, recursively look for all classes that are annotated by the {@code annotationClass} parameter and add
      * them to the {@code classes} list.
      *
-     * @param directory       The directory to search - should be a classpath path.
-     * @param packageName     The name of the package to search.
-     * @param annotationClass The {@link Annotation} the classes most be annotated by to be included in the results.
-     * @param classes         The classes list that will be built up as annotated clases are found.
+     * @param directory   The directory to search - should be a classpath path.
+     * @param packageName The name of the package to search.
+     * @param classes     The classes list that will be built up as annotated classes are found.
+     * @param predicate   A {@link Predicate} that allows for the filtering of what classes will be added.
      * @throws FlatwormConfigurationException should parsing the classpath fail.
      */
-    public static void findRecordAnnotatedClasses(File directory, String packageName, Class<? extends Annotation> annotationClass,
-                                                  List<Class<?>> classes) throws FlatwormConfigurationException {
+    public static void findRecordAnnotatedClasses(File directory, String packageName, List<Class<?>> classes, Predicate<Class<?>> predicate)
+            throws FlatwormConfigurationException {
         try {
             if (directory.exists()) {
                 File[] files = directory.listFiles();
                 if (files != null) {
                     for (File file : files) {
                         if (file.isDirectory() && file.getName().contains(".")) {
-                            findRecordAnnotatedClasses(file, packageName + "." + file.getName(), annotationClass, classes);
+                            findRecordAnnotatedClasses(file, packageName + "." + file.getName(), classes, predicate);
                         } else if (!file.isDirectory() && file.getName().endsWith(".class")) {
                             Class<?> clazz = Class.forName(packageName + "." + file.getName().substring(0, file.getName().length() - 6));
-                            if (clazz.isAnnotationPresent(annotationClass)) {
+                            if (predicate != null && predicate.test(clazz)) {
                                 classes.add(clazz);
                             }
                         }

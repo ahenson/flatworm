@@ -16,8 +16,6 @@
 
 package com.blackbear.flatworm.annotations;
 
-import com.blackbear.flatworm.CardinalityMode;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -36,12 +34,9 @@ public @interface SegmentElement {
 
     int order() default 1;
 
-    String lineId() default "default";
-
-    CardinalityMode cardinalityMode() default CardinalityMode.LOOSE;
-
-    int mintCount() default Integer.MIN_VALUE;
-    int maxCount() default Integer.MAX_VALUE;
-
-    FieldIdentity fieldIdentity() default @FieldIdentity(startPosition = -1, fieldLength = -1, apply = false, matchIdentities = {});
+    int lineIndex() default -1;
+    
+    Cardinality cardinality() default @Cardinality;
+    
+    FieldIdentity fieldIdentity() default @FieldIdentity(startPosition = -1, enabled = false, matchIdentities = {});
 }

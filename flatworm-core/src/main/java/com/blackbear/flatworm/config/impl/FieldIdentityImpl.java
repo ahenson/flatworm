@@ -87,14 +87,42 @@ public class FieldIdentityImpl extends AbstractLineTokenIdentity {
      */
     @Override
     public boolean matchesIdentity(RecordBO record, FileFormat fileFormat, String line) throws FlatwormParserException {
-        if(line == null) return false;
+        return doesMatchIdentity(line);
+    }
+
+    /**
+     * Determine if the given LineBO should be used to parse the line.
+     *
+     * @param line       The {@link LineBO} instance that is a candidate for performing the parsing.
+     * @param fileFormat The {@link FileFormat} instance representing the configuration that is driving the parsing and the last line that
+     *                   was read.
+     * @param dataLine   The line of data to be evaluated.
+     * @return {@code true} the {@code line} of data has the appropriate identity labels (i.e. it matches one of the {@code matchingString}
+     * instances in the spot identified by the {@code startPosition} and is within the length of the {@code fieldLength} specified.
+     * @throws FlatwormParserException should the script engine fail to invoke the script or should the return converterName of the script
+     *                                 not be a {@code boolean} value.
+     */
+    @Override
+    public boolean matchesIdentity(LineBO line, FileFormat fileFormat, String dataLine) throws FlatwormParserException {
+        return doesMatchIdentity(dataLine);
+    }
+
+    /**
+     * Perform the matching logic using the full configuration.
+     *
+     * @param dataLine The data line to test.
+     * @return {@code true} the {@code line} of data has the appropriate identity labels (i.e. it matches one of the {@code matchingString}
+     * instances in the spot identified by the {@code startPosition} and is within the length of the {@code fieldLength} specified.
+     */
+    private boolean doesMatchIdentity(String dataLine) {
+        if (dataLine == null) return false;
 
         boolean matchesLine = false;
-        if (line.length() < startPosition + fieldLength) {
+        if (dataLine.length() < startPosition + fieldLength) {
             matchesLine = false;
         } else {
             for (String matchingString : matchingStrings) {
-                if (line.regionMatches(ignoreCase, startPosition, matchingString, 0, fieldLength)) {
+                if (dataLine.regionMatches(ignoreCase, startPosition, matchingString, 0, fieldLength)) {
                     matchesLine = true;
                     break;
                 }
@@ -152,9 +180,19 @@ public class FieldIdentityImpl extends AbstractLineTokenIdentity {
     @Override
     public boolean matchesIdentity(String token) {
         String tokenToTest = token;
-        if(ignoreCase) {
+        if (ignoreCase) {
             tokenToTest = tokenToTest.toLowerCase();
         }
         return matchingStrings.contains(tokenToTest);
+    }
+
+    @Override
+    public String toString() {
+        return "FieldIdentityImpl{" +
+                "startPosition=" + startPosition +
+                ", fieldLength=" + fieldLength +
+                ", matchingStrings=" + matchingStrings +
+                ", ignoreCase=" + ignoreCase +
+                '}';
     }
 }

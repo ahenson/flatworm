@@ -18,10 +18,14 @@ package com.blackbear.flatworm.config.impl;
 
 import com.blackbear.flatworm.CardinalityMode;
 import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.ParseUtils;
 import com.blackbear.flatworm.Util;
+import com.blackbear.flatworm.annotations.Cardinality;
 import com.blackbear.flatworm.annotations.ConversionOption;
 import com.blackbear.flatworm.annotations.Converter;
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.ForProperty;
 import com.blackbear.flatworm.annotations.LengthIdentity;
 import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.Record;
@@ -31,6 +35,7 @@ import com.blackbear.flatworm.annotations.Scriptlet;
 import com.blackbear.flatworm.annotations.SegmentElement;
 import com.blackbear.flatworm.config.AnnotationConfigurationReader;
 import com.blackbear.flatworm.config.BeanBO;
+import com.blackbear.flatworm.config.CardinalityBO;
 import com.blackbear.flatworm.config.ConfigurationValidator;
 import com.blackbear.flatworm.config.ConversionOptionBO;
 import com.blackbear.flatworm.config.ConverterBO;
@@ -72,7 +77,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfigurationReader {
 
     private Map<String, RecordBO> recordCache;
-    private Map<String, LineBO> lineCache;
+    private Map<Integer, LineBO> lineCache;
     private Deque<LineElementCollection> lineElementDeque;
 
     @Setter
@@ -135,16 +140,16 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
      * and load them accordingly.
      *
      * @param packageNames The collection of package names to search.
-     * @return The {@link FileFormat} instance created from any classes found with the {@link Record}
-     * annotation within the specified packages.
-     * @throws FlatwormConfigurationException should parsing the classpaths cause an issue or if parsing the configuration causes
-     * any issues.
+     * @return The {@link FileFormat} instance created from any classes found with the {@link Record} annotation within the specified
+     * packages.
+     * @throws FlatwormConfigurationException should parsing the classpaths cause an issue or if parsing the configuration causes any
+     *                                        issues.
      */
     @Override
     public FileFormat loadConfigurationByPackageNames(Collection<String> packageNames) throws FlatwormConfigurationException {
         FileFormat fileFormat = null;
         List<Class<?>> recordAnnotatedClasses = Util.findRecordAnnotatedClasses(packageNames, Record.class);
-        if(!recordAnnotatedClasses.isEmpty()) {
+        if (!recordAnnotatedClasses.isEmpty()) {
             fileFormat = loadConfiguration(recordAnnotatedClasses);
         }
         return fileFormat;
@@ -163,7 +168,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     public FileFormat loadConfigurationByPackageName(String packageName) throws FlatwormConfigurationException {
         FileFormat fileFormat = null;
         List<Class<?>> recordAnnotatedClasses = Util.findRecordAnnotatedClasses(packageName, Record.class);
-        if(!recordAnnotatedClasses.isEmpty()) {
+        if (!recordAnnotatedClasses.isEmpty()) {
             fileFormat = loadConfiguration(recordAnnotatedClasses);
         }
         return fileFormat;
@@ -189,12 +194,12 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
 
                 // Record Annotations.
                 if (clazz.isAnnotationPresent(Record.class)) {
-                    recordBO = loadRecord(clazz);
+                    recordBO = loadRecord(clazz.getAnnotation(Record.class));
                     recordCache.put(clazz.getName(), recordBO);
                     fileFormat.addRecord(recordBO);
                 } else if (clazz.isAnnotationPresent(RecordLink.class)) {
                     // See if we have loaded the RecordBO yet - if not, we'll need to try again later.
-                    Class<?> recordClass = loadRecordLinkClass(clazz);
+                    Class<?> recordClass = loadRecordLinkClass(clazz.getAnnotation(RecordLink.class));
                     if (recordCache.containsKey(recordClass.getName())) {
                         recordBO = recordCache.get(recordClass.getName());
                     } else {
@@ -259,63 +264,56 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     }
 
     /**
-     * Get the linked {@link Record} class from the given {@link RecordLink} annotation instance within the {@code clazz} method.
+     * Get the linked {@link Record} class from the given {@link RecordLink} annotation instance.
      *
-     * @param clazz The class from which to load the {@link RecordLink} annotation instance and fetch its linked class.
+     * @param recordLink The {@link RecordLink} annotation instance from which to extract the data.
      * @return The Class instance found in the class parameter of the {@link RecordLink} instance or {@code null} if it wasn't found.
      */
-    public Class<?> loadRecordLinkClass(Class<?> clazz) {
-        Class<?> link = null;
-
-        RecordLink recordLink = clazz.getAnnotation(RecordLink.class);
-        if (recordLink != null) {
-            link = recordLink.recordClass();
-        }
-
-        return link;
+    public Class<?> loadRecordLinkClass(RecordLink recordLink) {
+        return recordLink.recordClass();
     }
 
     /**
      * For the given {@link Class}, load the {@link RecordBO} information if present.
      *
-     * @param clazz The {@link Class} to check for the {@code @RecordBO} annotation.
+     * @param annotatedRecord The {@link Record} instance from which to extract data.
      * @return A {@link RecordBO} instance if the annotation is found and {@code null} if not.
      * @throws FlatwormConfigurationException should any issues occur with parsing the configuration elements within the annotations.
      */
-    public RecordBO loadRecord(Class<?> clazz) throws FlatwormConfigurationException {
+    public RecordBO loadRecord(Record annotatedRecord) throws FlatwormConfigurationException {
         RecordBO record = null;
-        if (clazz != null) {
-            Record annotatedRecord = clazz.getAnnotation(Record.class);
 
-            if (annotatedRecord != null) {
-                record = new RecordBO();
-                record.setRecordDefinition(new RecordDefinitionBO(record));
+        if (annotatedRecord != null) {
+            record = new RecordBO();
+            record.setRecordDefinition(new RecordDefinitionBO(record));
 
-                // Capture the identifying information.
-                record.setName(annotatedRecord.name());
+            // Capture the identifying information.
+            record.setName(annotatedRecord.name());
 
-                // Load the data that is provided.
-                record.setRecordIdentity(loadRecordIdentity(clazz));
+            // Load the data that is provided.
+            record.setRecordIdentity(loadIdentity(annotatedRecord.identity()));
 
-                loadConverters(annotatedRecord);
+            // Load the converters.
+            loadConverters(annotatedRecord);
 
-                // Load the lines.
-                loadLines(record, annotatedRecord);
-                
-                // Load the before and after scriptlets.
-                if(annotatedRecord.beforeReadRecordScript().apply()) {
-                    record.setBeforeScriptlet(loadScriptlet(annotatedRecord.beforeReadRecordScript()));
-                }
-                else {
-                    record.setBeforeScriptlet(null);
-                }
-                
-                if(annotatedRecord.afterReadRecordScript().apply()) {
-                    record.setAfterScriptlet(loadScriptlet(annotatedRecord.afterReadRecordScript()));
-                }
-                else {
-                    record.setAfterScriptlet(null);
-                }
+            // Load the lines.
+            loadLinesFromRecord(record, annotatedRecord);
+
+            fileFormat.setEncoding(annotatedRecord.encoding());
+            
+            // Load the before and after scriptlets.
+            // -- Before
+            if (annotatedRecord.beforeReadRecordScript().enabled()) {
+                record.setBeforeScriptlet(loadScriptlet(annotatedRecord.beforeReadRecordScript()));
+            } else {
+                record.setBeforeScriptlet(null);
+            }
+
+            // -- After
+            if (annotatedRecord.afterReadRecordScript().enabled()) {
+                record.setAfterScriptlet(loadScriptlet(annotatedRecord.afterReadRecordScript()));
+            } else {
+                record.setAfterScriptlet(null);
             }
         }
         return record;
@@ -364,57 +362,87 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
      * @return a {@link List} of {@link Line} instances loaded.
      * @throws FlatwormConfigurationException should parsing the annotation's values fail for any reason.
      */
-    public List<LineBO> loadLines(RecordBO record, Record annotatedRecord) throws FlatwormConfigurationException {
+    public List<LineBO> loadLinesFromRecord(RecordBO record, Record annotatedRecord) throws FlatwormConfigurationException {
         List<LineBO> lines = new ArrayList<>();
         LineBO line;
         for (Line annotatedLine : annotatedRecord.lines()) {
-            line = new LineBO();
-            line.setDelimiter(annotatedLine.delimiter());
-            line.setQuoteChar(annotatedLine.quoteCharacter());
-            line.setId(annotatedLine.id());
+            line = loadLine(annotatedLine);
+
             record.getRecordDefinition().addLine(line);
-            lineCache.put(annotatedLine.id(), line);
-            
-            if(annotatedLine.beforeParseLine().apply()) {
-                line.setBeforeScriptlet(loadScriptlet(annotatedLine.beforeParseLine()));
-            }
-            else {
-                line.setBeforeScriptlet(null);
-            }
-            
-            if(annotatedLine.afterParseLine().apply()) {
-                line.setAfterScriptlet(loadScriptlet(annotatedLine.afterParseLine()));
-            }
-            else {
-                line.setAfterScriptlet(null);
-            }
-            
             lines.add(line);
         }
         return lines;
     }
 
     /**
+     * Create a {@link LineBO} instance from the {@link Line} annotation.
+     *
+     * @param annotatedLine The {@link Line} annotation instance.
+     * @return A contsructed {@link LineBO} instance from the {@link Line} instance.
+     */
+    public LineBO loadLine(Line annotatedLine) throws FlatwormConfigurationException {
+        LineBO line;
+        line = new LineBO();
+        line.setDelimiter(annotatedLine.delimiter());
+        line.setQuoteChar(annotatedLine.quoteCharacter());
+        line.setIndex(annotatedLine.index());
+        lineCache.put(line.getIndex(), line);
+
+        line.setRecordEndLine(annotatedLine.forProperty().isRecordEndLine());
+        
+        line.setLineIdentity(loadIdentity(annotatedLine.forProperty().identity()));
+        
+        // Scriptlets.
+        // -- Before
+        if (annotatedLine.beforeParseLine().enabled()) {
+            line.setBeforeScriptlet(loadScriptlet(annotatedLine.beforeParseLine()));
+        } else {
+            line.setBeforeScriptlet(null);
+        }
+
+        // -- After
+        if (annotatedLine.afterParseLine().enabled()) {
+            line.setAfterScriptlet(loadScriptlet(annotatedLine.afterParseLine()));
+        } else {
+            line.setAfterScriptlet(null);
+        }
+        return line;
+    }
+
+    /**
+     * If the {@link ForProperty} {@code enabled} flag is set to {@code true}, then parse out the contents into the given
+     * {@link LineBO} instance.
+     * @param forProperty The {@link ForProperty} annotation containing the data to be captured.
+     * @param line The {@link LineBO} instance that will be updated with the data if the {@code enabled} flag on the {@code forProperty}
+     *             parameter is {@code true}.
+     * @throws FlatwormConfigurationException should parsing the data fail for any reason.
+     */
+    public void loadForProperty(ForProperty forProperty, LineBO line) throws FlatwormConfigurationException {
+        if(forProperty.enabled()) {
+            line.setRecordEndLine(forProperty.isRecordEndLine());
+            line.setLineIdentity(loadIdentity(forProperty.identity()));
+            line.setCardinality(loadCardinality(forProperty.cardinality()));
+        }
+    }
+    
+    /**
      * Determine which {@link com.blackbear.flatworm.config.Identity} information is present in the {@link Record} annotation and create the
      * corresponding {@link com.blackbear.flatworm.config.Identity} implementation.
      *
-     * @param clazz The clazz to check for the {@link Record} annotation.
+     * @param annotatedIdentity The {@link DataIdentity} annotation instance from which to extract data.
      * @return the {@link Identity} instance loaded.
      * @throws FlatwormConfigurationException should parsing the annotation's values fail for any reason.
      */
-    public Identity loadRecordIdentity(Class<?> clazz) throws FlatwormConfigurationException {
-        Record annotatedRecord = clazz.getAnnotation(Record.class);
+    public Identity loadIdentity(DataIdentity annotatedIdentity) throws FlatwormConfigurationException {
         Identity identity = null;
 
-        fileFormat.setEncoding(annotatedRecord.encoding());
-
         // Load the identities.
-        if (annotatedRecord.lengthIdentity().apply()) {
-            identity = loadLengthIdentity(annotatedRecord.lengthIdentity());
-        } else if (annotatedRecord.fieldIdentity().apply()) {
-            identity = loadFieldIdentity(annotatedRecord.fieldIdentity());
-        } else if (annotatedRecord.scriptIdentity().apply()) {
-            identity = loadScriptIdentity(annotatedRecord.scriptIdentity());
+        if (annotatedIdentity.lengthIdentity().enabled()) {
+            identity = loadLengthIdentity(annotatedIdentity.lengthIdentity());
+        } else if (annotatedIdentity.fieldIdentity().enabled()) {
+            identity = loadFieldIdentity(annotatedIdentity.fieldIdentity());
+        } else if (annotatedIdentity.scriptIdentity().enabled()) {
+            identity = loadScriptIdentity(annotatedIdentity.scriptIdentity());
         }
 
         return identity;
@@ -442,11 +470,18 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
     public FieldIdentityImpl loadFieldIdentity(FieldIdentity annotatedIdentity) {
         FieldIdentityImpl fieldIdentity = new FieldIdentityImpl(annotatedIdentity.ignoreCase());
         fieldIdentity.setStartPosition(annotatedIdentity.startPosition());
-        fieldIdentity.setFieldLength(annotatedIdentity.fieldLength());
 
+        int maxFieldLength = Integer.MIN_VALUE;
+        
         for (String matchIdentity : annotatedIdentity.matchIdentities()) {
             fieldIdentity.addMatchingString(matchIdentity);
+            maxFieldLength = Math.max(maxFieldLength, matchIdentity.length());
         }
+        
+        if(annotatedIdentity.fieldLength() == -1) {
+            fieldIdentity.setFieldLength(maxFieldLength);
+        }
+        
         return fieldIdentity;
     }
 
@@ -471,10 +506,9 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
      */
     public ScriptletBO loadScriptlet(Scriptlet annotatedScriptlet) throws FlatwormConfigurationException {
         ScriptletBO scriptlet = new ScriptletBO(annotatedScriptlet.scriptEngine(), annotatedScriptlet.functionName());
-        if(!StringUtils.isBlank(annotatedScriptlet.script())) {
+        if (!StringUtils.isBlank(annotatedScriptlet.script())) {
             scriptlet.setScript(annotatedScriptlet.script());
-        }
-        else if(!StringUtils.isBlank(annotatedScriptlet.scriptFile())) {
+        } else if (!StringUtils.isBlank(annotatedScriptlet.scriptFile())) {
             scriptlet.setScriptFile(annotatedScriptlet.scriptFile());
         }
         return scriptlet;
@@ -496,6 +530,25 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                 loadRecordElement(record, clazz, field);
             } else if (field.isAnnotationPresent(SegmentElement.class)) {
                 loadSegment(clazz, field);
+            } else if (field.isAnnotationPresent(Line.class)) {
+                Line annotatedLine = field.getAnnotation(Line.class);
+                LineBO line = loadLine(annotatedLine);
+                loadForProperty(annotatedLine.forProperty(), line);
+                
+                Class<?> fieldType = Util.getActualFieldType(field);
+                line.getCardinality().setParentBeanRef(clazz.getName());
+                line.getCardinality().setBeanRef(fieldType.getName());
+                line.getCardinality().setPropertyName(field.getName());
+
+                if(line.getCardinality().getCardinalityMode() == CardinalityMode.AUTO_RESOLVE) {
+                    line.getCardinality().setCardinalityMode(ParseUtils.resolveCardinality(field.getType()));
+                }
+                
+                record.getRecordDefinition().addLine(line);
+                
+                lineElementDeque.add(line);
+                processFieldAnnotations(record, fieldType);
+                lineElementDeque.removeLast();
             }
         }
     }
@@ -514,7 +567,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         RecordElementBO recordElement = new RecordElementBO();
         RecordElement annotatedElement = field.getAnnotation(RecordElement.class);
 
-        LineBO line = lineCache.get(annotatedElement.lineId());
+        LineBO line = lineCache.get(annotatedElement.lineIndex());
         LineElementCollection elementCollection = lineElementDeque.isEmpty() ? line : lineElementDeque.getLast();
 
         try {
@@ -527,8 +580,13 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                 record.getRecordDefinition().addBean(bean);
             }
 
-            recordElement.setBeanRef(clazz.getName() + "." + field.getName());
+            CardinalityBO cardinality = new CardinalityBO();
+            cardinality.setBeanRef(clazz.getName());
+            cardinality.setPropertyName(field.getName());
+            cardinality.setCardinalityMode(CardinalityMode.SINGLE);
+            recordElement.setCardinality(cardinality);
             recordElement.setConverterName(annotatedElement.converterName());
+            
             recordElement.setOrder(annotatedElement.order());
 
             if (annotatedElement.length() != -1) {
@@ -553,8 +611,8 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
             }
         } catch (Exception e) {
             throw new FlatwormConfigurationException(String.format(
-                    "For %s::%s, line with ID %s was specified, but could not be found.",
-                    clazz.getName(), field.getName(), annotatedElement.lineId()));
+                    "For %s::%s, line with index %s was specified, but could not be found.",
+                    clazz.getName(), field.getName(), annotatedElement.lineIndex()));
         }
 
         return recordElement;
@@ -575,7 +633,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         SegmentElementBO segmentElementBO = new SegmentElementBO();
         SegmentElement annotatedElement = field.getAnnotation(SegmentElement.class);
 
-        LineBO line = lineCache.get(annotatedElement.lineId());
+        LineBO line = lineCache.get(annotatedElement.lineIndex());
         LineElementCollection elementCollection = lineElementDeque.isEmpty() ? line : lineElementDeque.getLast();
         elementCollection.addLineElement(segmentElementBO);
 
@@ -589,19 +647,23 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
                 segmentElementBO.setOrder(annotatedElement.order());
                 segmentElementBO.setFieldIdentity(fieldIdentity);
 
-                segmentElementBO.setParentBeanRef(clazz.getName());
-                segmentElementBO.setPropertyName(field.getName());
-                segmentElementBO.setBeanRef(fieldType.getName());
-
+                CardinalityBO cardinality;
                 if (Collection.class.isAssignableFrom(field.getType()) || field.getType().isArray()) {
-                    segmentElementBO.setCardinalityMode(annotatedElement.cardinalityMode());
-                    segmentElementBO.setMinCount(annotatedElement.mintCount());
-                    segmentElementBO.setMaxCount(annotatedElement.maxCount());
+                    segmentElementBO.setCardinality(loadCardinality(annotatedElement.cardinality()));
+                    
                 } else {
                     // This is a singular instance.
-                    segmentElementBO.setCardinalityMode(CardinalityMode.SINGLE);
+                    cardinality = new CardinalityBO();
+                    cardinality.setMinCount(Integer.MIN_VALUE);
+                    cardinality.setMaxCount(Integer.MAX_VALUE);
+                    cardinality.setCardinalityMode(CardinalityMode.SINGLE);
                 }
 
+                cardinality = segmentElementBO.getCardinality();
+                cardinality.setParentBeanRef(clazz.getName());
+                cardinality.setPropertyName(field.getName());
+                cardinality.setBeanRef(fieldType.getName());
+                
                 loadConfiguration(fieldType);
                 lineElementDeque.removeLast();
             } else {
@@ -613,6 +675,20 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         }
 
         return segmentElementBO;
+    }
+
+    /**
+     * Load a {@link CardinalityBO} annotation instance and return it.
+     *
+     * @param annotatedCardinality The {@link Cardinality} annotation instance.
+     * @return The built up {@link CardinalityBO}.
+     */
+    public CardinalityBO loadCardinality(Cardinality annotatedCardinality) {
+        CardinalityBO cardinality = new CardinalityBO();
+        cardinality.setCardinalityMode(annotatedCardinality.cardinalityMode());
+        cardinality.setMinCount(annotatedCardinality.mintCount());
+        cardinality.setMaxCount(annotatedCardinality.maxCount());
+        return cardinality;
     }
 
     /**

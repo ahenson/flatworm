@@ -40,7 +40,7 @@ public @interface RecordElement {
 
     String converterName() default "";
 
-    String lineId() default "default";
+    int lineIndex() default -1;
 
 
     ConversionOption[] conversionOptions() default {};

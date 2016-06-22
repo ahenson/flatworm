@@ -17,6 +17,7 @@
 package com.blackbear.flatworm.annotations.beans;
 
 import com.blackbear.flatworm.annotations.Converter;
+import com.blackbear.flatworm.annotations.DataIdentity;
 import com.blackbear.flatworm.annotations.LengthIdentity;
 import com.blackbear.flatworm.annotations.Record;
 import com.blackbear.flatworm.converters.CoreConverters;
@@ -30,12 +31,12 @@ import lombok.Data;
  */
 @Data
 @Record(name = "ConverterBean",
-        lengthIdentity =
+        identity = @DataIdentity(lengthIdentity =
         @LengthIdentity(
                 minLength = 0,
                 maxLength = 3,
-                apply = true
-        ),
+                enabled = true
+        )),
         converters = {@Converter(name = "test", clazz = CoreConverters.class, methodName = "convertChar", returnType = String.class)}
 )
 public class ConverterBean {

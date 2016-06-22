@@ -197,7 +197,7 @@ public class FileCreator {
                 LineElement lineElement = itRecElements.next();
                 if (lineElement instanceof RecordElementBO) {
                     RecordElementBO recElement = (RecordElementBO) lineElement;
-                    String beanRef = recElement.getBeanRef();
+                    String beanRef = recElement.getCardinality().getBeanRef() + "." + recElement.getCardinality().getPropertyName();
                     String type = recElement.getConverterName();
 
                     if (recElement.getFieldLength() == null) {

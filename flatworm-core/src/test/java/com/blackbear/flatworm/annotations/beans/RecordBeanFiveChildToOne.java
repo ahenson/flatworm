@@ -16,6 +16,10 @@
 
 package com.blackbear.flatworm.annotations.beans;
 
+import com.blackbear.flatworm.annotations.DataIdentity;
+import com.blackbear.flatworm.annotations.FieldIdentity;
+import com.blackbear.flatworm.annotations.ForProperty;
+import com.blackbear.flatworm.annotations.Line;
 import com.blackbear.flatworm.annotations.RecordElement;
 import com.blackbear.flatworm.annotations.RecordLink;
 
@@ -30,9 +34,18 @@ import lombok.Data;
 @RecordLink(recordClass = RecordBeanOne.class)
 public class RecordBeanFiveChildToOne {
 
-    @RecordElement(order = 1, length = 15)
+    @RecordElement
     private String valueOne;
 
-    @RecordElement(order = 2, length = 15)
+    @RecordElement
     private String valueTwo;
+
+    @Line(
+            forProperty = @ForProperty(
+                    enabled = true,
+                    identity = @DataIdentity(
+                            fieldIdentity = @FieldIdentity(startPosition = 0, matchIdentities = {"RB8"}, enabled = true)
+                    ))
+    )
+    private RecordBeanEightChildToFive beanEight;
 }

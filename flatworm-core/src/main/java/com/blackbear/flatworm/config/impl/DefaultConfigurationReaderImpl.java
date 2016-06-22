@@ -22,6 +22,7 @@ import com.blackbear.flatworm.CardinalityMode;
 import com.blackbear.flatworm.FileFormat;
 import com.blackbear.flatworm.Util;
 import com.blackbear.flatworm.config.BeanBO;
+import com.blackbear.flatworm.config.CardinalityBO;
 import com.blackbear.flatworm.config.ConfigurationReader;
 import com.blackbear.flatworm.config.ConfigurationValidator;
 import com.blackbear.flatworm.config.ConversionOptionBO;
@@ -580,7 +581,6 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         // JBL - Determine if this line is delimited
         // Determine value of quote character, default = "
         // These fields are optional
-        line.setId(getAttributeValueNamed(node, "id"));
         line.setDelimiter(getAttributeValueNamed(node, "delimit"));
         line.setQuoteChar(getAttributeValueNamed(node, "quote"));
 
@@ -607,14 +607,8 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
      */
     protected SegmentElementBO readSegmentElement(Node node) throws FlatwormConfigurationException {
         SegmentElementBO segment = new SegmentElementBO();
-        segment.setMinCount(Util.tryParseInt(getAttributeValueNamed(node, "minCount")));
-        segment.setMaxCount(Util.tryParseInt(getAttributeValueNamed(node, "maxCount")));
-        segment.setBeanRef(getAttributeValueNamed(node, "beanref"));
-        segment.setParentBeanRef(getAttributeValueNamed(node, "parent-beanref"));
-        segment.setAddMethod(getAttributeValueNamed(node, "add-method"));
-        segment.setPropertyName(getAttributeValueNamed(node, "property-name"));
 
-        readCardinalityMode(node, segment);
+        segment.setCardinality(readCardinality(node));
 
         Node fieldChild = getChildElementNodeName(node, "field-ident");
         if (fieldChild != null) {
@@ -631,27 +625,37 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
     }
 
     /**
-     * Parse a {@link SegmentElementBO}'s cardinality-mode out of the information found in the given node.
-     *
+     * Parse a {@link CardinalityBO} instance out of the information found in the given node and return it.
      * @param node    The node.
-     * @param segment The {@link SegmentElementBO} instance to populate with the data found.
+     * @return The built up {@link CardinalityBO} instance.                
      */
-    protected void readCardinalityMode(Node node, SegmentElementBO segment) {
+    protected CardinalityBO readCardinality(Node node) {
+        CardinalityBO cardinality = new CardinalityBO();
+        
         String segmentMode = getAttributeValueNamed(node, "cardinality-mode");
+        cardinality.setMinCount(Util.tryParseInt(getAttributeValueNamed(node, "minCount")));
+        cardinality.setMaxCount(Util.tryParseInt(getAttributeValueNamed(node, "maxCount")));
+        
+        cardinality.setBeanRef(getAttributeValueNamed(node, "beanref"));
+        cardinality.setParentBeanRef(getAttributeValueNamed(node, "parent-beanref"));
+        cardinality.setAddMethod(getAttributeValueNamed(node, "add-method"));
+        cardinality.setPropertyName(getAttributeValueNamed(node, "property-name"));
+        
 
         if (!StringUtils.isBlank(segmentMode)) {
             if (segmentMode.toUpperCase().startsWith(CardinalityMode.LOOSE.name())) {
-                segment.setCardinalityMode(CardinalityMode.LOOSE);
+                cardinality.setCardinalityMode(CardinalityMode.LOOSE);
             } else if (segmentMode.toUpperCase().startsWith(CardinalityMode.RESTRICTED.name())) {
-                segment.setCardinalityMode(CardinalityMode.RESTRICTED);
+                cardinality.setCardinalityMode(CardinalityMode.RESTRICTED);
             } else if (segmentMode.toUpperCase().startsWith(CardinalityMode.STRICT.name())) {
-                segment.setCardinalityMode(CardinalityMode.STRICT);
+                cardinality.setCardinalityMode(CardinalityMode.STRICT);
             } else if (segmentMode.toUpperCase().startsWith(CardinalityMode.SINGLE.name())) {
-                segment.setCardinalityMode(CardinalityMode.SINGLE);
+                cardinality.setCardinalityMode(CardinalityMode.SINGLE);
             }
         } else {
-            segment.setCardinalityMode(CardinalityMode.LOOSE);
+            cardinality.setCardinalityMode(CardinalityMode.LOOSE);
         }
+        return cardinality;
     }
 
     /**
@@ -682,7 +686,15 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
             recordElement.setFieldLength(Util.tryParseInt(length.getNodeValue()));
         }
         if (beanref != null) {
-            recordElement.setBeanRef(beanref.getNodeValue());
+            int lastIndex;
+            recordElement.setCardinality(readCardinality(node));
+            recordElement.getCardinality().setCardinalityMode(CardinalityMode.SINGLE);
+            if(!StringUtils.isBlank(recordElement.getCardinality().getBeanRef())
+                    && (lastIndex = recordElement.getCardinality().getBeanRef().lastIndexOf('.')) > -1) {
+                String beanRef = recordElement.getCardinality().getBeanRef();
+                recordElement.getCardinality().setBeanRef(beanRef.substring(0, lastIndex));
+                recordElement.getCardinality().setPropertyName(beanRef.substring(lastIndex + 1));
+            }
         }
         if (converterName != null) {
             recordElement.setConverterName(converterName.getNodeValue());

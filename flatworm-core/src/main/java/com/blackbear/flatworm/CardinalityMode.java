@@ -35,5 +35,11 @@ public enum CardinalityMode {
     /**
      * If the bean isn't a collection but is instead a single child object.
      */
-    SINGLE
+    SINGLE,
+
+    /**
+     * Default value for the annotation approach to instruct the system that the bean should be inspected to auto-resolve
+     * the cardinality. Collections will get a LOOSE setting and single properties will get a SINGLE setting.
+     */
+    AUTO_RESOLVE
 }

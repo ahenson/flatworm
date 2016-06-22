@@ -16,6 +16,9 @@
 
 package com.blackbear.flatworm.config;
 
+import com.blackbear.flatworm.FileFormat;
+import com.blackbear.flatworm.errors.FlatwormParserException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,11 +42,16 @@ public class RecordDefinitionBO {
 
     @Getter
     @Setter
+    private List<LineBO> linesWithIdentities;
+
+    @Getter
+    @Setter
     private RecordBO parentRecord;
 
     public RecordDefinitionBO() {
         this.beans = new HashMap<>();
         this.lines = new ArrayList<>();
+        this.linesWithIdentities = new ArrayList<>();
     }
 
     public RecordDefinitionBO(RecordBO parentRecord) {
@@ -65,14 +73,55 @@ public class RecordDefinitionBO {
     }
 
     public void addLine(LineBO line) {
-        line.setParentRecordDefinition(this);
-        lines.add(line);
+        if (line.getLineIdentity() == null) {
+            line.setParentRecordDefinition(this);
+            
+            if(line.getIndex() == -1) {
+                line.setIndex(lines.size() + 1);
+            }
+            
+            lines.add(line);
+        } else {
+            addLineWithIdentity(line);
+        }
     }
+
+    public void addLineWithIdentity(LineBO line) {
+        if (line.getLineIdentity() != null) {
+            line.setParentRecordDefinition(this);
+            linesWithIdentities.add(line);
+        } else {
+            addLine(line);
+        }
+    }
+
+    /**
+     * Determine if one of the {@code LineBO} instances within this {@link RecordDefinitionBO} matches the given line.
+     *
+     * @param fileFormat the parent {@link FileFormat} instance that contains the master configuration.
+     * @param line       the input line from the file being parsed.
+     * @return {@code true} if the {@link RecordBO} instance identifies the line and can parse it and {@code false} if not.
+     * @throws FlatwormParserException should the matching logic fail for any reason.
+     */
+    public boolean matchesLine(FileFormat fileFormat, String line) throws FlatwormParserException {
+        boolean matchesLine = true;
+        for (LineBO lineBO : lines) {
+            if (lineBO.getLineIdentity() != null) {
+                matchesLine = lineBO.getLineIdentity().matchesIdentity(lineBO, fileFormat, line);
+                if (matchesLine) {
+                    break;
+                }
+            }
+        }
+        return matchesLine;
+    }
+
 
     @Override
     public String toString() {
         return "RecordDefinitionBO{" +
-                "parentRecord=" + parentRecord +
+                "linesCount=" + lines.size() +
+                ", linesWithIdentitiesCount=" + linesWithIdentities.size() +
                 '}';
     }
 }

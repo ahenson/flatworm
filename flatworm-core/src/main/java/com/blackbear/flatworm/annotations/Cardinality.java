@@ -14,26 +14,28 @@
  * and limitations under the License.
  */
 
-package com.blackbear.flatworm.annotations.beans;
+package com.blackbear.flatworm.annotations;
 
-import com.blackbear.flatworm.annotations.DataIdentity;
-import com.blackbear.flatworm.annotations.LengthIdentity;
-import com.blackbear.flatworm.annotations.Record;
+import com.blackbear.flatworm.CardinalityMode;
 
-import lombok.Data;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Basic bean for testing the LengthIdentity annotation.
+ * Provides the ability to configure a Segment Element via annotations vs. the flatworm XML structure.
  *
  * @author Alan Henson
  */
-@Data
-@Record(name = "LengthIdentityBean",
-        identity = @DataIdentity(lengthIdentity =
-        @LengthIdentity(
-                minLength = 0,
-                maxLength = 3,
-                enabled = true
-        )))
-public class LengthIdentityBean {
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD})
+public @interface Cardinality {
+
+    CardinalityMode cardinalityMode() default CardinalityMode.LOOSE;
+
+    int mintCount() default Integer.MIN_VALUE;
+    int maxCount() default Integer.MAX_VALUE;
 }

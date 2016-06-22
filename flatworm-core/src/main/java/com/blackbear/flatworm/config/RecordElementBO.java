@@ -40,7 +40,8 @@ public class RecordElementBO implements LineElement {
     private Integer fieldLength;
 
     @Setter
-    private String beanRef;
+    @Getter
+    private CardinalityBO cardinality;
 
     @Getter
     @Setter
@@ -64,11 +65,6 @@ public class RecordElementBO implements LineElement {
     private Map<String, ConversionOptionBO> conversionOptions;
 
     public RecordElementBO() {
-        fieldEnd = null;
-        fieldStart = null;
-        fieldLength = null;
-        beanRef = null;
-        converterName = null;
         conversionOptions = new HashMap<>();
         ignoreField = false;
     }
@@ -89,11 +85,6 @@ public class RecordElementBO implements LineElement {
         conversionOptions.put(name, option);
     }
 
-    @Override
-    public String getBeanRef() {
-        return beanRef;
-    }
-
     public void setIgnoreField(Boolean ignoreField) {
         if(ignoreField != null) {
             this.ignoreField = ignoreField;
@@ -109,7 +100,7 @@ public class RecordElementBO implements LineElement {
                 "fieldEnd=" + fieldEnd +
                 ", fieldStart=" + fieldStart +
                 ", fieldLength=" + fieldLength +
-                ", beanRef='" + beanRef + '\'' +
+                ", cardinality='" + cardinality + '\'' +
                 ", converterName='" + converterName + '\'' +
                 ", ignoreField=" + ignoreField +
                 '}';

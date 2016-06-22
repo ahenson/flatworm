@@ -1,3 +1,8 @@
 TEST|valueOne|valueTwo|RB2|valueOne2A|valueTwo2A|RB4|valueOne4A|valueTwo4A|RB2|valueOne2B|valueTwo2B|RB3|valueOne3B|valueTwo3B
-valueOne5      valueTwo5      
+valueOne5,valueTwo5
+RB8valueOne8valueTwo8
+RB7valueOne71     valueTwo71     
+RB7valueOne72     valueTwo72     
+RB7valueOne73     valueTwo73     
+RB9|valueOne9|valueTwo9
 valueOne6     valueTwo6     

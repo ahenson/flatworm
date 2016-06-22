@@ -49,7 +49,7 @@
                 <record-element beanref="account.accountNumber" converter-name="char"/>
                 <record-element beanref="account.serviceType" converter-name="char"/>
                 <record-element beanref="account.companyId" converter-name="char"/>
-                <segment-element beanref="consumer" minCount="0" maxCount="5" parent-beanref="account" add-method="addConsumer"
+                <segment-element beanref="consumer" minCount="0" maxCount="5" parent-beanref="account" property-name="consumers" add-method="addConsumer"
                                  cardinality-mode="restricted">
                     <field-ident field-start="0" field-length="2">
                         <match-string>ID</match-string>
@@ -59,7 +59,7 @@
                     <record-element beanref="consumer.firstName" converter-name="char"/>
                     <record-element beanref="consumer.middleName" converter-name="char"/>
                     <record-element beanref="consumer.gender" converter-name="char"/>
-                    <segment-element minCount="0" maxCount="6" parent-beanref="consumer" add-method="addId" beanref="id">
+                    <segment-element minCount="0" maxCount="6" parent-beanref="consumer" property-name="id" add-method="addId" beanref="id">
                         <field-ident field-start="0" field-length="2">
                             <match-string>II</match-string>
                         </field-ident>
@@ -67,7 +67,7 @@
                         <record-element beanref="id.state" converter-name="char"/>
                         <record-element beanref="id.value" converter-name="char"/>
                     </segment-element>
-                    <segment-element minCount="0" maxCount="7" parent-beanref="consumer" add-method="addPhone" beanref="phone">
+                    <segment-element minCount="0" maxCount="7" parent-beanref="consumer" property-name="phone" add-method="addPhone" beanref="phone">
                         <field-ident field-start="0" field-length="2">
                             <match-string>PH</match-string>
                         </field-ident>
@@ -76,7 +76,7 @@
                         <record-element beanref="phone.number" converter-name="char"/>
                     </segment-element>
                 </segment-element>
-                <segment-element minCount="0" maxCount="4" parent-beanref="account" add-method="addAddress" beanref="address">
+                <segment-element minCount="0" maxCount="4" parent-beanref="account" property-name="addresses" add-method="addAddress" beanref="address">
                     <field-ident field-start="0" field-length="2">
                         <match-string>AD</match-string>
                     </field-ident>
