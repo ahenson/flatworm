@@ -154,29 +154,33 @@ public class RecordBO {
                 boolean continueParsing = true;
                 do {
                     lastReadLine = parsedLastReadLine ? in.readLine() : lastReadLine;
-                    Optional<LineBO> matchingLine = linesWithIdentities
-                            .stream()
-                            .filter(line -> {
-                                try {
-                                    return line.getLineIdentity().matchesIdentity(line, parentFileFormat, lastReadLine);
-                                }
-                                catch(FlatwormParserException e) {
-                                    throw new UncheckedFlatwormParserException("Failed to run matchesIdentity on line: " + line, e);
-                                }
-                            })
-                            .findFirst();
-                    if(matchingLine.isPresent()) {
-                        matchingLine.get().parseInput(lastReadLine, beans, conversionHelper, matchingLine.get().getLineIdentity());
-                        addBeanToBean(matchingLine.get(), beans);
-                        parsedLastReadLine = true;
-                        
-                        if(matchingLine.get().getRecordEndLine()) {
-                            continueParsing = false;
+                    if (lastReadLine != null) {
+                        Optional<LineBO> matchingLine = linesWithIdentities
+                                .stream()
+                                .filter(line -> {
+                                    try {
+                                        return line.getLineIdentity().matchesIdentity(line, parentFileFormat, lastReadLine);
+                                    }
+                                    catch(FlatwormParserException e) {
+                                        throw new UncheckedFlatwormParserException("Failed to run matchesIdentity on line: " + line, e);
+                                    }
+                                })
+                                .findFirst();
+                        if(matchingLine.isPresent()) {
+                            matchingLine.get().parseInput(lastReadLine, beans, conversionHelper, matchingLine.get().getLineIdentity());
+                            addBeanToBean(matchingLine.get(), beans);
+                            parsedLastReadLine = true;
+                            
+                            if(matchingLine.get().getRecordEndLine()) {
+                                continueParsing = false;
+                            }
                         }
-                    }
-                    else {
+                        else {
+                            continueParsing = false;
+                            parsedLastReadLine = false;
+                        }
+                    } else {
                         continueParsing = false;
-                        parsedLastReadLine = false;
                     }
                 }
                 while(continueParsing);
