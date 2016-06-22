@@ -122,7 +122,8 @@ public class FieldIdentityImpl extends AbstractLineTokenIdentity {
             matchesLine = false;
         } else {
             for (String matchingString : matchingStrings) {
-                if (dataLine.regionMatches(ignoreCase, startPosition, matchingString, 0, fieldLength)) {
+                int regionLengthMatch = Math.min(fieldLength, matchingString.length());
+                if (dataLine.regionMatches(ignoreCase, startPosition, matchingString, 0, regionLengthMatch)) {
                     matchesLine = true;
                     break;
                 }
