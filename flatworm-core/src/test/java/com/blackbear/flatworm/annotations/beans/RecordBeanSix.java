@@ -34,7 +34,7 @@ import lombok.Data;
         name = "RecordBeanSix",
         lines = {@Line},
         identity = @DataIdentity(lengthIdentity = @LengthIdentity(
-                minLength = 30,
+                minLength = 16,
                 maxLength = 30,
                 enabled = true
         ))
@@ -44,6 +44,6 @@ public class RecordBeanSix {
     @RecordElement(order = 1, length = 15)
     private String valueOne;
 
-    @RecordElement(order = 2, length = 15)
+    @RecordElement(order = 2, length = 15, enforceFieldLength = false)
     private String valueTwo;
 }

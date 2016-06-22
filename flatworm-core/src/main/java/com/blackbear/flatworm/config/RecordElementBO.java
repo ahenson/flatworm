@@ -62,6 +62,11 @@ public class RecordElementBO implements LineElement {
     @Setter
     private boolean trimValue;
     
+    /** Used for when the element is the last on the line and the trailing white space that's required might be missing. */
+    @Getter
+    @Setter
+    private boolean enforceFieldLength;
+    
     // The elements are queried, there are just multiple layers of abstraction that the compiler can't see.
     @Getter
     @Setter

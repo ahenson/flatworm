@@ -201,10 +201,15 @@ public class LineBO extends AbstractLineElementCollection {
                     end = start + recordElement.getFieldLength();
                     charPos = end;
                 }
-                if (end > inputLine.length())
-                    throw new FlatwormParserException("Looking for field " + recordElement.getCardinality().getBeanRef()
-                            + "." + recordElement.getCardinality().getPropertyName()
-                            + " at pos " + start + ", end " + end + ", input length = " + inputLine.length());
+                if (end > inputLine.length()) {
+                    if (recordElement.isEnforceFieldLength()) {
+                        throw new FlatwormParserException("Looking for field " + recordElement.getCardinality().getBeanRef()
+                                + "." + recordElement.getCardinality().getPropertyName()
+                                + " at pos " + start + ", end " + end + ", input length = " + inputLine.length());
+                    } else {
+                        end = charPos = inputLine.length();
+                    }
+                }
                 if (recordElement.getCardinality().getBeanRef() != null) {
                     String fieldChars = inputLine.substring(start, end);
 

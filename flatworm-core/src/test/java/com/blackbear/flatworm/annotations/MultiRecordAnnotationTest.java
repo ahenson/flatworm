@@ -27,6 +27,7 @@ import com.blackbear.flatworm.annotations.beans.RecordBeanSix;
 import com.blackbear.flatworm.annotations.beans.RecordBeanThreeChildToTwo;
 import com.blackbear.flatworm.annotations.beans.RecordBeanTwoChildToOne;
 import com.blackbear.flatworm.config.RecordBO;
+import com.blackbear.flatworm.config.impl.LengthIdentityImpl;
 
 import org.junit.Test;
 
@@ -133,6 +134,19 @@ public class MultiRecordAnnotationTest extends AbstractBaseAnnotationTest {
             // ---------------------------------------------------------
             // Load the next record - which should be RecordBeanSix.
             // ---------------------------------------------------------
+            
+            // Assert that the min/max length was updated by the script.
+            RecordBO recordBO = fileFormat.getRecords().get(1);
+            assertNotNull("Null Record Identity for second Record - RecordBeanSix.", recordBO.getRecordIdentity());
+            assertTrue("Invalid Record Identity for RecordBeanSix", recordBO.getRecordIdentity() instanceof LengthIdentityImpl);
+            LengthIdentityImpl identity = LengthIdentityImpl.class.cast(recordBO.getRecordIdentity());
+            assertEquals("Invalid min-length set on RecordBeanSix after script was run", 28, identity.getMinLength().intValue());
+            assertEquals("Invalid max-length set on RecordBeanSix after script was run", 30, identity.getMaxLength().intValue());
+            
+            Record record = RecordBeanSix.class.getAnnotation(Record.class);
+            identity.setMinLength(record.identity().lengthIdentity().minLength());
+            identity.setMaxLength(record.identity().lengthIdentity().maxLength());
+            
             matchedRecord = fileFormat.nextRecord(bufIn);
             assertNotNull("Null MatchedRecord returned when not expected.", matchedRecord);
             assertEquals("RecordBeanSix", matchedRecord.getRecordName());

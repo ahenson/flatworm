@@ -77,6 +77,7 @@ Work Completed
 * Added support to "optional" lines. Meaning, the parser doesn't "skip" a line if a LineBO has an Identity set for lineIdentity but the line has no data present for a given record.
 * When using the Field Identity, start position is no longer required for Record Elements as it can be auto-derived from the Field Identity's fieldLength property
 * Added ability to instruct the parser to trim the results read for a Record Element.
+* Added ability to instruct the parser to not enforce the last record element to be of a certain length if the line ends - `enforce-field-length = false` in the XML and `enforceFieldLength = false` in the RecordElement annotation.
 
 TODOs
 -------

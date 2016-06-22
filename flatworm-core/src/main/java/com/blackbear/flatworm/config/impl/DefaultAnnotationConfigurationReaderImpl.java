@@ -481,6 +481,9 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         if(annotatedIdentity.fieldLength() == -1) {
             fieldIdentity.setFieldLength(maxFieldLength);
         }
+        else {
+            fieldIdentity.setFieldLength(annotatedIdentity.fieldLength());
+        }
         
         return fieldIdentity;
     }
@@ -582,10 +585,11 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
             cardinality.setPropertyName(field.getName());
             cardinality.setCardinalityMode(CardinalityMode.SINGLE);
             recordElement.setCardinality(cardinality);
-            
+
+            recordElement.setOrder(annotatedElement.order());
             recordElement.setConverterName(annotatedElement.converterName());
             recordElement.setTrimValue(annotatedElement.trimValue());
-            recordElement.setOrder(annotatedElement.order());
+            recordElement.setEnforceFieldLength(annotatedElement.enforceFieldLength());
 
             if (annotatedElement.length() != -1) {
                 recordElement.setFieldLength(annotatedElement.length());
