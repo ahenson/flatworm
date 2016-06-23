@@ -98,7 +98,12 @@ public class RecordBO {
     @Getter
     private String lastReadLine;
 
+    @Getter
+    @Setter
+    private boolean enforceLineLengths;
+    
     public RecordBO() {
+        enforceLineLengths = true;
     }
 
     /**

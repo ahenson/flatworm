@@ -48,6 +48,7 @@ public class AnnotationHierarchyTest extends AbstractBaseAnnotationTest {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream("hierarchy_input.txt")) {
             configLoader.setPerformValidation(true);
             FileFormat fileFormat = configLoader.loadConfiguration(HierarchyHeader.class, HierarchyOne.class);
+            fileFormat.setEnforceLineLengths(false);
 
             validateFileFormat(fileFormat, 2, false);
             RecordBO recordOne = fileFormat.getRecords().get(0);

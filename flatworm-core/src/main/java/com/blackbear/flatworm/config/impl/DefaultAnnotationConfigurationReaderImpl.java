@@ -589,7 +589,6 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
             recordElement.setOrder(annotatedElement.order());
             recordElement.setConverterName(annotatedElement.converterName());
             recordElement.setTrimValue(annotatedElement.trimValue());
-            recordElement.setEnforceFieldLength(annotatedElement.enforceFieldLength());
 
             if (annotatedElement.length() != -1) {
                 recordElement.setFieldLength(annotatedElement.length());

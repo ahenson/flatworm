@@ -31,6 +31,6 @@ public class HierarchyThreeParentTwo {
     @RecordElement(order = 1, length = 8)
     private String propOne;
     
-    @RecordElement(order = 2, length = 8, enforceFieldLength = false)
+    @RecordElement(order = 2, length = 8)
     private String propTwo;
 }

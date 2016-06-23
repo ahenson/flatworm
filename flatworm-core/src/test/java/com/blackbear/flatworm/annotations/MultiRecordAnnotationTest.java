@@ -54,6 +54,7 @@ public class MultiRecordAnnotationTest extends AbstractBaseAnnotationTest {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream("annotation_input.txt")) {
             configLoader.setPerformValidation(true);
             FileFormat fileFormat = configLoader.loadConfiguration(RecordBeanOne.class, RecordBeanSix.class);
+            fileFormat.setEnforceLineLengths(false);
 
             validateFileFormat(fileFormat, 2, false);
             RecordBO recordOne = fileFormat.getRecords().get(0);

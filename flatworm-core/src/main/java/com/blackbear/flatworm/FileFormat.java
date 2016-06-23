@@ -68,11 +68,16 @@ public class FileFormat {
     @Getter
     private RecordBO lastParsingRecord;
 
+    @Getter
+    @Setter
+    private boolean enforceLineLengths;
+    
     public FileFormat() {
         records = new HashMap<>();
         recordOrder = new ArrayList<>();
         currentParsedLine = "";
         lineNumber = 0;
+        enforceLineLengths = true;
 
         // JBL
         conversionHelper = new ConversionHelper();
@@ -149,6 +154,7 @@ public class FileFormat {
             RecordBO record = findMatchingRecord(currentParsedLine);
             if (record != null) {
                 lastParsingRecord = record;
+                record.setEnforceLineLengths(isEnforceLineLengths());
                 if (record.getBeforeScriptlet() != null) {
                     record.getBeforeScriptlet().invokeFunction(this, currentParsedLine);
                 }

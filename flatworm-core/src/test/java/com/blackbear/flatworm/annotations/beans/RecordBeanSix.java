@@ -44,6 +44,6 @@ public class RecordBeanSix {
     @RecordElement(order = 1, length = 15)
     private String valueOne;
 
-    @RecordElement(order = 2, length = 15, enforceFieldLength = false)
+    @RecordElement(order = 2, length = 15)
     private String valueTwo;
 }

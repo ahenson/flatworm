@@ -676,7 +676,6 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         Node converterName = getAttributeNamed(node, "converter-name");
         Node ignoreField = getAttributeNamed(node, "ignore-field");
         Node trimValue = getAttributeNamed(node, "trim-value");
-        Node enforceFieldLength = getAttributeNamed(node, "enforce-field-length");
 
         if (start != null) {
             recordElement.setFieldStart(Util.tryParseInt(start.getNodeValue()));
@@ -706,9 +705,6 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         }
         if(trimValue != null) {
             recordElement.setTrimValue(Util.tryParseBoolean(trimValue.getNodeValue()));
-        }
-        if(enforceFieldLength != null) {
-            recordElement.setEnforceFieldLength(Util.tryParseBoolean(enforceFieldLength.getNodeValue()));
         }
 
         readConversionOptions(node, recordElement);

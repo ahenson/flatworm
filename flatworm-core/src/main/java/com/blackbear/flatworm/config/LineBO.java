@@ -186,6 +186,9 @@ public class LineBO extends AbstractLineElementCollection {
      */
     private int parseInput(String inputLine, List<LineElement> lineElements, int charPos)
             throws FlatwormParserException {
+        
+        boolean enforceLineLengths = getParentRecordDefinition().getParentRecord().isEnforceLineLengths();
+        
         for (LineElement lineElement : lineElements) {
             if (lineElement instanceof RecordElementBO) {
                 RecordElementBO recordElement = (RecordElementBO) lineElement;
@@ -202,7 +205,7 @@ public class LineBO extends AbstractLineElementCollection {
                     charPos = end;
                 }
                 if (end > inputLine.length()) {
-                    if (recordElement.isEnforceFieldLength()) {
+                    if (enforceLineLengths) {
                         throw new FlatwormParserException("Looking for field " + recordElement.getCardinality().getBeanRef()
                                 + "." + recordElement.getCardinality().getPropertyName()
                                 + " at pos " + start + ", end " + end + ", input length = " + inputLine.length());

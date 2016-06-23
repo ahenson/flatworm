@@ -44,7 +44,5 @@ public @interface RecordElement {
 
     boolean trimValue() default true;
     
-    boolean enforceFieldLength() default true;
-
     ConversionOption[] conversionOptions() default {};
 }
