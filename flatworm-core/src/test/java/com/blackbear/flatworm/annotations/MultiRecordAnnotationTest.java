@@ -49,7 +49,7 @@ import static org.junit.Assert.fail;
 public class MultiRecordAnnotationTest extends AbstractBaseAnnotationTest {
 
     @Test
-    public void singleRecordAnnotationValueTest() {
+    public void multiRecordAnnotationValueTest() {
 
         try (InputStream in = getClass().getClassLoader().getResourceAsStream("annotation_input.txt")) {
             configLoader.setPerformValidation(true);
