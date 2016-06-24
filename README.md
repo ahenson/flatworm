@@ -90,6 +90,7 @@ TODOs
 * Add ability for folks to write their own Identity implementations and make them annotation enabled. Right now they would have to build their own annotation configuration loader and extend the relevant parts - which is fine, but this can be done more cleanly I think.
 * Add more verbose logging
 * Is the field-length attribute really needed on Field Identity? We know the length by the matching strings. They should all be the same length else the match will always fail
+* Refactor the concept of start/end records and how LineBO's are used for broader-scale records - meaning, when a LineBO acts more like a record then a line.
 
 [flatworm 3.0.2]: https://github.com/trx/flatworm
 [flatworm 4.0.0-SNAPSHOT]: https://github.com/ahenson/flatworm

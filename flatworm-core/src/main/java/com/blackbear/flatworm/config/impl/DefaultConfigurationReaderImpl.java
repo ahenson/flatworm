@@ -584,6 +584,9 @@ public class DefaultConfigurationReaderImpl implements ConfigurationReader {
         line.setDelimiter(getAttributeValueNamed(node, "delimit"));
         line.setQuoteChar(getAttributeValueNamed(node, "quote"));
 
+        line.setRecordStartLine(Util.tryParseBoolean(getAttributeValueNamed(node, "record-start-line")));
+        line.setRecordEndLine(Util.tryParseBoolean(getAttributeValueNamed(node, "record-end-line")));
+        
         // Before/After Scriptlets.
         line.setBeforeScriptlet(readScriptlet(node, "before-scriptlet"));
         line.setAfterScriptlet(readScriptlet(node, "after-scriptlet"));

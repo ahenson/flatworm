@@ -101,8 +101,8 @@ public class ConversionHelper {
             PropertyDescriptor propDescriptor = PropertyUtils.getPropertyDescriptor(bean, propertyName);
             value = ConverterFunctionCache.convertFromString(propDescriptor.getPropertyType(), fieldChars, options);
         } catch (Exception e) {
-            throw new FlatwormParserException(String.format("Failed to convert and set value %s on bean %s [%s] for property %s.",
-                    fieldChars, beanName, bean.getClass().getName(), propertyName));
+            throw new FlatwormParserException(String.format("Failed to convert and set value '%s' on bean %s [%s] for property %s.",
+                    fieldChars, beanName, bean.getClass().getName(), propertyName), e);
         }
         return value;
     }

@@ -158,28 +158,50 @@ public class RecordBO {
                 do {
                     lastReadLine = parsedLastReadLine ? in.readLine() : lastReadLine;
                     if (lastReadLine != null) {
-                        Optional<LineBO> matchingLine = linesWithIdentities
-                                .stream()
-                                .filter(line -> {
-                                    try {
-                                        return line.getLineIdentity().matchesIdentity(line, parentFileFormat, lastReadLine);
-                                    } catch (FlatwormParserException e) {
-                                        throw new UncheckedFlatwormParserException("Failed to run matchesIdentity on line: " + line, e);
-                                    }
-                                })
-                                .findFirst();
-                        if (matchingLine.isPresent()) {
-                            loadBeanInstances(matchingLine.get(), beans);
-                            matchingLine.get().parseInput(lastReadLine, beans, conversionHelper, matchingLine.get().getLineIdentity());
-                            addBeanToBean(matchingLine.get(), beans);
+                        LineBO line = findMatchingIdentityLine(lastReadLine);
+                        if (line != null) {
+                            loadBeanInstances(line, beans);
+                            line.parseInput(lastReadLine, beans, conversionHelper, line.getLineIdentity());
+                            addBeanToBean(line, beans);
                             parsedLastReadLine = true;
 
-                            if (matchingLine.get().getRecordEndLine()) {
-                                continueParsing = false;
+                            //  If this was the closing record, then we need to make sure the next line is a starting record.
+                            if (line.getRecordEndLine()) {
+                                // See if the next line is the start line for a record.
+                                lastReadLine = in.readLine();
+                                if (lastReadLine != null) {
+                                    parsedLastReadLine = false;
+
+                                    // See if the next line is the beginning of a new record - if not, kick out.
+                                    // If we have non-identity lines, then they constitute the start of a new record.
+                                    // Otherwise, we need to look to see if a matching identity line is labeled as the start record.
+                                    if(!lines.isEmpty()) {
+                                        continueParsing = getParentFileFormat().findMatchingRecord(lastReadLine) == this;
+                                    }
+                                    else {
+                                        line = findMatchingIdentityLine(lastReadLine);
+                                        continueParsing = line != null && line.getRecordStartLine();
+                                    }
+                                }
+                                else {
+                                    continueParsing = false;
+                                }
                             }
                         } else {
-                            continueParsing = false;
-                            parsedLastReadLine = false;
+                            
+                            // Is this an unmatched line that we should ignore, or the start of another record.
+                            if(getParentFileFormat().isIgnoreUnmappedRecords()) {
+                                // It would need to be the start to a record to exit this loop - not just a line that happens
+                                // to match another line - therefore, we are only looking for a matching record that isn't this 
+                                // instance.
+                                RecordBO otherRecord = getParentFileFormat().findMatchingRecord(lastReadLine);
+                                continueParsing = otherRecord == null || otherRecord == this;
+                                parsedLastReadLine = true;
+                            }
+                            else {
+                                continueParsing = false;
+                                parsedLastReadLine = false;
+                            }
                         }
                     } else {
                         continueParsing = false;
@@ -194,6 +216,29 @@ public class RecordBO {
         return beans;
     }
 
+    /**
+     * See if there is a LineBO instance within this record group that can parse the given line of data.
+     * @param lineToEvaluate The line of data to be parsed.
+     * @return A {@link LineBO} instance if one was found within this {@link RecordBO} instance that can parse it and {@code null} if not.
+     */
+    private LineBO findMatchingIdentityLine(String lineToEvaluate) {
+        LineBO matchingLineResult = null;
+        Optional<LineBO> matchingLine = recordDefinition.getLinesWithIdentities()
+                .stream()
+                .filter(line -> {
+                    try {
+                        return line.getLineIdentity().matchesIdentity(line, parentFileFormat, lineToEvaluate);
+                    } catch (FlatwormParserException e) {
+                        throw new UncheckedFlatwormParserException("Failed to run matchesIdentity on line: " + lineToEvaluate, e);
+                    }
+                })
+                .findFirst();
+        if(matchingLine.isPresent()) {
+            matchingLineResult = matchingLine.get(); 
+        }
+        return matchingLineResult;
+    }
+    
     /**
      * If the {@link LineBO} configuration results in the need to add a built out bean to another bean, do it here.
      *

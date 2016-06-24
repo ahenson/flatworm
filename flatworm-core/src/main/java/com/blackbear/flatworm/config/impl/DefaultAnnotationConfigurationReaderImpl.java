@@ -388,6 +388,7 @@ public class DefaultAnnotationConfigurationReaderImpl implements AnnotationConfi
         line.setIndex(annotatedLine.index());
         lineCache.put(line.getIndex(), line);
 
+        line.setRecordStartLine(annotatedLine.forProperty().isRecordStartLine());
         line.setRecordEndLine(annotatedLine.forProperty().isRecordEndLine());
         
         line.setLineIdentity(loadIdentity(annotatedLine.forProperty().identity()));

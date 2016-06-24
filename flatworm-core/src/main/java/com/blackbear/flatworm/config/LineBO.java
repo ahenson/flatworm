@@ -83,6 +83,10 @@ public class LineBO extends AbstractLineElementCollection {
 
     @Getter
     @Setter
+    private Boolean recordStartLine;
+    
+    @Getter
+    @Setter
     private Boolean recordEndLine;
 
     public LineBO() {

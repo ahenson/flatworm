@@ -97,7 +97,7 @@ public class FileFormat {
         return records.get(name);
     }
 
-    private RecordBO findMatchingRecord(String firstLine) throws FlatwormParserException {
+    public RecordBO findMatchingRecord(String firstLine) throws FlatwormParserException {
         RecordBO result = null;
         for (RecordBO record : recordOrder) {
             if (record.matchesLine(this, firstLine)) {

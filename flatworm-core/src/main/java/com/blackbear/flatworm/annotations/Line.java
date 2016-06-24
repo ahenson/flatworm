@@ -36,6 +36,7 @@ public @interface Line {
     char quoteCharacter() default '\0';
     
     ForProperty forProperty() default @ForProperty(
+            isRecordStartLine = false,
             isRecordEndLine = false,
             identity = @DataIdentity
     );

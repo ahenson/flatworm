@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface ForProperty {
     boolean enabled() default false;
+    boolean isRecordStartLine() default false;
     boolean isRecordEndLine() default false;
     DataIdentity identity() default @DataIdentity;
     Cardinality cardinality() default @Cardinality(cardinalityMode = CardinalityMode.AUTO_RESOLVE);
