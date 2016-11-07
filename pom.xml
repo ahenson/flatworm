@@ -96,7 +96,7 @@
     <dependencyManagement>
         <dependencies>
 
-            <!-- Flatwork dependencies -->
+            <!-- Flatworm dependencies -->
             <dependency>
                 <groupId>com.blackbear</groupId>
                 <artifactId>flatworm-core</artifactId>
